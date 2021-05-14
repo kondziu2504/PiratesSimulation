@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/PiratesSimulation.dir/main.cpp.o CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o CMakeFiles/PiratesSimulation.dir/World.cpp.o CMakeFiles/PiratesSimulation.dir/Ship.cpp.o CMakeFiles/PiratesSimulation.dir/Pos.cpp.o -o PiratesSimulation  -lncurses -lpthread 
