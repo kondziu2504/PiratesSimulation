@@ -8,13 +8,15 @@
 #include <cmath>
 #include "Ship.h"
 #include "World.h"
+#include "Mast.h"
 using namespace std;
 
 Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
-    velocity = 0.5f;
+    for(int i = 0; i < 3; i++)
+        masts.push_back(make_shared<Mast>());
 }
 
 Vec2 Ship::GetPos() {
@@ -93,9 +95,15 @@ void Ship::AdjustDirection() {
 }
 
 void Ship::ApplyWind(Vec2 wind) {
-    lock_guard<mutex> guard(pos_mutex);
-    float effectiveness = direction.Dot(wind.Normalized());
-    effectiveness = max(effectiveness, 0.1f);
     float wind_power = wind.Distance();
-    pos = pos + direction * effectiveness * wind_power;
+    float effective_power = 0;
+    for(shared_ptr<Mast> mast : masts){
+        Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
+        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) * mast->GetEfficiency();
+        mast_effectiveness = max(mast_effectiveness, 0.1f);
+        effective_power += wind_power * mast_effectiveness;
+    }
+
+    lock_guard<mutex> guard(pos_mutex);
+    pos = pos + direction * effective_power;
 }

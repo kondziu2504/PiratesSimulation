@@ -9,18 +9,20 @@
 #include "Vec2.h"
 #include <mutex>
 #include <memory>
+#include <vector>
 
+class Mast;
 class World;
 
 class Ship {
 
     Vec2 pos;
     std::shared_ptr<World> world;
+    std::vector<std::shared_ptr<Mast>> masts;
 
     std::mutex pos_mutex;
 
     Vec2 direction;
-    float velocity;
 
     void AdjustDirection();
     [[noreturn]] void UpdateThread();

@@ -142,6 +142,33 @@ PiratesSimulation/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/build
 .PHONY : PiratesSimulation/fast
 
+Mast.o: Mast.cpp.o
+
+.PHONY : Mast.o
+
+# target to build an object file
+Mast.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Mast.cpp.o
+.PHONY : Mast.cpp.o
+
+Mast.i: Mast.cpp.i
+
+.PHONY : Mast.i
+
+# target to preprocess a source file
+Mast.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Mast.cpp.i
+.PHONY : Mast.cpp.i
+
+Mast.s: Mast.cpp.s
+
+.PHONY : Mast.s
+
+# target to generate assembly for a file
+Mast.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Mast.cpp.s
+.PHONY : Mast.cpp.s
+
 Monitor.o: Monitor.cpp.o
 
 .PHONY : Monitor.o
@@ -313,6 +340,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... PiratesSimulation"
+	@echo "... Mast.o"
+	@echo "... Mast.i"
+	@echo "... Mast.s"
 	@echo "... Monitor.o"
 	@echo "... Monitor.i"
 	@echo "... Monitor.s"
