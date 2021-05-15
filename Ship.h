@@ -8,16 +8,24 @@
 
 #include "Pos.h"
 #include <mutex>
+#include <memory>
+
+class World;
 
 class Ship {
+
     Pos pos;
+    std::shared_ptr<World> world;
 
     std::mutex pos_mutex;
 
-public:
-    Ship(Pos pos);
-    Pos GetPos();
 
+    [[noreturn]] void UpdateThread();
+public:
+    Ship(Pos pos, std::shared_ptr<World> world);
+
+    Pos GetPos();
+    void Start();
 };
 
 

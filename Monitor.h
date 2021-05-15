@@ -11,14 +11,13 @@
 #include <ncurses.h>
 
 class Monitor {
-
-    World &world;
+    std::shared_ptr<World> world;
 
     int curr_column = 0, curr_row = 0;
 
-    enum class Tile {kWater = 1, kShip};
+    enum class Tile {kWater = 1, kLand, kShip};
 public:
-    Monitor(const World &world);
+    Monitor(std::shared_ptr<World> world);
 
     void Start();
     void Stop();

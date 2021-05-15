@@ -18,7 +18,7 @@ public:
     std::mutex shipsMutex;
 
 public:
-    World(int width, int height);
+    World(int width, int height, int seed);
     void AddShip(std::shared_ptr<Ship> ship);
 };
 

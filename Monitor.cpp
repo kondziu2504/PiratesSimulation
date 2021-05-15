@@ -10,7 +10,9 @@
 
 using namespace std;
 
-Monitor::Monitor(const World &world) : world(const_cast<World &>(world)) {}
+Monitor::Monitor(shared_ptr<World> world) {
+    this->world = world;
+}
 
 
 void Monitor::Start() {
@@ -45,6 +47,7 @@ void Monitor::Initialize() {
 
     init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
     init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BLUE );
+    init_pair(static_cast<short>(Tile::kLand), COLOR_YELLOW, COLOR_GREEN);
 }
 
 void Monitor::Stop() {
@@ -65,9 +68,12 @@ void Monitor::Update() {
 }
 
 void Monitor::DrawMap() {
-    for(int x = 0; x < world.width; x++){
-        for(int y = 0; y < world.height; y++){
-            DrawTile(y, x, ';', Tile::kWater);
+    for(int x = 0; x < world->width; x++){
+        for(int y = 0; y < world->height; y++){
+            if(world->map[y * world->width + x])
+                DrawTile(y, x, ',', Tile::kLand);
+            else
+                DrawTile(y, x, ';', Tile::kWater);
         }
     }
 }
@@ -89,8 +95,8 @@ void Monitor::DrawShip(shared_ptr<Ship> ship) {
 }
 
 void Monitor::DrawShips() {
-    lock_guard<mutex> guard(world.shipsMutex);
-    for(shared_ptr<Ship> ship : world.ships){
+    lock_guard<mutex> guard(world->shipsMutex);
+    for(shared_ptr<Ship> ship : world->ships){
         DrawShip(ship);
     }
 }

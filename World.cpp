@@ -4,16 +4,36 @@
 
 #include "World.h"
 #include <memory>
+#include "PerlinNoise.hpp"
 
 using namespace std;
 
-World::World(int width, int height) {
-    this->map = make_shared<bool[]>(width * height);
+World::World(int width, int height, int seed) {
+    this->map = shared_ptr<bool[]>(new bool[width * height]);
     this->width = width;
     this->height = height;
+
+    siv::PerlinNoise perlinNoise((double)seed);
+    float noiseFrequency = 0.03;
+    float landThreshold = 0.6f;
+    int border = 1;
+
+    for(int x = 0; x < width; x++){
+        for(int y = 0; y < height; y++){
+            float noiseVal = perlinNoise.normalizedOctaveNoise2D_0_1(
+                    (float)x * noiseFrequency,
+                    (float)y * noiseFrequency,
+                    1);
+            noiseVal = 1 - noiseVal;
+            int ind = y * width + x;
+            map[ind] = noiseVal > landThreshold;
+
+        }
+    }
 }
 
 void World::AddShip(std::shared_ptr<Ship> ship) {
     lock_guard<mutex> guard(shipsMutex);
     ships.push_back(ship);
+    ship->Start();
 }
