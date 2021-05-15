@@ -42,3 +42,15 @@ Vec2 Vec2::Rotate(float angle) {
 float Vec2::Angle() {
     return atan2(this->y, this->x);
 }
+
+Vec2 Vec2::operator-(const Vec2 &b) {
+    return Vec2(this->x - b.x, this->y - b.y);
+}
+
+Vec2 Vec2::FromAngle(float angle) {
+    return Vec2(cos(angle), sin(angle));
+}
+
+float Vec2::Dot(const Vec2 & b) {
+    return this->x * b.x + this->y * b.y;
+}

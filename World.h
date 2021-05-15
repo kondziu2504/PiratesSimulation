@@ -7,8 +7,9 @@
 
 #include <memory>
 #include <vector>
-#include "Ship.h"
 #include <mutex>
+
+class Ship;
 
 class World {
 public:

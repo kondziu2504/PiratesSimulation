@@ -8,6 +8,8 @@
 #include <thread>
 #include <iostream>
 #include <cmath>
+#include "Vec2.h"
+#include "Ship.h"
 
 using namespace std;
 

@@ -14,9 +14,13 @@ struct Vec2 {
     Vec2 Normalized();
     Vec2 Rotate(float angle);
     float Angle();
+    static Vec2 FromAngle(float angle);
+    float Dot(const Vec2 & b);
     Vec2 operator+(const Vec2 & b);
+    Vec2 operator-(const Vec2 & b);
     Vec2 operator*(float b);
     Vec2 operator/(float b);
+
 };
 
 

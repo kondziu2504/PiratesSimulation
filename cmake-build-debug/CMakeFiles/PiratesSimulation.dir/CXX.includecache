@@ -6,20 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp
-ncurses.h
--
-unistd.h
--
-Monitor.h
-/home/konrad/CLionProjects/PiratesSimulation/Monitor.h
-thread
--
-iostream
--
-cmath
--
-
 /home/konrad/CLionProjects/PiratesSimulation/Monitor.h
 memory
 -
@@ -45,8 +31,22 @@ memory
 -
 vector
 -
-Ship.h
-/home/konrad/CLionProjects/PiratesSimulation/Ship.h
 mutex
 -
+
+/home/konrad/CLionProjects/PiratesSimulation/main.cpp
+iostream
+-
+World.h
+/home/konrad/CLionProjects/PiratesSimulation/World.h
+Monitor.h
+/home/konrad/CLionProjects/PiratesSimulation/Monitor.h
+memory
+-
+ncurses.h
+-
+Vec2.h
+/home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+Ship.h
+/home/konrad/CLionProjects/PiratesSimulation/Ship.h
 

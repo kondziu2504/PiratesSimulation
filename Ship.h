@@ -22,6 +22,7 @@ class Ship {
     Vec2 direction;
     float velocity;
 
+    void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
     Ship(Vec2 pos, std::shared_ptr<World> world);

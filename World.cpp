@@ -5,6 +5,7 @@
 #include "World.h"
 #include <memory>
 #include "PerlinNoise.hpp"
+#include "Ship.h"
 
 using namespace std;
 

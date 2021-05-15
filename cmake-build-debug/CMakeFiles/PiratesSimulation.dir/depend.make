@@ -10,6 +10,7 @@ CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../World.h
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Ship.cpp
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Ship.h
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Vec2.h
+CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../World.h
 
 CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o: ../Vec2.cpp
 CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o: ../Vec2.h
