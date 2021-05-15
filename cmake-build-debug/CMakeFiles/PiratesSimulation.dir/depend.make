@@ -14,6 +14,7 @@ CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Pos.h
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Ship.cpp
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Ship.h
 
+CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../PerlinNoise.hpp
 CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../Pos.h
 CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../Ship.h
 CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../World.cpp
