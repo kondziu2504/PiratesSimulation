@@ -94,6 +94,12 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Monitor.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Sailor.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Ship.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>

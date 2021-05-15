@@ -19,6 +19,7 @@ bool Mast::AddOccupant() {
 void Mast::RemoveOccupant() {
     lock_guard<mutex> guard(mast_mutex);
     occupied_slots--;
+    c_var_slot_freed.notify_one();
 }
 
 float Mast::GetEfficiency() {

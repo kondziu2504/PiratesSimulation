@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/konrad/CLionProjects/PiratesSimulation/Mast.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Mast.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o"
+  "/home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Ship.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Ship.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Wind.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Wind.cpp.o"

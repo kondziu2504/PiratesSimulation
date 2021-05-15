@@ -13,6 +13,20 @@ Mast.h
 /home/konrad/CLionProjects/PiratesSimulation/Mast.h
 mutex
 -
+condition_variable
+-
+
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp
+thread
+-
+unistd.h
+-
+Sailor.h
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+random
+-
 
 /home/konrad/CLionProjects/PiratesSimulation/Ship.cpp
 unistd.h

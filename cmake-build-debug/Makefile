@@ -196,6 +196,33 @@ Monitor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Monitor.cpp.s
 .PHONY : Monitor.cpp.s
 
+Sailor.o: Sailor.cpp.o
+
+.PHONY : Sailor.o
+
+# target to build an object file
+Sailor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o
+.PHONY : Sailor.cpp.o
+
+Sailor.i: Sailor.cpp.i
+
+.PHONY : Sailor.i
+
+# target to preprocess a source file
+Sailor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Sailor.cpp.i
+.PHONY : Sailor.cpp.i
+
+Sailor.s: Sailor.cpp.s
+
+.PHONY : Sailor.s
+
+# target to generate assembly for a file
+Sailor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Sailor.cpp.s
+.PHONY : Sailor.cpp.s
+
 Ship.o: Ship.cpp.o
 
 .PHONY : Ship.o
@@ -346,6 +373,9 @@ help:
 	@echo "... Monitor.o"
 	@echo "... Monitor.i"
 	@echo "... Monitor.s"
+	@echo "... Sailor.o"
+	@echo "... Sailor.i"
+	@echo "... Sailor.s"
 	@echo "... Ship.o"
 	@echo "... Ship.i"
 	@echo "... Ship.s"
