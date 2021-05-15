@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
             seed = stoi(argv[1]);
     }catch(invalid_argument ex){}
     shared_ptr<World> world = make_shared<World>(190, 50, seed);
-    world->AddShip(make_shared<Ship>(Pos(3,3), world));
+    world->AddShip(make_shared<Ship>(Vec2(15,15), world));
     Monitor monitor(world);
     monitor.Start();
 

@@ -7,6 +7,7 @@
 #include "Monitor.h"
 #include <thread>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -90,8 +91,31 @@ void Monitor::DrawWorld() {
 }
 
 void Monitor::DrawShip(shared_ptr<Ship> ship) {
-    Pos ship_pos = ship->GetPos();
-    DrawTile(ship_pos.y, ship_pos.x, '#', Tile::kShip);
+    Vec2 ship_pos = ship->GetPos();
+    Vec2 ship_dir = ship->GetDir();
+
+    vector<string> texture = {
+            "TTMMMFF",
+            "TTMMMFF"
+    };
+
+    for(int i = 0; i < texture.size(); i++){
+        for(int j = 0; j < texture[i].length(); j++){
+            if(texture[i][j] != ' '){
+                float length = texture[i].length();
+                float width = texture.size();
+                Vec2 rotatedLocal = Vec2(
+                        j - length / 2,
+                        i - width / 2).Rotate( ship_dir.Angle());
+                DrawTile(
+                        (int)ship_pos.y + rotatedLocal.y,
+                        (int)ship_pos.x + rotatedLocal.x,
+                        texture[i][j], Tile::kShip);
+            }
+        }
+    }
+
+    //DrawTile(ship_pos.y, ship_pos.x, '#', Tile::kShip);
 }
 
 void Monitor::DrawShips() {

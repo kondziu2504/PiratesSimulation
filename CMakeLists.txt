@@ -4,7 +4,7 @@ project(PiratesSimulation)
 set(CMAKE_CXX_STANDARD 17)
 
 
-add_executable(PiratesSimulation main.cpp Monitor.cpp Monitor.h World.cpp World.h Ship.cpp Ship.h Pos.h Pos.cpp)
+add_executable(PiratesSimulation main.cpp Monitor.cpp Monitor.h World.cpp World.h Ship.cpp Ship.h Vec2.h Vec2.cpp)
 target_link_libraries(PiratesSimulation LINK_PUBLIC noise)
 target_link_libraries(PiratesSimulation LINK_PUBLIC ncurses)
 target_link_libraries(PiratesSimulation LINK_PUBLIC pthread)

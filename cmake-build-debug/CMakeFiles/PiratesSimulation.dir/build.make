@@ -128,18 +128,18 @@ CMakeFiles/PiratesSimulation.dir/Ship.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/Ship.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/Ship.cpp -o CMakeFiles/PiratesSimulation.dir/Ship.cpp.s
 
-CMakeFiles/PiratesSimulation.dir/Pos.cpp.o: CMakeFiles/PiratesSimulation.dir/flags.make
-CMakeFiles/PiratesSimulation.dir/Pos.cpp.o: ../Pos.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/PiratesSimulation.dir/Pos.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/PiratesSimulation.dir/Pos.cpp.o -c /home/konrad/CLionProjects/PiratesSimulation/Pos.cpp
+CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o: CMakeFiles/PiratesSimulation.dir/flags.make
+CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o: ../Vec2.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o -c /home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp
 
-CMakeFiles/PiratesSimulation.dir/Pos.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PiratesSimulation.dir/Pos.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/konrad/CLionProjects/PiratesSimulation/Pos.cpp > CMakeFiles/PiratesSimulation.dir/Pos.cpp.i
+CMakeFiles/PiratesSimulation.dir/Vec2.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PiratesSimulation.dir/Vec2.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp > CMakeFiles/PiratesSimulation.dir/Vec2.cpp.i
 
-CMakeFiles/PiratesSimulation.dir/Pos.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/Pos.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/Pos.cpp -o CMakeFiles/PiratesSimulation.dir/Pos.cpp.s
+CMakeFiles/PiratesSimulation.dir/Vec2.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/Vec2.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp -o CMakeFiles/PiratesSimulation.dir/Vec2.cpp.s
 
 # Object files for target PiratesSimulation
 PiratesSimulation_OBJECTS = \
@@ -147,7 +147,7 @@ PiratesSimulation_OBJECTS = \
 "CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o" \
 "CMakeFiles/PiratesSimulation.dir/World.cpp.o" \
 "CMakeFiles/PiratesSimulation.dir/Ship.cpp.o" \
-"CMakeFiles/PiratesSimulation.dir/Pos.cpp.o"
+"CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o"
 
 # External object files for target PiratesSimulation
 PiratesSimulation_EXTERNAL_OBJECTS =
@@ -156,7 +156,7 @@ PiratesSimulation: CMakeFiles/PiratesSimulation.dir/main.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/World.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Ship.cpp.o
-PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Pos.cpp.o
+PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/build.make
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable PiratesSimulation"

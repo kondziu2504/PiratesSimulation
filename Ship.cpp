@@ -8,12 +8,14 @@
 #include "Ship.h"
 using namespace std;
 
-Ship::Ship(Pos pos, shared_ptr<World> world){
+Ship::Ship(Vec2 pos, shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
+    direction = Vec2(5, 2).Normalized();
+    velocity = 0.25f;
 }
 
-Pos Ship::GetPos() {
+Vec2 Ship::GetPos() {
     lock_guard<mutex> guard(pos_mutex);
     return pos;
 }
@@ -27,8 +29,13 @@ void Ship::Start() {
     while(true){
         {
             lock_guard<mutex> guard(pos_mutex);
-            pos = Pos(pos.x + 0.13f, pos.y);
+            pos = pos + direction * velocity;
         }
         usleep(100000);
     }
+}
+
+Vec2 Ship::GetDir() {
+    lock_guard<mutex> guard(pos_mutex);
+    return direction;
 }

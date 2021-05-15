@@ -6,7 +6,7 @@
 #define PIRATESSIMULATION_SHIP_H
 
 
-#include "Pos.h"
+#include "Vec2.h"
 #include <mutex>
 #include <memory>
 
@@ -14,17 +14,20 @@ class World;
 
 class Ship {
 
-    Pos pos;
+    Vec2 pos;
     std::shared_ptr<World> world;
 
     std::mutex pos_mutex;
 
+    Vec2 direction;
+    float velocity;
 
     [[noreturn]] void UpdateThread();
 public:
-    Ship(Pos pos, std::shared_ptr<World> world);
+    Ship(Vec2 pos, std::shared_ptr<World> world);
 
-    Pos GetPos();
+    Vec2 GetPos();
+    Vec2 GetDir();
     void Start();
 };
 

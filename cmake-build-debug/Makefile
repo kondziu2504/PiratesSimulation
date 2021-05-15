@@ -169,33 +169,6 @@ Monitor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Monitor.cpp.s
 .PHONY : Monitor.cpp.s
 
-Pos.o: Pos.cpp.o
-
-.PHONY : Pos.o
-
-# target to build an object file
-Pos.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Pos.cpp.o
-.PHONY : Pos.cpp.o
-
-Pos.i: Pos.cpp.i
-
-.PHONY : Pos.i
-
-# target to preprocess a source file
-Pos.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Pos.cpp.i
-.PHONY : Pos.cpp.i
-
-Pos.s: Pos.cpp.s
-
-.PHONY : Pos.s
-
-# target to generate assembly for a file
-Pos.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Pos.cpp.s
-.PHONY : Pos.cpp.s
-
 Ship.o: Ship.cpp.o
 
 .PHONY : Ship.o
@@ -222,6 +195,33 @@ Ship.s: Ship.cpp.s
 Ship.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Ship.cpp.s
 .PHONY : Ship.cpp.s
+
+Vec2.o: Vec2.cpp.o
+
+.PHONY : Vec2.o
+
+# target to build an object file
+Vec2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o
+.PHONY : Vec2.cpp.o
+
+Vec2.i: Vec2.cpp.i
+
+.PHONY : Vec2.i
+
+# target to preprocess a source file
+Vec2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Vec2.cpp.i
+.PHONY : Vec2.cpp.i
+
+Vec2.s: Vec2.cpp.s
+
+.PHONY : Vec2.s
+
+# target to generate assembly for a file
+Vec2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Vec2.cpp.s
+.PHONY : Vec2.cpp.s
 
 World.o: World.cpp.o
 
@@ -289,12 +289,12 @@ help:
 	@echo "... Monitor.o"
 	@echo "... Monitor.i"
 	@echo "... Monitor.s"
-	@echo "... Pos.o"
-	@echo "... Pos.i"
-	@echo "... Pos.s"
 	@echo "... Ship.o"
 	@echo "... Ship.i"
 	@echo "... Ship.s"
+	@echo "... Vec2.o"
+	@echo "... Vec2.i"
+	@echo "... Vec2.s"
 	@echo "... World.o"
 	@echo "... World.i"
 	@echo "... World.s"

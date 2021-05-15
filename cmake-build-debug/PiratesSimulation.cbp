@@ -88,16 +88,16 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Monitor.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
-		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Pos.cpp">
-			<Option target="PiratesSimulation"/>
-		</Unit>
-		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Pos.h">
-			<Option target="PiratesSimulation"/>
-		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Ship.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Ship.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Vec2.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/World.cpp">
