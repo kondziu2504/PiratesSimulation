@@ -223,6 +223,33 @@ Vec2.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Vec2.cpp.s
 .PHONY : Vec2.cpp.s
 
+Wind.o: Wind.cpp.o
+
+.PHONY : Wind.o
+
+# target to build an object file
+Wind.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Wind.cpp.o
+.PHONY : Wind.cpp.o
+
+Wind.i: Wind.cpp.i
+
+.PHONY : Wind.i
+
+# target to preprocess a source file
+Wind.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Wind.cpp.i
+.PHONY : Wind.cpp.i
+
+Wind.s: Wind.cpp.s
+
+.PHONY : Wind.s
+
+# target to generate assembly for a file
+Wind.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Wind.cpp.s
+.PHONY : Wind.cpp.s
+
 World.o: World.cpp.o
 
 .PHONY : World.o
@@ -295,6 +322,9 @@ help:
 	@echo "... Vec2.o"
 	@echo "... Vec2.i"
 	@echo "... Vec2.s"
+	@echo "... Wind.o"
+	@echo "... Wind.i"
+	@echo "... Wind.s"
 	@echo "... World.o"
 	@echo "... World.i"
 	@echo "... World.s"

@@ -7,6 +7,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Ship.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Ship.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o"
+  "/home/konrad/CLionProjects/PiratesSimulation/Wind.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Wind.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/World.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/World.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/main.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/main.cpp.o"
   )

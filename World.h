@@ -8,14 +8,15 @@
 #include <memory>
 #include <vector>
 #include <mutex>
-
 class Ship;
+class Wind;
 
 class World {
 public:
     int width, height;
     std::shared_ptr<bool[]> map;
     std::vector<std::shared_ptr<Ship>> ships;
+    std::shared_ptr<Wind> wind;
     std::mutex shipsMutex;
 
 public:

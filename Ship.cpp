@@ -10,10 +10,10 @@
 #include "World.h"
 using namespace std;
 
-Ship::Ship(Vec2 pos, shared_ptr<World> world){
+Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
-    direction = Vec2(5, 2).Normalized();
+    this->direction = direction.Normalized();
     velocity = 0.5f;
 }
 
@@ -30,8 +30,7 @@ void Ship::Start() {
 [[noreturn]] void Ship::UpdateThread() {
     while(true){
         {
-            lock_guard<mutex> guard(pos_mutex);
-            pos = pos + direction * velocity;
+            //pos = pos + direction * velocity;
             AdjustDirection();
         }
         usleep(100000);
@@ -56,13 +55,33 @@ void Ship::AdjustDirection() {
             bool tileOutsideWorld = scannedTile.x < 0 || scannedTile.x >= world->width ||
                     scannedTile.y < 0 || scannedTile.y > world->height;
             if(world->map[scannedTile.y * world->width + scannedTile.x] || tileOutsideWorld){
-                Vec2 correction_dir = (pos - scannedTile).Normalized();
-                float significance = (float)(scan_dist - i) / scan_dist;
-                closest_tile = min(closest_tile, i);
-                totalCorrection = totalCorrection + correction_dir * significance;
+                if(!(pos - scannedTile).Distance() == 0){
+                    Vec2 correction_dir = (pos - scannedTile).Normalized();
+                    float significance = (float)(scan_dist - i) / scan_dist;
+                    closest_tile = min(closest_tile, i);
+                    totalCorrection = totalCorrection + correction_dir * significance;
+                }
             }
         }
     }
+    {
+        lock_guard<mutex> guard(world->shipsMutex);
+        for(shared_ptr<Ship> ship : world->ships){
+            if(&(*ship) != &(*this)){
+                Vec2 ship_pos = ship->GetPos();
+                float dist = (pos - ship_pos).Distance();
+                if(dist < scan_dist && dist > 0){
+                    Vec2 correction_dir = (pos - ship_pos).Normalized();
+                    float significance = (float)(scan_dist - dist) / scan_dist;
+                    closest_tile = min(closest_tile, (int)dist);
+                    totalCorrection = totalCorrection + correction_dir * significance;
+                }
+            }
+        }
+    }
+
+
+
     if(totalCorrection.Distance() != 0){
         Vec2 normalizedCorrection = totalCorrection.Normalized();
         float correctionSignificance = (float)(scan_dist - closest_tile) / scan_dist;
@@ -71,4 +90,12 @@ void Ship::AdjustDirection() {
         direction = direction + normalizedCorrection * correctionSignificance;
         direction = direction.Normalized();
     }
+}
+
+void Ship::ApplyWind(Vec2 wind) {
+    lock_guard<mutex> guard(pos_mutex);
+    float effectiveness = direction.Dot(wind.Normalized());
+    effectiveness = max(effectiveness, 0.1f);
+    float wind_power = wind.Distance();
+    pos = pos + direction * effectiveness * wind_power;
 }

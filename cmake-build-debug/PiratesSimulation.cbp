@@ -100,6 +100,12 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Vec2.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Wind.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Wind.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/World.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>

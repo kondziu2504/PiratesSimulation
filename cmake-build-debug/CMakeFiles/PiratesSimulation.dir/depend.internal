@@ -15,10 +15,17 @@ CMakeFiles/PiratesSimulation.dir/Ship.cpp.o
 CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+CMakeFiles/PiratesSimulation.dir/Wind.cpp.o
+ /home/konrad/CLionProjects/PiratesSimulation/Ship.h
+ /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+ /home/konrad/CLionProjects/PiratesSimulation/Wind.cpp
+ /home/konrad/CLionProjects/PiratesSimulation/Wind.h
+ /home/konrad/CLionProjects/PiratesSimulation/World.h
 CMakeFiles/PiratesSimulation.dir/World.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/PerlinNoise.hpp
  /home/konrad/CLionProjects/PiratesSimulation/Ship.h
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+ /home/konrad/CLionProjects/PiratesSimulation/Wind.h
  /home/konrad/CLionProjects/PiratesSimulation/World.cpp
  /home/konrad/CLionProjects/PiratesSimulation/World.h
 CMakeFiles/PiratesSimulation.dir/main.cpp.o

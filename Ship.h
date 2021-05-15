@@ -25,8 +25,8 @@ class Ship {
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
-    Ship(Vec2 pos, std::shared_ptr<World> world);
-
+    Ship(Vec2 pos, Vec2 direction, std::shared_ptr<World> world);
+    void ApplyWind(Vec2 wind);
     Vec2 GetPos();
     Vec2 GetDir();
     void Start();

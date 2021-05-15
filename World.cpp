@@ -6,6 +6,7 @@
 #include <memory>
 #include "PerlinNoise.hpp"
 #include "Ship.h"
+#include "Wind.h"
 
 using namespace std;
 
@@ -13,6 +14,8 @@ World::World(int width, int height, int seed) {
     this->map = shared_ptr<bool[]>(new bool[width * height]);
     this->width = width;
     this->height = height;
+    this->wind = make_shared<Wind>(this);
+    wind->Start();
 
     siv::PerlinNoise perlinNoise((double)seed);
     float noiseFrequency = 0.03;
