@@ -10,6 +10,9 @@
 #include <cmath>
 #include "Vec2.h"
 #include "Ship.h"
+#include "Sailor.h"
+#include "MastDistributor.h"
+#include "Mast.h"
 
 using namespace std;
 
@@ -21,7 +24,10 @@ Monitor::Monitor(shared_ptr<World> world) {
 void Monitor::Start() {
     Initialize();
     thread monitorThread(&Monitor::UpdateThread, this);
-    monitorThread.detach();
+    //monitorThread.detach();
+    thread inputThread(&Monitor::InputThread, this);
+    inputThread.detach();
+    monitorThread.join();
 }
 
 void Monitor::Initialize() {
@@ -58,7 +64,14 @@ void Monitor::Stop() {
 }
 
 void Monitor::Update() {
-    DrawWorld();
+    clear();
+    {
+        lock_guard<mutex> guard(display_mode_mutex);
+        if(display_mode == MonitorDisplayMode::kMap){
+            DrawWorld();
+        }else
+            DrawDashboard();
+    }
     refresh();
 }
 
@@ -124,5 +137,66 @@ void Monitor::DrawShips() {
     lock_guard<mutex> guard(world->shipsMutex);
     for(shared_ptr<Ship> ship : world->ships){
         DrawShip(ship);
+    }
+}
+
+void Monitor::DrawDashboard() {
+    int ship_index = 0;
+    int line = 0;
+    int indentation = 0;
+    for(auto ship : world->ships){
+        indentation = 0;
+        string header = "Statek " + to_string(ship_index);
+        mvaddstr(line++, 0, header.c_str());
+        indentation += 2;
+        mvaddstr(line++, indentation, "Marynarze:");
+        {
+            indentation += 2;
+            int sailor_index = 0;
+            lock_guard<mutex> guard(ship->sailors_mutex);
+            for(auto sailor : *ship->sailors){
+                string state_text = "";
+                switch (sailor->GetState()) {
+                    case SailorState::kResting:
+                        state_text = "Odpoczywa";
+                        break;
+                    case SailorState::kMast:
+                        state_text = "Obsluguje maszt";
+                        break;
+                }
+                string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
+                mvaddstr(line++, indentation, sailor_text.c_str());
+                sailor_index++;
+            }
+        }
+        indentation -= 2;
+        mvaddstr(line++, indentation, "Maszty:");
+        int mast_index = 0;
+        indentation += 2;
+        for(auto mast_owners_pair : *ship->distributor->masts_owners){
+            bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
+            string mast_text =
+                    "Maszt " + to_string(mast_index) +
+                    " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
+                    " " + (max_owners ? "(max)" : "");
+            mvaddstr(line++, indentation, mast_text.c_str());
+            mast_index++;
+        }
+        indentation -= 2;
+
+        ship_index++;
+    }
+}
+
+[[noreturn]] void Monitor::InputThread() {
+    while(true){
+        char key = getchar();
+        if(key == ' '){
+             lock_guard<mutex> guard(display_mode_mutex);
+            if(display_mode == MonitorDisplayMode::kMap)
+                display_mode = MonitorDisplayMode::kDashboard;
+            else
+                display_mode = MonitorDisplayMode::kMap;
+        }
     }
 }

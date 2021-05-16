@@ -10,9 +10,12 @@
 #include <pthread.h>
 #include <ncurses.h>
 
+enum class MonitorDisplayMode {kMap, kDashboard};
+
 class Monitor {
     std::shared_ptr<World> world;
-
+    MonitorDisplayMode display_mode = MonitorDisplayMode::kMap;
+    std::mutex display_mode_mutex;
     int curr_column = 0, curr_row = 0;
 
     enum class Tile {kWater = 1, kLand, kShip};
@@ -29,6 +32,9 @@ private:
     void DrawShip(std::shared_ptr<Ship>);
     void DrawMap();
     void DrawTile(int y, int x, char ch, Tile tile);
+    void DrawDashboard();
+
+    [[noreturn]] void InputThread();
 
 
     [[noreturn]] void UpdateThread();

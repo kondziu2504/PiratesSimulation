@@ -22,7 +22,7 @@ Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
         masts->push_back(make_shared<Mast>());
     distributor = make_shared<MastDistributor>(masts);
     sailors = make_shared<vector<shared_ptr<Sailor>>>();
-    for(int i = 0; i < 24; i++){
+    for(int i = 0; i < 7; i++){
         shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
         sailor->Start();
         sailors->push_back(sailor);

@@ -22,11 +22,12 @@ class Ship {
     std::shared_ptr<World> world;
     std::mutex pos_mutex;
     Vec2 direction;
-    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
 
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
+    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
+    std::mutex sailors_mutex;
     std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
     std::shared_ptr<MastDistributor> distributor;
 

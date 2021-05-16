@@ -20,8 +20,10 @@ void Sailor::Start() {
     while(true){
         usleep(1000000);
         shared_ptr<Mast> occupied_mast = ship->distributor->RequestMast(this);
+        SetState(SailorState::kMast);
         usleep(1000000);
         ship->distributor->ReleaseMast(occupied_mast, this);
+        SetState(SailorState::kResting);
     }
 }
 
@@ -32,4 +34,14 @@ void Sailor::GoRest() {
 
 Sailor::Sailor(Ship * ship) {
     this->ship = ship;
+}
+
+SailorState Sailor::GetState() {
+    lock_guard<mutex> guard(sailor_mutex);
+    return currentState;
+}
+
+void Sailor::SetState(SailorState new_state) {
+    lock_guard<mutex> guard(sailor_mutex);
+    currentState = new_state;
 }

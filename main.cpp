@@ -26,8 +26,7 @@ int main(int argc, char *argv[]) {
     Monitor monitor(world);
     monitor.Start();
 
-    getchar();
-    int g = 0;
+    //while(getchar() != 27);
 
     endwin();
     return 0;
