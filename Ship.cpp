@@ -9,14 +9,24 @@
 #include "Ship.h"
 #include "World.h"
 #include "Mast.h"
+#include "MastDistributor.h"
+#include "Sailor.h"
 using namespace std;
 
 Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
+    masts = make_shared<vector<shared_ptr<Mast>>>();
     for(int i = 0; i < 3; i++)
-        masts.push_back(make_shared<Mast>());
+        masts->push_back(make_shared<Mast>());
+    distributor = make_shared<MastDistributor>(masts);
+    sailors = make_shared<vector<shared_ptr<Sailor>>>();
+    for(int i = 0; i < 3; i++){
+        shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
+        sailor->Start();
+        sailors->push_back(sailor);
+    }
 }
 
 Vec2 Ship::GetPos() {
@@ -97,13 +107,13 @@ void Ship::AdjustDirection() {
 void Ship::ApplyWind(Vec2 wind) {
     float wind_power = wind.Distance();
     float effective_power = 0;
-    for(shared_ptr<Mast> mast : masts){
+    for(shared_ptr<Mast> mast : *masts){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
-        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) * mast->GetEfficiency();
-        mast_effectiveness = max(mast_effectiveness, 0.1f);
+        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) * distributor->OccupiedMasts() / 6.f;
         effective_power += wind_power * mast_effectiveness;
     }
 
+    effective_power = max(effective_power, 0.2f);
     lock_guard<mutex> guard(pos_mutex);
     pos = pos + direction * effective_power;
 }

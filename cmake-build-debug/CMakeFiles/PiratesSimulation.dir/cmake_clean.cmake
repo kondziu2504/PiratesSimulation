@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/PiratesSimulation.dir/Mast.cpp.o"
+  "CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o"
   "CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o"
   "CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o"
   "CMakeFiles/PiratesSimulation.dir/Ship.cpp.o"

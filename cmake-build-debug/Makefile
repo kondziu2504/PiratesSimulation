@@ -169,6 +169,33 @@ Mast.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Mast.cpp.s
 .PHONY : Mast.cpp.s
 
+MastDistributor.o: MastDistributor.cpp.o
+
+.PHONY : MastDistributor.o
+
+# target to build an object file
+MastDistributor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o
+.PHONY : MastDistributor.cpp.o
+
+MastDistributor.i: MastDistributor.cpp.i
+
+.PHONY : MastDistributor.i
+
+# target to preprocess a source file
+MastDistributor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.i
+.PHONY : MastDistributor.cpp.i
+
+MastDistributor.s: MastDistributor.cpp.s
+
+.PHONY : MastDistributor.s
+
+# target to generate assembly for a file
+MastDistributor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.s
+.PHONY : MastDistributor.cpp.s
+
 Monitor.o: Monitor.cpp.o
 
 .PHONY : Monitor.o
@@ -370,6 +397,9 @@ help:
 	@echo "... Mast.o"
 	@echo "... Mast.i"
 	@echo "... Mast.s"
+	@echo "... MastDistributor.o"
+	@echo "... MastDistributor.i"
+	@echo "... MastDistributor.s"
 	@echo "... Monitor.o"
 	@echo "... Monitor.i"
 	@echo "... Monitor.s"

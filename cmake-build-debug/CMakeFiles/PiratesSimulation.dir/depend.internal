@@ -4,6 +4,10 @@
 CMakeFiles/PiratesSimulation.dir/Mast.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Mast.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Mast.h
+CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o
+ /home/konrad/CLionProjects/PiratesSimulation/Mast.h
+ /home/konrad/CLionProjects/PiratesSimulation/MastDistributor.cpp
+ /home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Monitor.h
@@ -11,10 +15,16 @@ CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
  /home/konrad/CLionProjects/PiratesSimulation/World.h
 CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o
+ /home/konrad/CLionProjects/PiratesSimulation/Mast.h
+ /home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h
  /home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+ /home/konrad/CLionProjects/PiratesSimulation/Ship.h
+ /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Mast.h
+ /home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h
+ /home/konrad/CLionProjects/PiratesSimulation/Sailor.h
  /home/konrad/CLionProjects/PiratesSimulation/Ship.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Ship.h
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.h

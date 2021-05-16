@@ -88,6 +88,12 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Mast.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/MastDistributor.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>

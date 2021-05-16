@@ -6,23 +6,23 @@
 
 #IncludeRegexTransform: 
 
-/home/konrad/CLionProjects/PiratesSimulation/Mast.cpp
-Mast.h
-/home/konrad/CLionProjects/PiratesSimulation/Mast.h
-
 /home/konrad/CLionProjects/PiratesSimulation/Mast.h
 mutex
 -
 condition_variable
 -
 
-/home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp
-thread
+/home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h
+memory
 -
-unistd.h
+vector
 -
-Sailor.h
-/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+mutex
+-
+queue
+-
+condition_variable
+-
 
 /home/konrad/CLionProjects/PiratesSimulation/Sailor.h
 random
@@ -43,6 +43,10 @@ World.h
 /home/konrad/CLionProjects/PiratesSimulation/World.h
 Mast.h
 /home/konrad/CLionProjects/PiratesSimulation/Mast.h
+MastDistributor.h
+/home/konrad/CLionProjects/PiratesSimulation/MastDistributor.h
+Sailor.h
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
 
 /home/konrad/CLionProjects/PiratesSimulation/Ship.h
 Vec2.h

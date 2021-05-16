@@ -15,13 +15,13 @@ class Sailor {
     std::uniform_real_distribution<double> distribution = std::uniform_real_distribution(4.0, 6.0);
 
     SailorState currentState = SailorState::kResting;
-    std::shared_ptr<Ship> ship;
+    Ship * ship;
 
     [[noreturn]] void ThreadFun();
     void GoOperateMast();
     void GoRest();
 public:
-    Sailor(std::shared_ptr<Ship> ship);
+    explicit Sailor(Ship * ship);
     void Start();
 };
 

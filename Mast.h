@@ -8,20 +8,14 @@
 
 #include <mutex>
 #include <condition_variable>
+class MastDistributor;
 
 class Mast {
     int max_slots = 4;
-    int occupied_slots = 0;
     float angle = 0.f;
-
 
     std::mutex mast_mutex;
 public:
-    std::condition_variable c_var_slot_freed;
-
-    bool AddOccupant();
-    void RemoveOccupant();
-    float GetEfficiency();
     float GetAngle();
     void SetAngle(float angle);
 };
