@@ -16,6 +16,7 @@ class Mast {
 
     std::mutex mast_mutex;
 public:
+    float GetMaxSlots();
     float GetAngle();
     void SetAngle(float angle);
 };

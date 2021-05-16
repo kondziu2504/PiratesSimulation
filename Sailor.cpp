@@ -19,16 +19,12 @@ void Sailor::Start() {
 [[noreturn]] void Sailor::ThreadFun() {
     while(true){
         usleep(1000000);
-        shared_ptr<Mast> occupied_mast = ship->distributor->RequestMast();
+        shared_ptr<Mast> occupied_mast = ship->distributor->RequestMast(this);
         usleep(1000000);
-        ship->distributor->ReleaseMast(occupied_mast);
+        ship->distributor->ReleaseMast(occupied_mast, this);
     }
 }
 
-void Sailor::GoOperateMast() {
-    usleep(1000000);
-    ship->distributor->RequestMast();
-}
 
 void Sailor::GoRest() {
 

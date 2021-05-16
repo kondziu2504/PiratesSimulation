@@ -15,3 +15,7 @@ void Mast::SetAngle(float angle) {
     lock_guard<mutex> guard(mast_mutex);
     this->angle = angle;
 }
+
+float Mast::GetMaxSlots() {
+    return max_slots;
+}

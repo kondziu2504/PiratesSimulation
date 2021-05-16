@@ -7,6 +7,7 @@ CMakeFiles/PiratesSimulation.dir/Mast.cpp.o: ../Mast.h
 CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../Mast.h
 CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../MastDistributor.cpp
 CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../MastDistributor.h
+CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../Sailor.h
 
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../Monitor.cpp
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../Monitor.h
