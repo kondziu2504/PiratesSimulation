@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
     int seed = 1;
-    int world_width = 160, world_height = 70;
+    int world_width = 130, world_height = 60;
     try{
         if(argc > 1)
             seed = stoi(argv[1]);

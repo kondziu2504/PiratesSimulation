@@ -25,6 +25,8 @@ class Ship {
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
+    std::shared_ptr<std::mutex> stairs_mutex;
+
     std::shared_ptr<World> world;
     std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
     std::mutex sailors_mutex;

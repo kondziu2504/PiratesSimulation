@@ -21,14 +21,14 @@ using sp = std::shared_ptr<T>;
 class MastDistributor {
     std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
 
-    std::mutex free_masts_mutex;
+
     std::condition_variable c_var_mast_freed;
     sp<Mast> FindFreeMast();
 
 public:
+    std::mutex free_masts_mutex;
     sp<std::map<sp<Mast>, sp<std::vector<Sailor*>>>> masts_owners;
     explicit MastDistributor(std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts);
-    void NotifySlotFreed(std::shared_ptr<Mast> mast);
     std::shared_ptr<Mast> RequestMast(Sailor * sailor);
     void ReleaseMast(std::shared_ptr<Mast>, Sailor * sailor);
     int OccupiedMasts();

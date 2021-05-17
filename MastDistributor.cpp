@@ -16,10 +16,6 @@ MastDistributor::MastDistributor(std::shared_ptr<std::vector<std::shared_ptr<Mas
     }
 }
 
-void MastDistributor::NotifySlotFreed(std::shared_ptr<Mast> mast) {
-
-}
-
 shared_ptr<Mast> MastDistributor::RequestMast(Sailor * sailor) {
     unique_lock<mutex> lock(free_masts_mutex);
     shared_ptr<Mast> target_mast = FindFreeMast();;
@@ -43,15 +39,17 @@ int MastDistributor::OccupiedMasts() {
 }
 
 void MastDistributor::ReleaseMast(std::shared_ptr<Mast> mast, Sailor * sailor) {
-    lock_guard<mutex> guard(free_masts_mutex);
-    auto owners = masts_owners->at(mast);
-    auto it = owners->begin();
-    while(it != owners->end()){
-        if(*it == sailor){
-            owners->erase(it);
-            break;
-        }else{
-            ++it;
+    {
+        lock_guard<mutex> guard(free_masts_mutex);
+        auto owners = masts_owners->at(mast);
+        auto it = owners->begin();
+        while(it != owners->end()){
+            if(*it == sailor){
+                owners->erase(it);
+                break;
+            }else{
+                ++it;
+            }
         }
     }
     c_var_mast_freed.notify_one();

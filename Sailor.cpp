@@ -24,6 +24,7 @@ void Sailor::Start() {
         GoWaitForMast();
         GoOperateMast();
         GoRest();
+        GoUseStairs();
     }
 }
 
@@ -142,4 +143,37 @@ std::shared_ptr<void> Sailor::GetPreviousTarget() {
 std::shared_ptr<void> Sailor::GetNextTarget() {
     lock_guard<mutex> guard(target_mutex);
     return next_target;
+}
+
+void Sailor::UseStairs() {
+    SetState(SailorState::kWaitingStairs);
+    lock_guard<mutex> guard(*ship->stairs_mutex);
+    SetState(SailorState::kStairs);
+    for(int i = 0; i < 10; i++){
+        SetProgress((float)i / 9);
+        usleep(100000);
+    }
+    {
+        lock_guard<mutex> guard(sailor_mutex);
+        upper_deck = !upper_deck;
+    }
+    SetState(SailorState::kStanding);
+}
+
+void Sailor::GoUseStairs() {
+    SetState(SailorState::kWalking);
+    next_target = ship->stairs_mutex;
+    for(int i = 0; i < 10; i++){
+        SetProgress((float)i / 9);
+        usleep(100000);
+    }
+    previous_target = next_target;
+    SetState(SailorState::kStanding);
+
+    UseStairs();
+}
+
+bool Sailor::IsUpperDeck() {
+    lock_guard<mutex> guard(sailor_mutex);
+    return upper_deck;
 }

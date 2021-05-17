@@ -17,6 +17,7 @@ Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
+    stairs_mutex = make_shared<mutex>();
     masts = make_shared<vector<shared_ptr<Mast>>>();
     for(int i = 0; i < 3; i++)
         masts->push_back(make_shared<Mast>());
@@ -109,7 +110,7 @@ void Ship::ApplyWind(Vec2 wind) {
     float effective_power = 0;
     for(shared_ptr<Mast> mast : *masts){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
-        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) * distributor->OccupiedMasts() / 6.f;
+        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized());
         effective_power += wind_power * mast_effectiveness;
     }
 

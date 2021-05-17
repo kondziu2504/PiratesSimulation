@@ -29,7 +29,7 @@ class Monitor {
     sp<std::unordered_set<sp<Ship>>> visualized_ships;
     sp<std::unordered_map<sp<void>, Vec2>> elements_positions;
 
-    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor};
+    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs};
 public:
     Monitor(std::shared_ptr<World> world);
 

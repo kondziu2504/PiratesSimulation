@@ -10,7 +10,7 @@
 class Ship;
 class Mast;
 
-enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding};
+enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding, kWaitingStairs, kStairs};
 
 class Sailor {
     std::mt19937 mt;
@@ -21,6 +21,8 @@ class Sailor {
     std::mutex target_mutex;
 
     float activity_progress;
+
+    bool upper_deck = true;
 
     Ship * ship;
     std::shared_ptr<Mast> operated_mast;
@@ -39,7 +41,10 @@ class Sailor {
     void SetProgress(float progress);
     void SetPreviousTarget(std::shared_ptr<void> target);
     void SetNextTarget(std::shared_ptr<void> target);
+    void UseStairs();
+    void GoUseStairs();
 public:
+    bool IsUpperDeck();
     std::shared_ptr<void> GetPreviousTarget();
     std::shared_ptr<void> GetNextTarget();
     float GetProgress();

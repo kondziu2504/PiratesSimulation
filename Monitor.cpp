@@ -71,6 +71,7 @@ void Monitor::Initialize() {
     init_pair(static_cast<short>(Tile::kSail), COLOR_WHITE, COLOR_BROWN);
     init_pair(static_cast<short>(Tile::kGray), COLOR_GRAY, COLOR_GRAY);
     init_pair(static_cast<short>(Tile::kSailor), COLOR_YELLOW, COLOR_BLACK);
+    init_pair(static_cast<short>(Tile::kStairs), COLOR_YELLOW, COLOR_BLACK);
 }
 
 void Monitor::Stop() {
@@ -174,11 +175,10 @@ void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewpo
 }
 
 void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
-    int ship_index = 0;
     int line = 0;
     int indentation = 0;
     indentation = 0;
-    string header = "Statek " + to_string(ship_index);
+    string header = "Statek ";
     mvaddstr(line++, 0, header.c_str());
     indentation += 2;
     mvaddstr(line++, indentation, "Marynarze:");
@@ -195,6 +195,15 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
                 case SailorState::kMast:
                     state_text = "Obsluguje maszt";
                     break;
+                case SailorState::kStairs:
+                    state_text = "Korzysta ze schodow";
+                    break;
+                case SailorState::kWalking:
+                    state_text = "Idzie";
+                    break;
+                case SailorState::kWaitingStairs:
+                    state_text = "Czeka na schody";
+                    break;
             }
             string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
             mvaddstr(line++, indentation, sailor_text.c_str());
@@ -205,6 +214,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     mvaddstr(line++, indentation, "Maszty:");
     int mast_index = 0;
     indentation += 2;
+    lock_guard<mutex> guard(ship->distributor->free_masts_mutex);
     for(auto mast_owners_pair : *ship->distributor->masts_owners){
         bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
         string mast_text =
@@ -215,9 +225,6 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
         mast_index++;
     }
     indentation -= 2;
-
-    ship_index++;
-
 }
 
 [[noreturn]] void Monitor::InputThread() {
@@ -253,7 +260,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         if(masts->size() == 1)
             first_mast_y = height / 2;
         else{
-            first_mast_y = height / 4;
+            first_mast_y = height / 3;
             last_mast_y = height - first_mast_y;
         }
 
@@ -266,6 +273,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
 
         elements_positions->insert(make_pair(ship->distributor, Vec2(width * 0.75, height/2)));
+        elements_positions->insert(make_pair(ship->stairs_mutex, Vec2(width/2, width/2)));
         elements_positions->insert(make_pair(nullptr, Vec2(width * 0.75, height * 0.25)));
     }
 
@@ -288,6 +296,9 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
     }
 
+    Vec2 stairs_pos = elements_positions->find(ship->stairs_mutex)->second;
+    DrawTile(stairs_pos.y + y_offset, stairs_pos.x + x_offset, '=', Tile::kStairs);
+
     auto masts = ship->masts;
     int mast_ind = 0;
     int mast_width = (width * 1.8) / 2  - 1;
@@ -301,13 +312,15 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
     }
 
     for(auto sailor : *ship->sailors){
-        shared_ptr<void> prev_target = sailor->GetPreviousTarget();
-        shared_ptr<void> next_target = sailor->GetNextTarget();
-        float progress = sailor->GetProgress();
-        Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
-        Vec2 next_target_pos = elements_positions->find(next_target)->second;
-        Vec2 tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
-        DrawTile(tile_pos.y + y_offset, tile_pos.x + x_offset, 'S', Tile::kSailor);
+        if(sailor->IsUpperDeck()){
+            shared_ptr<void> prev_target = sailor->GetPreviousTarget();
+            shared_ptr<void> next_target = sailor->GetNextTarget();
+            float progress = sailor->GetProgress();
+            Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
+            Vec2 next_target_pos = elements_positions->find(next_target)->second;
+            Vec2 tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
+            DrawTile(tile_pos.y + y_offset, tile_pos.x + x_offset, 'S', Tile::kSailor);
+        }
     }
 }
 
@@ -347,11 +360,11 @@ void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_p
 void Monitor::DrawShipInfo(int ship_ind) {
     auto ship = world->ships[ship_ind];
     DrawDashboard(ship);
-    DrawShipDeck(ship, 40, 0, 30, 60);
+    DrawShipDeck(ship, 40, 0, 20, 40);
     DrawWindDir(71, 0, 18);
     DrawShipDir(71, 20, 18, ship);
     DrawSailTarget(71, 40, 18, ship);
-    int preview_size = 60;
+    int preview_size = 50;
     DrawWorld(90, 0,
               ship->GetPos().x - preview_size/2,
               ship->GetPos().y - preview_size/2,

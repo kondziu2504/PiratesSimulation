@@ -142,6 +142,33 @@ PiratesSimulation/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/build
 .PHONY : PiratesSimulation/fast
 
+BedDistributor.o: BedDistributor.cpp.o
+
+.PHONY : BedDistributor.o
+
+# target to build an object file
+BedDistributor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.o
+.PHONY : BedDistributor.cpp.o
+
+BedDistributor.i: BedDistributor.cpp.i
+
+.PHONY : BedDistributor.i
+
+# target to preprocess a source file
+BedDistributor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.i
+.PHONY : BedDistributor.cpp.i
+
+BedDistributor.s: BedDistributor.cpp.s
+
+.PHONY : BedDistributor.s
+
+# target to generate assembly for a file
+BedDistributor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.s
+.PHONY : BedDistributor.cpp.s
+
 Mast.o: Mast.cpp.o
 
 .PHONY : Mast.o
@@ -421,6 +448,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... PiratesSimulation"
+	@echo "... BedDistributor.o"
+	@echo "... BedDistributor.i"
+	@echo "... BedDistributor.s"
 	@echo "... Mast.o"
 	@echo "... Mast.i"
 	@echo "... Mast.s"
