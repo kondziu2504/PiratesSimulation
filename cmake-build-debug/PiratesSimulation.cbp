@@ -112,6 +112,12 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Ship.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Util.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Util.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>

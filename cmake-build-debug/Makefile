@@ -277,6 +277,33 @@ Ship.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Ship.cpp.s
 .PHONY : Ship.cpp.s
 
+Util.o: Util.cpp.o
+
+.PHONY : Util.o
+
+# target to build an object file
+Util.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Util.cpp.o
+.PHONY : Util.cpp.o
+
+Util.i: Util.cpp.i
+
+.PHONY : Util.i
+
+# target to preprocess a source file
+Util.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Util.cpp.i
+.PHONY : Util.cpp.i
+
+Util.s: Util.cpp.s
+
+.PHONY : Util.s
+
+# target to generate assembly for a file
+Util.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Util.cpp.s
+.PHONY : Util.cpp.s
+
 Vec2.o: Vec2.cpp.o
 
 .PHONY : Vec2.o
@@ -409,6 +436,9 @@ help:
 	@echo "... Ship.o"
 	@echo "... Ship.i"
 	@echo "... Ship.s"
+	@echo "... Util.o"
+	@echo "... Util.i"
+	@echo "... Util.s"
 	@echo "... Vec2.o"
 	@echo "... Vec2.i"
 	@echo "... Vec2.s"

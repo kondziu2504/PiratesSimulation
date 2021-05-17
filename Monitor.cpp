@@ -13,10 +13,13 @@
 #include "Sailor.h"
 #include "MastDistributor.h"
 #include "Mast.h"
+#include "Wind.h"
+#include "Util.h"
 
 using namespace std;
 
 #define COLOR_BROWN 8
+#define COLOR_GRAY 9
 
 Monitor::Monitor(shared_ptr<World> world) {
     this->world = world;
@@ -56,11 +59,13 @@ void Monitor::Initialize() {
     init_color(COLOR_GREEN, 250, 1000, 250);
     init_color(COLOR_MAGENTA, 1000, 500, 1000);
     init_color(COLOR_BROWN, 700, 350, 0);
+    init_color(COLOR_GRAY, 300, 300, 300);
 
     init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
     init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BROWN );
     init_pair(static_cast<short>(Tile::kLand), COLOR_YELLOW, COLOR_GREEN);
-    init_pair(static_cast<short>(Tile::kSail), COLOR_CYAN, COLOR_WHITE);
+    init_pair(static_cast<short>(Tile::kSail), COLOR_BLACK, COLOR_WHITE);
+    init_pair(static_cast<short>(Tile::kGray), COLOR_GRAY, COLOR_GRAY);
 }
 
 void Monitor::Stop() {
@@ -75,7 +80,10 @@ void Monitor::Update() {
             DrawWorld();
         }else{
             DrawDashboard();
-            DrawShipDeck();
+            DrawShipDeck(40, 0, 30, 60);
+            DrawWindDir(71, 0, 18);
+            DrawShipDir(71, 20, 18, world->ships[0]);
+            DrawSailTarget(71, 40, 18, world->ships[0]);
         }
     }
     refresh();
@@ -207,13 +215,10 @@ void Monitor::DrawDashboard() {
     }
 }
 
-void Monitor::DrawShipDeck() {
-    int width = 21, height = 40;
-    int x_offset = 40;
-
+void Monitor::DrawShipDeck(int x_offset, int y_offset, int width, int height) {
     for(int y = 0; y < height; y++){
-        for(int x = x_offset; x < width + x_offset; x++){
-            DrawTile(y, x, ',', Tile::kShip);
+        for(int x = 0; x < width; x++){
+            DrawTile(y + y_offset, x + x_offset, ',', Tile::kShip);
         }
     }
 
@@ -233,11 +238,45 @@ void Monitor::DrawShipDeck() {
     int mast_width = 13;
     for(auto mast : *masts){
         for(int i = 0; i < mast_width; i++){
-            Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle() + M_PI / 4);
-            DrawTile(mast_y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + width / 2, ',', Tile::kSail);
+            Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle());
+            char ch = i < mast_width / 2 ? 'L' : 'R';
+            DrawTile(y_offset + mast_y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + width / 2, ch, Tile::kSail);
         }
         if(masts->size() > 1){
             mast_y += (last_mast_y - first_mast_y) / (masts->size() - 1);
         }
     }
+}
+
+void Monitor::DrawCircleIndicator(int x_offset, int y_offset, float angle, string label, int size) {
+    int arrow_length = (size - 1) / 2;
+    int angles = arrow_length * 7;
+    mvaddstr(y_offset, x_offset + size/2.f  - label.length() / 2.f, label.c_str());
+    Vec2 circle_center(x_offset + arrow_length, y_offset + arrow_length + 1);
+    for(int i = 0; i < angles; i++){
+        float angle = (float)i / angles * 2 * M_PI;
+        Vec2 local_pos = Vec2(arrow_length - 1, 0).Rotate(angle);
+        DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kGray);
+    }
+    for(int i = 0; i < arrow_length; i++){
+        Vec2 local_pos = Vec2(i, 0).Rotate(angle);
+        DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kSail);
+    }
+}
+
+void Monitor::DrawWindDir(int x_offset, int y_offset, int size) {
+    Vec2 wind_velocity = world->wind->GetVelocity();
+    float wind_angle = wind_velocity.Angle();
+    DrawCircleIndicator(x_offset, y_offset, wind_angle, "Kierunek wiatru", size);
+}
+
+void Monitor::DrawShipDir(int x_offset, int y_offset, int size, shared_ptr<Ship> ship) {
+    DrawCircleIndicator(x_offset, y_offset, ship->GetDir().Angle(), "Kierunek statku", size);
+}
+
+void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship) {
+    float wind_angle = world->wind->GetVelocity().Angle();
+    float ship_angle = ship->GetDir().Angle();
+    DrawCircleIndicator(x_offset, y_offset, AngleDifference(wind_angle, ship_angle) - M_PI / 2, "Docelowy kat zagli",
+                        size);
 }

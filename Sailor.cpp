@@ -10,6 +10,7 @@
 #include "Wind.h"
 #include "World.h"
 #include "MastDistributor.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -60,13 +61,7 @@ void Sailor::OperateMast() {
         usleep(100000);
         float wind_angle = ship->world->wind->GetVelocity().Angle();
         float absolute_mast_angle = ship->GetDir().Angle() + operated_mast->GetAngle();
-        float angle_diff = wind_angle - absolute_mast_angle;
-        if(abs(angle_diff) > M_PI){
-            if(angle_diff < 0)
-                angle_diff += 2 * M_PI;
-            else
-                angle_diff -= 2 * M_PI;
-        }
+        float angle_diff = AngleDifference(wind_angle, absolute_mast_angle);
         float angle_change = min(abs(angle_diff), (float)M_PI / 180.f);
         angle_diff = angle_change * (angle_diff >= 0 ? 1 : -1);
         operated_mast->AdjustAngle(angle_diff);

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include "World.h"
+#include "Vec2.h"
 #include <pthread.h>
 #include <ncurses.h>
 
@@ -18,7 +19,7 @@ class Monitor {
     std::mutex display_mode_mutex;
     int curr_column = 0, curr_row = 0;
 
-    enum class Tile {kWater = 1, kLand, kShip, kSail};
+    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray};
 public:
     Monitor(std::shared_ptr<World> world);
 
@@ -33,7 +34,11 @@ private:
     void DrawMap();
     void DrawTile(int y, int x, char ch, Tile tile);
     void DrawDashboard();
-    void DrawShipDeck();
+    void DrawShipDeck(int x_offset, int y_offset, int width, int height);
+    void DrawCircleIndicator(int x_offset, int y_offset, float angle, std::string label, int size);
+    void DrawWindDir(int x_offset, int y_offset, int size);
+    void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
+    void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
 
     [[noreturn]] void InputThread();
 
