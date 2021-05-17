@@ -35,3 +35,8 @@ Wind::Wind(World * world) {
 void Wind::UpdateVelocity() {
 
 }
+
+Vec2 Wind::GetVelocity() {
+    lock_guard<mutex> guard(wind_mutex);
+    return velocity;
+}

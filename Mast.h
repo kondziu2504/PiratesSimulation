@@ -18,7 +18,7 @@ class Mast {
 public:
     float GetMaxSlots();
     float GetAngle();
-    void SetAngle(float angle);
+    void AdjustAngle(float angle_delta);
 };
 
 

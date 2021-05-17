@@ -7,6 +7,8 @@
 #include "Sailor.h"
 #include "Mast.h"
 #include "Ship.h"
+#include "Wind.h"
+#include "World.h"
 #include "MastDistributor.h"
 
 using namespace std;
@@ -19,10 +21,17 @@ void Sailor::Start() {
 [[noreturn]] void Sailor::ThreadFun() {
     while(true){
         usleep(1000000);
-        shared_ptr<Mast> occupied_mast = ship->distributor->RequestMast(this);
+        {
+            lock_guard<mutex> guard(sailor_mutex);
+            operated_mast = ship->distributor->RequestMast(this);
+        }
         SetState(SailorState::kMast);
-        usleep(1000000);
-        ship->distributor->ReleaseMast(occupied_mast, this);
+        OperateMast();
+        {
+            lock_guard<mutex> guard(sailor_mutex);
+            ship->distributor->ReleaseMast(operated_mast, this);
+            operated_mast = nullptr;
+        }
         SetState(SailorState::kResting);
     }
 }
@@ -44,4 +53,22 @@ SailorState Sailor::GetState() {
 void Sailor::SetState(SailorState new_state) {
     lock_guard<mutex> guard(sailor_mutex);
     currentState = new_state;
+}
+
+void Sailor::OperateMast() {
+    for(int i = 0; i < 10; i++){
+        usleep(100000);
+        float wind_angle = ship->world->wind->GetVelocity().Angle();
+        float absolute_mast_angle = ship->GetDir().Angle() + operated_mast->GetAngle();
+        float angle_diff = wind_angle - absolute_mast_angle;
+        if(abs(angle_diff) > M_PI){
+            if(angle_diff < 0)
+                angle_diff += 2 * M_PI;
+            else
+                angle_diff -= 2 * M_PI;
+        }
+        float angle_change = min(abs(angle_diff), (float)M_PI / 180.f);
+        angle_diff = angle_change * (angle_diff >= 0 ? 1 : -1);
+        operated_mast->AdjustAngle(angle_diff);
+    }
 }

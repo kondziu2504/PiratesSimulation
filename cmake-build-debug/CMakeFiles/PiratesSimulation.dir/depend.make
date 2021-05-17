@@ -24,6 +24,8 @@ CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../Sailor.cpp
 CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../Sailor.h
 CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../Ship.h
 CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../Vec2.h
+CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../Wind.h
+CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o: ../World.h
 
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../Mast.h
 CMakeFiles/PiratesSimulation.dir/Ship.cpp.o: ../MastDistributor.h

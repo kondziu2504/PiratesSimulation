@@ -8,6 +8,7 @@
 #include <random>
 #include <mutex>
 class Ship;
+class Mast;
 
 enum class SailorState {kMast, kResting};
 
@@ -17,10 +18,12 @@ class Sailor {
 
     SailorState currentState = SailorState::kResting;
     Ship * ship;
+    std::shared_ptr<Mast> operated_mast;
+
     std::mutex sailor_mutex;
 
     [[noreturn]] void ThreadFun();
-    void GoOperateMast();
+    void OperateMast();
     void GoRest();
     void SetState(SailorState new_state);
 public:

@@ -16,10 +16,10 @@ public:
     int width, height;
     std::shared_ptr<bool[]> map;
     std::vector<std::shared_ptr<Ship>> ships;
-    std::shared_ptr<Wind> wind;
     std::mutex shipsMutex;
 
 public:
+    std::shared_ptr<Wind> wind;
     World(int width, int height, int seed);
     void AddShip(std::shared_ptr<Ship> ship);
 };
