@@ -10,8 +10,13 @@
 #include "Vec2.h"
 #include <pthread.h>
 #include <ncurses.h>
+#include <unordered_set>
+#include <unordered_map>
 
 enum class MonitorDisplayMode {kMap, kDashboard};
+
+template<typename T>
+using sp = std::shared_ptr<T>;
 
 class Monitor {
     std::shared_ptr<World> world;
@@ -21,7 +26,10 @@ class Monitor {
     std::mutex current_ship_mutex;
     int current_ship_ind = 0;
 
-    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray};
+    sp<std::unordered_set<sp<Ship>>> visualized_ships;
+    sp<std::unordered_map<sp<void>, Vec2>> elements_positions;
+
+    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor};
 public:
     Monitor(std::shared_ptr<World> world);
 

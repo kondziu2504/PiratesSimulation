@@ -65,6 +65,10 @@ pthread.h
 -
 ncurses.h
 -
+unordered_set
+-
+unordered_map
+-
 
 /home/konrad/CLionProjects/PiratesSimulation/Sailor.h
 random
