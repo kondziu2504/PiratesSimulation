@@ -239,8 +239,21 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
 }
 
 void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height) {
-    for(int y = 0; y < height; y++){
+
+    for(int y = 0; y < width/2; y++){
+        for(int x = width/2 - y; x < width/2 + y; x++){
+            DrawTile(y + y_offset, x + x_offset, ',', Tile::kShip);
+        }
+    }
+
+    for(int y = width/2; y < height - width/4; y++){
         for(int x = 0; x < width; x++){
+            DrawTile(y + y_offset, x + x_offset, ',', Tile::kShip);
+        }
+    }
+
+    for(int y = height - width/4; y < height; y++){
+        for(int x = width/4 - (height - y); x < width - width/4 + (height - y); x++){
             DrawTile(y + y_offset, x + x_offset, ',', Tile::kShip);
         }
     }
