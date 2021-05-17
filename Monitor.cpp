@@ -77,13 +77,10 @@ void Monitor::Update() {
     {
         lock_guard<mutex> guard(display_mode_mutex);
         if(display_mode == MonitorDisplayMode::kMap){
-            DrawWorld();
+            DrawWorld(0, 0, 0, 0, 0, 0);
         }else{
-            DrawDashboard();
-            DrawShipDeck(40, 0, 30, 60);
-            DrawWindDir(71, 0, 18);
-            DrawShipDir(71, 20, 18, world->ships[0]);
-            DrawSailTarget(71, 40, 18, world->ships[0]);
+            lock_guard<mutex> guard(current_ship_mutex);
+            DrawShipInfo(current_ship_ind);
         }
     }
     refresh();
@@ -97,13 +94,20 @@ void Monitor::Update() {
     }
 }
 
-void Monitor::DrawMap() {
-    for(int x = 0; x < world->width; x++){
-        for(int y = 0; y < world->height; y++){
-            if(world->map[y * world->width + x])
-                DrawTile(y, x, ',', Tile::kLand);
-            else
-                DrawTile(y, x, ';', Tile::kWater);
+void
+Monitor::DrawMap(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+    for(int x = 0; x < viewport_width; x++){
+        int map_x = x + x_viewport;
+        for(int y = 0; y < viewport_height; y++){
+            int map_y = y + y_viewport;
+            if(map_x >= 0 && map_x < world->width && map_y >= 0 && map_y < world->height){
+                if(world->map[map_y * world->width + map_x])
+                    DrawTile(y_offset + y, x_offset + x, ',', Tile::kLand);
+                else
+                    DrawTile(y_offset + y, x_offset + x, ';', Tile::kWater);
+            }else{
+                DrawTile(y_offset + y, x_offset + x, ';', Tile::kGray);
+            }
         }
     }
 }
@@ -114,12 +118,17 @@ void Monitor::DrawTile(int y, int x, char ch, Tile tile) {
     attroff(COLOR_PAIR((int)tile));
 }
 
-void Monitor::DrawWorld() {
-    DrawMap();
-    DrawShips();
+void Monitor::DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+    if(viewport_width == 0)
+        viewport_width = world->width;
+    if(viewport_height == 0)
+        viewport_height = world->height;
+
+    DrawMap(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
+    DrawShips(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
 }
 
-void Monitor::DrawShip(shared_ptr<Ship> ship) {
+void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
     Vec2 ship_pos = ship->GetPos();
     Vec2 ship_dir = ship->GetDir();
 
@@ -136,10 +145,15 @@ void Monitor::DrawShip(shared_ptr<Ship> ship) {
                 Vec2 rotatedLocal = Vec2(
                         j - length / 2,
                         i - width / 2).Rotate( ship_dir.Angle());
-                DrawTile(
-                        (int)ship_pos.y + rotatedLocal.y,
-                        (int)ship_pos.x + rotatedLocal.x,
-                        texture[i][j], Tile::kShip);
+                Vec2 tile_pos = Vec2((int)ship_pos.x + rotatedLocal.x, (int)ship_pos.y + rotatedLocal.y);
+                if(tile_pos.x >= x_viewport && tile_pos.x < x_viewport + viewport_width
+                    && tile_pos.y >= y_viewport && tile_pos.y < y_viewport + viewport_height)
+                {
+                    DrawTile(
+                            tile_pos.y + y_offset - y_viewport,
+                            tile_pos.x + x_offset - x_viewport,
+                            texture[i][j], Tile::kShip);
+                }
             }
         }
     }
@@ -147,59 +161,59 @@ void Monitor::DrawShip(shared_ptr<Ship> ship) {
     //DrawTile(ship_pos.y, ship_pos.x, '#', Tile::kShip);
 }
 
-void Monitor::DrawShips() {
+void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
     lock_guard<mutex> guard(world->shipsMutex);
     for(shared_ptr<Ship> ship : world->ships){
-        DrawShip(ship);
+        DrawShip(ship, x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
     }
 }
 
-void Monitor::DrawDashboard() {
+void Monitor::DrawDashboard(int ship_ind) {
     int ship_index = 0;
     int line = 0;
     int indentation = 0;
-    for(auto ship : world->ships){
-        indentation = 0;
-        string header = "Statek " + to_string(ship_index);
-        mvaddstr(line++, 0, header.c_str());
+    auto ship = world->ships[ship_ind];
+    indentation = 0;
+    string header = "Statek " + to_string(ship_index);
+    mvaddstr(line++, 0, header.c_str());
+    indentation += 2;
+    mvaddstr(line++, indentation, "Marynarze:");
+    {
         indentation += 2;
-        mvaddstr(line++, indentation, "Marynarze:");
-        {
-            indentation += 2;
-            int sailor_index = 0;
-            lock_guard<mutex> guard(ship->sailors_mutex);
-            for(auto sailor : *ship->sailors){
-                string state_text = "";
-                switch (sailor->GetState()) {
-                    case SailorState::kResting:
-                        state_text = "Odpoczywa";
-                        break;
-                    case SailorState::kMast:
-                        state_text = "Obsluguje maszt";
-                        break;
-                }
-                string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
-                mvaddstr(line++, indentation, sailor_text.c_str());
-                sailor_index++;
+        int sailor_index = 0;
+        lock_guard<mutex> guard(ship->sailors_mutex);
+        for(auto sailor : *ship->sailors){
+            string state_text = "";
+            switch (sailor->GetState()) {
+                case SailorState::kResting:
+                    state_text = "Odpoczywa";
+                    break;
+                case SailorState::kMast:
+                    state_text = "Obsluguje maszt";
+                    break;
             }
+            string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
+            mvaddstr(line++, indentation, sailor_text.c_str());
+            sailor_index++;
         }
-        indentation -= 2;
-        mvaddstr(line++, indentation, "Maszty:");
-        int mast_index = 0;
-        indentation += 2;
-        for(auto mast_owners_pair : *ship->distributor->masts_owners){
-            bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
-            string mast_text =
-                    "Maszt " + to_string(mast_index) +
-                    " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
-                    " " + (max_owners ? "(max)" : "");
-            mvaddstr(line++, indentation, mast_text.c_str());
-            mast_index++;
-        }
-        indentation -= 2;
-
-        ship_index++;
     }
+    indentation -= 2;
+    mvaddstr(line++, indentation, "Maszty:");
+    int mast_index = 0;
+    indentation += 2;
+    for(auto mast_owners_pair : *ship->distributor->masts_owners){
+        bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
+        string mast_text =
+                "Maszt " + to_string(mast_index) +
+                " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
+                " " + (max_owners ? "(max)" : "");
+        mvaddstr(line++, indentation, mast_text.c_str());
+        mast_index++;
+    }
+    indentation -= 2;
+
+    ship_index++;
+
 }
 
 [[noreturn]] void Monitor::InputThread() {
@@ -211,6 +225,16 @@ void Monitor::DrawDashboard() {
                 display_mode = MonitorDisplayMode::kDashboard;
             else
                 display_mode = MonitorDisplayMode::kMap;
+        }else if(key == 'a'){
+            lock_guard<mutex> guard(current_ship_mutex);
+            current_ship_ind--;
+            if(current_ship_ind < 0)
+                current_ship_ind = world->ships.size() - 1;
+        }else if(key == 'd'){
+            lock_guard<mutex> guard(current_ship_mutex);
+            current_ship_ind++;
+            if(current_ship_ind >= world->ships.size())
+                current_ship_ind = 0;
         }
     }
 }
@@ -279,4 +303,17 @@ void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_p
     float ship_angle = ship->GetDir().Angle();
     DrawCircleIndicator(x_offset, y_offset, AngleDifference(wind_angle, ship_angle) - M_PI / 2, "Docelowy kat zagli",
                         size);
+}
+
+void Monitor::DrawShipInfo(int ship_ind) {
+    DrawDashboard(ship_ind);
+    DrawShipDeck(40, 0, 30, 60);
+    DrawWindDir(71, 0, 18);
+    DrawShipDir(71, 20, 18, world->ships[ship_ind]);
+    DrawSailTarget(71, 40, 18, world->ships[ship_ind]);
+    int preview_size = 60;
+    DrawWorld(90, 0,
+              world->ships[ship_ind]->GetPos().x - preview_size/2,
+              world->ships[ship_ind]->GetPos().y - preview_size/2,
+              preview_size, preview_size);
 }

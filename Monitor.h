@@ -18,6 +18,8 @@ class Monitor {
     MonitorDisplayMode display_mode = MonitorDisplayMode::kMap;
     std::mutex display_mode_mutex;
     int curr_column = 0, curr_row = 0;
+    std::mutex current_ship_mutex;
+    int current_ship_ind = 0;
 
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray};
 public:
@@ -28,17 +30,18 @@ public:
 private:
     void Update();
     void Initialize();
-    void DrawWorld();
-    void DrawShips();
-    void DrawShip(std::shared_ptr<Ship>);
-    void DrawMap();
+    void DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+    void DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+    void DrawShip(std::shared_ptr<Ship>, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+    void DrawMap(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     void DrawTile(int y, int x, char ch, Tile tile);
-    void DrawDashboard();
+    void DrawDashboard(int ship_ind);
     void DrawShipDeck(int x_offset, int y_offset, int width, int height);
     void DrawCircleIndicator(int x_offset, int y_offset, float angle, std::string label, int size);
     void DrawWindDir(int x_offset, int y_offset, int size);
     void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
     void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
+    void DrawShipInfo(int ship_ind);
 
     [[noreturn]] void InputThread();
 
