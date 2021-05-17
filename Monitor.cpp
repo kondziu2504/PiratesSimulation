@@ -168,11 +168,10 @@ void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewpo
     }
 }
 
-void Monitor::DrawDashboard(int ship_ind) {
+void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     int ship_index = 0;
     int line = 0;
     int indentation = 0;
-    auto ship = world->ships[ship_ind];
     indentation = 0;
     string header = "Statek " + to_string(ship_index);
     mvaddstr(line++, 0, header.c_str());
@@ -239,17 +238,15 @@ void Monitor::DrawDashboard(int ship_ind) {
     }
 }
 
-void Monitor::DrawShipDeck(int x_offset, int y_offset, int width, int height) {
+void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height) {
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++){
             DrawTile(y + y_offset, x + x_offset, ',', Tile::kShip);
         }
     }
 
-    int ship_id = 0;
-
     lock_guard<mutex> guard(world->shipsMutex);
-    auto masts = world->ships[ship_id]->masts;
+    auto masts = ship->masts;
     int first_mast_y, last_mast_y;
     if(masts->size() == 1)
         first_mast_y = height / 2;
@@ -306,14 +303,15 @@ void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_p
 }
 
 void Monitor::DrawShipInfo(int ship_ind) {
-    DrawDashboard(ship_ind);
-    DrawShipDeck(40, 0, 30, 60);
+    auto ship = world->ships[ship_ind];
+    DrawDashboard(ship);
+    DrawShipDeck(ship, 40, 0, 30, 60);
     DrawWindDir(71, 0, 18);
-    DrawShipDir(71, 20, 18, world->ships[ship_ind]);
-    DrawSailTarget(71, 40, 18, world->ships[ship_ind]);
+    DrawShipDir(71, 20, 18, ship);
+    DrawSailTarget(71, 40, 18, ship);
     int preview_size = 60;
     DrawWorld(90, 0,
-              world->ships[ship_ind]->GetPos().x - preview_size/2,
-              world->ships[ship_ind]->GetPos().y - preview_size/2,
+              ship->GetPos().x - preview_size/2,
+              ship->GetPos().y - preview_size/2,
               preview_size, preview_size);
 }

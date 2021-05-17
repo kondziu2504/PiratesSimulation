@@ -35,8 +35,8 @@ private:
     void DrawShip(std::shared_ptr<Ship>, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     void DrawMap(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     void DrawTile(int y, int x, char ch, Tile tile);
-    void DrawDashboard(int ship_ind);
-    void DrawShipDeck(int x_offset, int y_offset, int width, int height);
+    void DrawDashboard(std::shared_ptr <Ship> ship);
+    void DrawShipDeck(std::shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height);
     void DrawCircleIndicator(int x_offset, int y_offset, float angle, std::string label, int size);
     void DrawWindDir(int x_offset, int y_offset, int size);
     void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
