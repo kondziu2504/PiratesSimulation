@@ -16,6 +16,8 @@
 
 using namespace std;
 
+#define COLOR_BROWN 8
+
 Monitor::Monitor(shared_ptr<World> world) {
     this->world = world;
 }
@@ -53,10 +55,12 @@ void Monitor::Initialize() {
     init_color(COLOR_YELLOW, 1000, 1000, 250);
     init_color(COLOR_GREEN, 250, 1000, 250);
     init_color(COLOR_MAGENTA, 1000, 500, 1000);
+    init_color(COLOR_BROWN, 700, 350, 0);
 
     init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
-    init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BLUE );
+    init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BROWN );
     init_pair(static_cast<short>(Tile::kLand), COLOR_YELLOW, COLOR_GREEN);
+    init_pair(static_cast<short>(Tile::kSail), COLOR_CYAN, COLOR_WHITE);
 }
 
 void Monitor::Stop() {
@@ -69,8 +73,10 @@ void Monitor::Update() {
         lock_guard<mutex> guard(display_mode_mutex);
         if(display_mode == MonitorDisplayMode::kMap){
             DrawWorld();
-        }else
+        }else{
             DrawDashboard();
+            DrawShipDeck();
+        }
     }
     refresh();
 }
@@ -197,6 +203,41 @@ void Monitor::DrawDashboard() {
                 display_mode = MonitorDisplayMode::kDashboard;
             else
                 display_mode = MonitorDisplayMode::kMap;
+        }
+    }
+}
+
+void Monitor::DrawShipDeck() {
+    int width = 21, height = 40;
+    int x_offset = 40;
+
+    for(int y = 0; y < height; y++){
+        for(int x = x_offset; x < width + x_offset; x++){
+            DrawTile(y, x, ',', Tile::kShip);
+        }
+    }
+
+    int ship_id = 0;
+
+    lock_guard<mutex> guard(world->shipsMutex);
+    auto masts = world->ships[ship_id]->masts;
+    int first_mast_y, last_mast_y;
+    if(masts->size() == 1)
+        first_mast_y = height / 2;
+    else{
+        first_mast_y = height / 4;
+        last_mast_y = height - first_mast_y;
+    }
+    int mast_ind = 0;
+    int mast_y = first_mast_y;
+    int mast_width = 13;
+    for(auto mast : *masts){
+        for(int i = 0; i < mast_width; i++){
+            Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle() + M_PI / 4);
+            DrawTile(mast_y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + width / 2, ',', Tile::kSail);
+        }
+        if(masts->size() > 1){
+            mast_y += (last_mast_y - first_mast_y) / (masts->size() - 1);
         }
     }
 }

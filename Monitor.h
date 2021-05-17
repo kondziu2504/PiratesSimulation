@@ -18,7 +18,7 @@ class Monitor {
     std::mutex display_mode_mutex;
     int curr_column = 0, curr_row = 0;
 
-    enum class Tile {kWater = 1, kLand, kShip};
+    enum class Tile {kWater = 1, kLand, kShip, kSail};
 public:
     Monitor(std::shared_ptr<World> world);
 
@@ -33,6 +33,7 @@ private:
     void DrawMap();
     void DrawTile(int y, int x, char ch, Tile tile);
     void DrawDashboard();
+    void DrawShipDeck();
 
     [[noreturn]] void InputThread();
 
