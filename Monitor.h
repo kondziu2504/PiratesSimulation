@@ -27,9 +27,9 @@ class Monitor {
     int current_ship_ind = 0;
 
     sp<std::unordered_set<sp<Ship>>> visualized_ships;
-    sp<std::unordered_map<sp<void>, Vec2>> elements_positions;
+    sp<std::unordered_map<void *, Vec2>> elements_positions;
 
-    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs};
+    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball};
 public:
     Monitor(std::shared_ptr<World> world);
 
@@ -50,6 +50,7 @@ private:
     void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
     void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
     void DrawShipInfo(int ship_ind);
+    void DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
 
     [[noreturn]] void InputThread();
 

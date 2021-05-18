@@ -10,6 +10,7 @@
 #include <mutex>
 class Ship;
 class Wind;
+class Cannonball;
 
 class World {
 public:
@@ -19,6 +20,8 @@ public:
     std::mutex shipsMutex;
 
 public:
+    std::mutex cannonballs_mutex;
+    std::vector<std::shared_ptr<Cannonball>> cannonballs;
     std::shared_ptr<Wind> wind;
     World(int width, int height, int seed);
     void AddShip(std::shared_ptr<Ship> ship);

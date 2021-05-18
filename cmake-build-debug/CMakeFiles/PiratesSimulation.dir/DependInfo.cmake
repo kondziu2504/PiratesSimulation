@@ -5,6 +5,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/konrad/CLionProjects/PiratesSimulation/BedDistributor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.o"
+  "/home/konrad/CLionProjects/PiratesSimulation/Cannon.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o"
+  "/home/konrad/CLionProjects/PiratesSimulation/Cannonball.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Mast.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Mast.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/MastDistributor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o"
   "/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp" "/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o"

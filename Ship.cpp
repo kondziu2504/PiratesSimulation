@@ -12,6 +12,7 @@
 #include "MastDistributor.h"
 #include "Sailor.h"
 #include "Util.h"
+#include "Cannon.h"
 
 using namespace std;
 
@@ -24,6 +25,8 @@ Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     for(int i = 0; i < 3; i++)
         masts->push_back(make_shared<Mast>());
     distributor = make_shared<MastDistributor>(masts);
+    for(int i = 0; i < 3; i++)
+        cannons.push_back(make_shared<Cannon>(this));
     sailors = make_shared<vector<shared_ptr<Sailor>>>();
     for(int i = 0; i < 24; i++){
         shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
@@ -117,11 +120,11 @@ void Ship::ApplyWind(Vec2 wind) {
     float effective_power = 0;
     for(shared_ptr<Mast> mast : *masts){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
-        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 3;
+        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;
     }
 
-    effective_power = max(effective_power, 0.2f);
+    effective_power = max(effective_power, 0.05f);
     lock_guard<mutex> guard(pos_mutex);
     pos = pos + direction * effective_power;
 }

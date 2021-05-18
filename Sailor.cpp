@@ -11,6 +11,7 @@
 #include "World.h"
 #include "MastDistributor.h"
 #include "Util.h"
+#include "Cannon.h"
 
 using namespace std;
 
@@ -21,8 +22,10 @@ void Sailor::Start() {
 
 [[noreturn]] void Sailor::ThreadFun() {
     while(true){
-        GoWaitForMast();
-        GoOperateMast();
+        //GoWaitForMast();
+        //GoOperateMast();
+        GoWaitForCannon();
+        GoUseCannon();
         GoRest();
         //GoUseStairs();
     }
@@ -81,7 +84,7 @@ void Sailor::OperateMast() {
 
 
 void Sailor::GoOperateMast() {
-    next_target = operated_mast;
+    next_target = operated_mast.get();
     SetState(SailorState::kWalking);
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
@@ -103,7 +106,7 @@ void Sailor::WaitForMast() {
 }
 
 void Sailor::GoWaitForMast() {
-    next_target = ship->distributor;
+    next_target = ship->distributor.get();
     SetState(SailorState::kWalking);
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
@@ -125,22 +128,22 @@ void Sailor::SetProgress(float progress) {
     activity_progress = progress;
 }
 
-void Sailor::SetPreviousTarget(std::shared_ptr<void> target) {
+void Sailor::SetPreviousTarget(void * target) {
     lock_guard<mutex> guard(target_mutex);
     previous_target = target;
 }
 
-void Sailor::SetNextTarget(std::shared_ptr<void> target) {
+void Sailor::SetNextTarget(void * target) {
     lock_guard<mutex> guard(target_mutex);
     next_target = target;
 }
 
-std::shared_ptr<void> Sailor::GetPreviousTarget() {
+void * Sailor::GetPreviousTarget() {
     lock_guard<mutex> guard(target_mutex);
     return previous_target;
 }
 
-std::shared_ptr<void> Sailor::GetNextTarget() {
+void * Sailor::GetNextTarget() {
     lock_guard<mutex> guard(target_mutex);
     return next_target;
 }
@@ -162,7 +165,7 @@ void Sailor::UseStairs() {
 
 void Sailor::GoUseStairs() {
     SetState(SailorState::kWalking);
-    next_target = ship->stairs_mutex;
+    next_target = ship->stairs_mutex.get();
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
         usleep(100000);
@@ -177,3 +180,60 @@ bool Sailor::IsUpperDeck() {
     lock_guard<mutex> guard(sailor_mutex);
     return upper_deck;
 }
+
+void Sailor::GoWaitForCannon() {
+    SetState(SailorState::kWalking);
+    next_target = ship->distributor.get();
+    for(int i = 0; i < 10; i++){
+        SetProgress((float)i / 9);
+        usleep(100000);
+    }
+    previous_target = next_target;
+    SetState(SailorState::kStanding);
+
+    WaitForCannon();
+}
+
+void Sailor::WaitForCannon() {
+    SetState(SailorState::kWaitingCannon);
+    while(true){
+        for(auto cannon : ship->cannons){
+            if(cannon->TryClaim(this)){
+                operated_cannon = cannon.get();
+                SetState(SailorState::kWaitingCannon);
+                return;
+            }
+        }
+        usleep(100000);
+    }
+}
+
+void Sailor::GoUseCannon() {
+    SetState(SailorState::kWalking);
+    next_target = operated_cannon;
+    for(int i = 0; i < 10; i++){
+        SetProgress((float)i / 9);
+        usleep(100000);
+    }
+    previous_target = next_target;
+
+    UseCannon();
+}
+
+void Sailor::UseCannon() {
+    SetState(SailorState::kCannon);
+
+    auto cannon_owners = operated_cannon->GetOwners();
+    if(cannon_owners.first == this){
+        operated_cannon->WaitUntilLoaded();
+        Vec2 perpendicular = ship->GetPos() + Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
+        operated_cannon->Shoot(perpendicular);
+    }else if(cannon_owners.second == this){
+        operated_cannon->Load();
+    }
+
+    operated_cannon->Release(this);
+    SetState(SailorState::kStanding);
+}
+
+

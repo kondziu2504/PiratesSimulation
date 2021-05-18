@@ -7,10 +7,13 @@
 
 #include <random>
 #include <mutex>
+
+class Cannon;
 class Ship;
 class Mast;
 
-enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding, kWaitingStairs, kStairs};
+enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
+        kWaitingStairs, kStairs, kWaitingCannon, kCannon};
 
 class Sailor {
     std::mt19937 mt;
@@ -26,8 +29,9 @@ class Sailor {
 
     Ship * ship;
     std::shared_ptr<Mast> operated_mast;
-    std::shared_ptr<void> previous_target = nullptr;
-    std::shared_ptr<void> next_target = nullptr;
+    Cannon * operated_cannon = nullptr;
+    void * previous_target = nullptr;
+    void * next_target = nullptr;
 
     std::mutex sailor_mutex;
 
@@ -36,17 +40,22 @@ class Sailor {
     void GoOperateMast();
     void WaitForMast();
     void GoWaitForMast();
+
     void GoRest();
     void SetState(SailorState new_state);
     void SetProgress(float progress);
-    void SetPreviousTarget(std::shared_ptr<void> target);
-    void SetNextTarget(std::shared_ptr<void> target);
+    void SetPreviousTarget(void * target);
+    void SetNextTarget(void * target);
     void UseStairs();
     void GoUseStairs();
+    void GoWaitForCannon();
+    void WaitForCannon();
+    void GoUseCannon();
+    void UseCannon();
 public:
     bool IsUpperDeck();
-    std::shared_ptr<void> GetPreviousTarget();
-    std::shared_ptr<void> GetNextTarget();
+    void * GetPreviousTarget();
+    void * GetNextTarget();
     float GetProgress();
     explicit Sailor(Ship * ship);
     void Start();

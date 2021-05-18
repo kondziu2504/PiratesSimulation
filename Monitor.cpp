@@ -15,6 +15,7 @@
 #include "Mast.h"
 #include "Wind.h"
 #include "Util.h"
+#include "Cannonball.h"
 
 using namespace std;
 
@@ -25,7 +26,7 @@ Monitor::Monitor(shared_ptr<World> world) {
     this->world = world;
 
     visualized_ships = make_shared<unordered_set<sp<Ship>>>();
-    elements_positions = make_shared<unordered_map<sp<void>, Vec2>>();
+    elements_positions = make_shared<unordered_map<void *, Vec2>>();
 }
 
 
@@ -72,6 +73,8 @@ void Monitor::Initialize() {
     init_pair(static_cast<short>(Tile::kGray), COLOR_GRAY, COLOR_GRAY);
     init_pair(static_cast<short>(Tile::kSailor), COLOR_YELLOW, COLOR_BLACK);
     init_pair(static_cast<short>(Tile::kStairs), COLOR_YELLOW, COLOR_BLACK);
+    init_pair(static_cast<short>(Tile::kCannon), COLOR_WHITE, COLOR_BLACK);
+    init_pair(static_cast<short>(Tile::kCannonball), COLOR_WHITE, COLOR_BLACK);
 }
 
 void Monitor::Stop() {
@@ -132,6 +135,7 @@ void Monitor::DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewpo
 
     DrawMap(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
     DrawShips(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
+    DrawCannonballs(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
 }
 
 void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
@@ -266,14 +270,22 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
         int mast_y = first_mast_y;
         for(auto mast : *masts){
-            elements_positions->insert(make_pair(mast, Vec2(width/2, mast_y)));
+            elements_positions->insert(make_pair(mast.get(), Vec2(width/2, mast_y)));
             if(masts->size() > 1){
                 mast_y += (last_mast_y - first_mast_y) / (masts->size() - 1);
             }
         }
 
-        elements_positions->insert(make_pair(ship->distributor, Vec2(width * 0.75, height/2)));
-        elements_positions->insert(make_pair(ship->stairs_mutex, Vec2(width/2, width/2)));
+        int cannon_y = height / 3;
+        auto cannons = ship->cannons;
+        int cannon_y_delta = height / (2 * cannons.size());
+        for(auto cannon : cannons){
+            elements_positions->insert(make_pair(cannon.get(), Vec2(width - 1, cannon_y)));
+            cannon_y += cannon_y_delta;
+        }
+
+        elements_positions->insert(make_pair(ship->distributor.get(), Vec2(width * 0.75, height/2)));
+        elements_positions->insert(make_pair(ship->stairs_mutex.get(), Vec2(width/2, width/2)));
         elements_positions->insert(make_pair(nullptr, Vec2(width * 0.75, height * 0.25)));
     }
 
@@ -296,8 +308,13 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
     }
 
-    Vec2 stairs_pos = elements_positions->find(ship->stairs_mutex)->second;
+    Vec2 stairs_pos = elements_positions->find(ship->stairs_mutex.get())->second;
     DrawTile(stairs_pos.y + y_offset, stairs_pos.x + x_offset, '=', Tile::kStairs);
+
+    for(auto cannon : ship->cannons){
+        Vec2 cannon_pos = elements_positions->find(cannon.get())->second;
+        DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
+    }
 
     auto masts = ship->masts;
     int mast_ind = 0;
@@ -306,15 +323,15 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         for(int i = 0; i < mast_width; i++){
             Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
-            Vec2 mast_pos = elements_positions->find(mast)->second;
+            Vec2 mast_pos = elements_positions->find(mast.get())->second;
             DrawTile(y_offset + mast_pos.y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + mast_pos.x, ch, Tile::kSail);
         }
     }
 
     for(auto sailor : *ship->sailors){
         if(sailor->IsUpperDeck()){
-            shared_ptr<void> prev_target = sailor->GetPreviousTarget();
-            shared_ptr<void> next_target = sailor->GetNextTarget();
+            void * prev_target = sailor->GetPreviousTarget();
+            void * next_target = sailor->GetNextTarget();
             float progress = sailor->GetProgress();
             Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
             Vec2 next_target_pos = elements_positions->find(next_target)->second;
@@ -369,4 +386,18 @@ void Monitor::DrawShipInfo(int ship_ind) {
               ship->GetPos().x - preview_size/2,
               ship->GetPos().y - preview_size/2,
               preview_size, preview_size);
+}
+
+void Monitor::DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+    lock_guard<mutex> guard(world->cannonballs_mutex);
+    for(auto cannonball : world->cannonballs){
+        if(cannonball->dead)
+            continue;
+        Vec2 cannonball_pos = cannonball->GetPos();
+        if(cannonball_pos.x >= x_viewport && cannonball_pos.x < x_viewport + viewport_width
+           && cannonball_pos.y >= y_viewport && cannonball_pos.y < y_viewport + viewport_height)
+        {
+            DrawTile(cannonball_pos.y + y_offset - y_viewport, cannonball_pos.x + x_offset - x_viewport, 'O', Tile::kCannonball);
+        }
+    }
 }

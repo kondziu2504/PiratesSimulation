@@ -6,6 +6,16 @@
 
 #IncludeRegexTransform: 
 
+/home/konrad/CLionProjects/PiratesSimulation/Cannon.h
+memory
+-
+mutex
+-
+condition_variable
+-
+Ship.h
+/home/konrad/CLionProjects/PiratesSimulation/Ship.h
+
 /home/konrad/CLionProjects/PiratesSimulation/Mast.h
 mutex
 -
@@ -53,6 +63,8 @@ Sailor.h
 /home/konrad/CLionProjects/PiratesSimulation/Sailor.h
 Util.h
 /home/konrad/CLionProjects/PiratesSimulation/Util.h
+Cannon.h
+/home/konrad/CLionProjects/PiratesSimulation/Cannon.h
 
 /home/konrad/CLionProjects/PiratesSimulation/Ship.h
 Vec2.h

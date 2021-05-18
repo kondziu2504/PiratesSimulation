@@ -88,6 +88,18 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/BedDistributor.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Cannon.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Cannon.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Cannonball.cpp">
+			<Option target="PiratesSimulation"/>
+		</Unit>
+		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Cannonball.h">
+			<Option target="PiratesSimulation"/>
+		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Mast.cpp">
 			<Option target="PiratesSimulation"/>
 		</Unit>

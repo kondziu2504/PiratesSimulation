@@ -169,6 +169,60 @@ BedDistributor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.s
 .PHONY : BedDistributor.cpp.s
 
+Cannon.o: Cannon.cpp.o
+
+.PHONY : Cannon.o
+
+# target to build an object file
+Cannon.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o
+.PHONY : Cannon.cpp.o
+
+Cannon.i: Cannon.cpp.i
+
+.PHONY : Cannon.i
+
+# target to preprocess a source file
+Cannon.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannon.cpp.i
+.PHONY : Cannon.cpp.i
+
+Cannon.s: Cannon.cpp.s
+
+.PHONY : Cannon.s
+
+# target to generate assembly for a file
+Cannon.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannon.cpp.s
+.PHONY : Cannon.cpp.s
+
+Cannonball.o: Cannonball.cpp.o
+
+.PHONY : Cannonball.o
+
+# target to build an object file
+Cannonball.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o
+.PHONY : Cannonball.cpp.o
+
+Cannonball.i: Cannonball.cpp.i
+
+.PHONY : Cannonball.i
+
+# target to preprocess a source file
+Cannonball.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.i
+.PHONY : Cannonball.cpp.i
+
+Cannonball.s: Cannonball.cpp.s
+
+.PHONY : Cannonball.s
+
+# target to generate assembly for a file
+Cannonball.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.s
+.PHONY : Cannonball.cpp.s
+
 Mast.o: Mast.cpp.o
 
 .PHONY : Mast.o
@@ -451,6 +505,12 @@ help:
 	@echo "... BedDistributor.o"
 	@echo "... BedDistributor.i"
 	@echo "... BedDistributor.s"
+	@echo "... Cannon.o"
+	@echo "... Cannon.i"
+	@echo "... Cannon.s"
+	@echo "... Cannonball.o"
+	@echo "... Cannonball.i"
+	@echo "... Cannonball.s"
 	@echo "... Mast.o"
 	@echo "... Mast.i"
 	@echo "... Mast.s"

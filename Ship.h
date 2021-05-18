@@ -15,6 +15,7 @@ class MastDistributor;
 class Mast;
 class World;
 class Sailor;
+class Cannon;
 
 enum class ShipState{kRoaming, kFighting};
 
@@ -26,8 +27,6 @@ class Ship {
     ShipState state = ShipState::kRoaming;
     std::mutex state_mutex;
 
-    Ship * enemy = nullptr;
-
     ShipState GetState();
     void SetState(ShipState new_state);
 
@@ -38,6 +37,8 @@ class Ship {
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
+    Ship * enemy = nullptr;
+    std::vector<std::shared_ptr<Cannon>> cannons;
     std::shared_ptr<std::mutex> stairs_mutex;
 
     std::shared_ptr<World> world;
