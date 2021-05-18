@@ -34,6 +34,7 @@ class Ship {
     void EngageFight(Ship * ship);
     void PrepareForFight(Ship * ship);
     bool LookForEnemy();
+    void GetInPosition();
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:

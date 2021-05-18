@@ -21,8 +21,8 @@ int main(int argc, char *argv[]) {
     }catch(invalid_argument ex){}
     shared_ptr<World> world = make_shared<World>(world_width, world_height, seed);
     world->AddShip(make_shared<Ship>(Vec2(15,16), Vec2(1,0), world));
-    world->AddShip(make_shared<Ship>(Vec2(45,15), Vec2(-1, 0), world));
-    world->AddShip(make_shared<Ship>(Vec2(75,15), Vec2(1,1), world));
+    world->AddShip(make_shared<Ship>(Vec2(55,16), Vec2(1, 0), world));
+    world->AddShip(make_shared<Ship>(Vec2(75,15), Vec2(-1,0), world));
     Monitor monitor(world);
     monitor.Start();
 

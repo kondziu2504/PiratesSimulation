@@ -11,6 +11,8 @@
 #include "Mast.h"
 #include "MastDistributor.h"
 #include "Sailor.h"
+#include "Util.h"
+
 using namespace std;
 
 Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
@@ -44,12 +46,11 @@ void Ship::Start() {
     while(true){
         ShipState current_state = GetState();
         if(current_state == ShipState::kRoaming){
-            if(!LookForEnemy()){
-                AdjustDirection();
-            }
+            LookForEnemy();
+            AdjustDirection();
             usleep(100000);
         }else if(current_state == ShipState::kFighting){
-            //GetInPosition
+            GetInPosition();
         }
     }
 }
@@ -148,18 +149,36 @@ void Ship::PrepareForFight(Ship *ship) {
 }
 
 bool Ship::LookForEnemy() {
+    lock_guard<mutex> guard(world->shipsMutex);
     for(auto ship : world->ships){
-        if(ship.get() == this)
-            continue;
+        auto got = ship.get();
+        if(ship.get() != this){
+            int lookout_radius = 9;
 
-        int lookout_radius = 6;
-
-        if((ship->GetPos() - GetPos()).Distance() < lookout_radius){
-            EngageFight(ship.get());
-            return true;
-        }else{
-            return false;
+            float dist = (ship->GetPos() - GetPos()).Distance();
+            Vec2 enemy_pos = ship->GetPos();
+            Vec2 this_pos = GetPos();
+            if(dist < lookout_radius){
+                EngageFight(ship.get());
+                return true;
+            }
         }
     }
     return false;
+}
+
+void Ship::GetInPosition() {
+    float target_angle = (enemy->GetPos() - GetPos()).Angle() - M_PI_2;
+    float current_angle = GetDir().Angle();
+    while(abs(current_angle - target_angle) > M_PI / 180.f){
+        float angle_diff = AngleDifference(target_angle, current_angle);
+        float angle_change = min(abs(angle_diff), 0.1f);
+        {
+            lock_guard<mutex> guard(pos_mutex);
+            direction = direction.Rotate(angle_change * (angle_diff > 0 ? 1 : -1));
+        }
+        current_angle = GetDir().Angle();
+        usleep(100000);
+    }
+
 }

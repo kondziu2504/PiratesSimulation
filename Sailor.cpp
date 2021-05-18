@@ -24,7 +24,7 @@ void Sailor::Start() {
         GoWaitForMast();
         GoOperateMast();
         GoRest();
-        GoUseStairs();
+        //GoUseStairs();
     }
 }
 
