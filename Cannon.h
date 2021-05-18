@@ -20,12 +20,12 @@ class Cannon {
     std::pair<Sailor *, Sailor *> owners;
 
     Ship * ship;
-
+    float relative_pos_along;
     std::mutex loaded_mutex;
     bool loaded = false;
     std::condition_variable c_var_loaded;
 public:
-    explicit Cannon(Ship * ship);
+    explicit Cannon(Ship * ship, float relative_pos_along);
     std::pair<Sailor *, Sailor *> GetOwners();
     bool Loaded();
     void WaitUntilLoaded();

@@ -27,7 +27,6 @@ class Ship {
     ShipState state = ShipState::kRoaming;
     std::mutex state_mutex;
 
-    ShipState GetState();
     void SetState(ShipState new_state);
 
     void EngageFight(Ship * ship);
@@ -37,8 +36,14 @@ class Ship {
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
+    bool use_right_cannons = true;
+    std::shared_ptr<void> left_junction;
+    std::shared_ptr<void> right_junction;
+    float length = 6;
+    ShipState GetState();
     Ship * enemy = nullptr;
-    std::vector<std::shared_ptr<Cannon>> cannons;
+    std::vector<std::shared_ptr<Cannon>> right_cannons;
+    std::vector<std::shared_ptr<Cannon>> left_cannons;
     std::shared_ptr<std::mutex> stairs_mutex;
 
     std::shared_ptr<World> world;

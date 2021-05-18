@@ -264,8 +264,8 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         if(masts->size() == 1)
             first_mast_y = height / 2;
         else{
-            first_mast_y = height / 3;
-            last_mast_y = height - first_mast_y;
+            first_mast_y = height / 4;
+            last_mast_y = height * 0.9f;
         }
 
         int mast_y = first_mast_y;
@@ -277,14 +277,23 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
 
         int cannon_y = height / 3;
-        auto cannons = ship->cannons;
-        int cannon_y_delta = height / (2 * cannons.size());
-        for(auto cannon : cannons){
+        auto right_cannons = ship->right_cannons;
+        int cannon_y_delta = height / (right_cannons.size() + 1);
+        for(auto cannon : right_cannons){
             elements_positions->insert(make_pair(cannon.get(), Vec2(width - 1, cannon_y)));
             cannon_y += cannon_y_delta;
         }
 
-        elements_positions->insert(make_pair(ship->distributor.get(), Vec2(width * 0.75, height/2)));
+        cannon_y = height / 3;
+        auto left_cannons = ship->left_cannons;
+        cannon_y_delta = height / (left_cannons.size() + 1);
+        for(auto cannon : left_cannons){
+            elements_positions->insert(make_pair(cannon.get(), Vec2(0, cannon_y)));
+            cannon_y += cannon_y_delta;
+        }
+
+        elements_positions->insert(make_pair(ship->right_junction.get(), Vec2(width * 0.75, height/2)));
+        elements_positions->insert(make_pair(ship->left_junction.get(), Vec2(width * 0.25, height/2)));
         elements_positions->insert(make_pair(ship->stairs_mutex.get(), Vec2(width/2, width/2)));
         elements_positions->insert(make_pair(nullptr, Vec2(width * 0.75, height * 0.25)));
     }
@@ -311,7 +320,12 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
     Vec2 stairs_pos = elements_positions->find(ship->stairs_mutex.get())->second;
     DrawTile(stairs_pos.y + y_offset, stairs_pos.x + x_offset, '=', Tile::kStairs);
 
-    for(auto cannon : ship->cannons){
+    for(auto cannon : ship->right_cannons){
+        Vec2 cannon_pos = elements_positions->find(cannon.get())->second;
+        DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
+    }
+
+    for(auto cannon : ship->left_cannons){
         Vec2 cannon_pos = elements_positions->find(cannon.get())->second;
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }

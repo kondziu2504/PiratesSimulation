@@ -22,10 +22,14 @@ void Sailor::Start() {
 
 [[noreturn]] void Sailor::ThreadFun() {
     while(true){
-        //GoWaitForMast();
-        //GoOperateMast();
-        GoWaitForCannon();
-        GoUseCannon();
+        ShipState ship_state = ship->GetState();
+        if(ship_state == ShipState::kRoaming) {
+            GoWaitForMast();
+            GoOperateMast();
+        }else if(ship_state == ShipState::kFighting){
+            GoWaitForCannon();
+            GoUseCannon();
+        }
         GoRest();
         //GoUseStairs();
     }
@@ -106,7 +110,7 @@ void Sailor::WaitForMast() {
 }
 
 void Sailor::GoWaitForMast() {
-    next_target = ship->distributor.get();
+    next_target = ship->right_junction.get();
     SetState(SailorState::kWalking);
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
@@ -183,7 +187,7 @@ bool Sailor::IsUpperDeck() {
 
 void Sailor::GoWaitForCannon() {
     SetState(SailorState::kWalking);
-    next_target = ship->distributor.get();
+    next_target = ship->use_right_cannons ? ship->right_junction.get() : ship->left_junction.get();
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
         usleep(100000);
@@ -197,7 +201,8 @@ void Sailor::GoWaitForCannon() {
 void Sailor::WaitForCannon() {
     SetState(SailorState::kWaitingCannon);
     while(true){
-        for(auto cannon : ship->cannons){
+        auto side_cannons = ship->use_right_cannons ? ship->right_cannons : ship->left_cannons;
+        for(auto cannon : side_cannons){
             if(cannon->TryClaim(this)){
                 operated_cannon = cannon.get();
                 SetState(SailorState::kWaitingCannon);
@@ -226,8 +231,8 @@ void Sailor::UseCannon() {
     auto cannon_owners = operated_cannon->GetOwners();
     if(cannon_owners.first == this){
         operated_cannon->WaitUntilLoaded();
-        Vec2 perpendicular = ship->GetPos() + Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
-        operated_cannon->Shoot(perpendicular);
+        Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
+        operated_cannon->Shoot(ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1 : -1));
     }else if(cannon_owners.second == this){
         operated_cannon->Load();
     }

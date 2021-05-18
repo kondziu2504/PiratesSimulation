@@ -22,7 +22,8 @@ void Cannon::Shoot(Vec2 target) {
     loaded = true;
     {
         lock_guard<mutex> guard_cannonballs(ship->world->cannonballs_mutex);
-        ship->world->cannonballs.push_back(make_shared<Cannonball>(ship->GetPos(), target));
+        Vec2 origin_offset = ship->GetDir() * ship->length * (0.5 - relative_pos_along);
+        ship->world->cannonballs.push_back(make_shared<Cannonball>(ship->GetPos() + origin_offset, target + origin_offset));
     }
     loaded = false;
 }
@@ -63,7 +64,8 @@ void Cannon::Release(Sailor *sailor) {
         owners.second = nullptr;
 }
 
-Cannon::Cannon(Ship * ship) {
+Cannon::Cannon(Ship * ship, float relative_pos_along) {
     this->ship = ship;
+    this->relative_pos_along = relative_pos_along;
     owners.first = owners.second = nullptr;
 }

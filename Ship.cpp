@@ -22,11 +22,15 @@ Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     this->direction = direction.Normalized();
     stairs_mutex = make_shared<mutex>();
     masts = make_shared<vector<shared_ptr<Mast>>>();
+    left_junction = make_shared<int>();
+    right_junction = make_shared<int>();
     for(int i = 0; i < 3; i++)
         masts->push_back(make_shared<Mast>());
     distributor = make_shared<MastDistributor>(masts);
-    for(int i = 0; i < 3; i++)
-        cannons.push_back(make_shared<Cannon>(this));
+    for(int i = 0; i < 3; i++){
+        right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
+        left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
+    }
     sailors = make_shared<vector<shared_ptr<Sailor>>>();
     for(int i = 0; i < 24; i++){
         shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
@@ -173,6 +177,8 @@ bool Ship::LookForEnemy() {
 void Ship::GetInPosition() {
     float target_angle = (enemy->GetPos() - GetPos()).Angle() - M_PI_2;
     float current_angle = GetDir().Angle();
+    float angle_diff = AngleDifference(target_angle, current_angle);;
+    use_right_cannons = angle_diff > 0;
     while(abs(current_angle - target_angle) > M_PI / 180.f){
         float angle_diff = AngleDifference(target_angle, current_angle);
         float angle_change = min(abs(angle_diff), 0.1f);
