@@ -16,12 +16,24 @@ class Mast;
 class World;
 class Sailor;
 
+enum class ShipState{kRoaming, kFighting};
+
 class Ship {
 
     Vec2 pos;
     std::mutex pos_mutex;
     Vec2 direction;
+    ShipState state = ShipState::kRoaming;
+    std::mutex state_mutex;
 
+    Ship * enemy = nullptr;
+
+    ShipState GetState();
+    void SetState(ShipState new_state);
+
+    void EngageFight(Ship * ship);
+    void PrepareForFight(Ship * ship);
+    bool LookForEnemy();
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:

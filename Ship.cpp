@@ -42,11 +42,15 @@ void Ship::Start() {
 
 [[noreturn]] void Ship::UpdateThread() {
     while(true){
-        {
-            //pos = pos + direction * velocity;
-            AdjustDirection();
+        ShipState current_state = GetState();
+        if(current_state == ShipState::kRoaming){
+            if(!LookForEnemy()){
+                AdjustDirection();
+            }
+            usleep(100000);
+        }else if(current_state == ShipState::kFighting){
+            //GetInPosition
         }
-        usleep(100000);
     }
 }
 
@@ -106,15 +110,56 @@ void Ship::AdjustDirection() {
 }
 
 void Ship::ApplyWind(Vec2 wind) {
+    if(GetState() == ShipState::kFighting)
+            return;
     float wind_power = wind.Distance();
     float effective_power = 0;
     for(shared_ptr<Mast> mast : *masts){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
-        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized());
+        float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 3;
         effective_power += wind_power * mast_effectiveness;
     }
 
     effective_power = max(effective_power, 0.2f);
     lock_guard<mutex> guard(pos_mutex);
     pos = pos + direction * effective_power;
+}
+
+ShipState Ship::GetState() {
+    lock_guard<mutex> guard(state_mutex);
+    return state;
+}
+
+void Ship::SetState(ShipState new_state) {
+    lock_guard<mutex> guard(state_mutex);
+    state = new_state;
+}
+
+void Ship::EngageFight(Ship * enemy_ship) {
+    if(enemy_ship->GetState() == ShipState::kFighting)
+        return;
+    PrepareForFight(enemy_ship);
+    enemy_ship->PrepareForFight(this);
+}
+
+void Ship::PrepareForFight(Ship *ship) {
+    enemy = ship;
+    SetState(ShipState::kFighting);
+}
+
+bool Ship::LookForEnemy() {
+    for(auto ship : world->ships){
+        if(ship.get() == this)
+            continue;
+
+        int lookout_radius = 6;
+
+        if((ship->GetPos() - GetPos()).Distance() < lookout_radius){
+            EngageFight(ship.get());
+            return true;
+        }else{
+            return false;
+        }
+    }
+    return false;
 }
