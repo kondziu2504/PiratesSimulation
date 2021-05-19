@@ -191,7 +191,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     int line = 0;
     int indentation = 0;
     indentation = 0;
-    string header = "Statek ";
+    string header = "Statek " + to_string(ship->hp);
     mvaddstr(line++, 0, header.c_str());
     indentation += 2;
     mvaddstr(line++, indentation, "Marynarze:");

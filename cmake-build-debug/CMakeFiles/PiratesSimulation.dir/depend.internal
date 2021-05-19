@@ -15,7 +15,9 @@ CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o
 CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Cannonball.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Cannonball.h
+ /home/konrad/CLionProjects/PiratesSimulation/Ship.h
  /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+ /home/konrad/CLionProjects/PiratesSimulation/World.h
 CMakeFiles/PiratesSimulation.dir/Mast.cpp.o
  /home/konrad/CLionProjects/PiratesSimulation/Mast.cpp
  /home/konrad/CLionProjects/PiratesSimulation/Mast.h

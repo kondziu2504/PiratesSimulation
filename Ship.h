@@ -36,6 +36,7 @@ class Ship {
     void AdjustDirection();
     [[noreturn]] void UpdateThread();
 public:
+    int hp = 10;
     bool use_right_cannons = true;
     std::shared_ptr<void> left_junction;
     std::shared_ptr<void> right_junction;

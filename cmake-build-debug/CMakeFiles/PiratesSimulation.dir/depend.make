@@ -14,7 +14,9 @@ CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o: ../World.h
 
 CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o: ../Cannonball.cpp
 CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o: ../Cannonball.h
+CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o: ../Ship.h
 CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o: ../Vec2.h
+CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o: ../World.h
 
 CMakeFiles/PiratesSimulation.dir/Mast.cpp.o: ../Mast.cpp
 CMakeFiles/PiratesSimulation.dir/Mast.cpp.o: ../Mast.h
