@@ -24,6 +24,7 @@ CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../MastDistributor.cpp
 CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../MastDistributor.h
 CMakeFiles/PiratesSimulation.dir/MastDistributor.cpp.o: ../Sailor.h
 
+CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../Cannon.h
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../Cannonball.h
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../Mast.h
 CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o: ../MastDistributor.h

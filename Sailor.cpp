@@ -21,6 +21,7 @@ void Sailor::Start() {
 }
 
 [[noreturn]] void Sailor::ThreadFun() {
+    usleep(RandomTime(0,10) * 1000000);
     while(true){
         ShipState ship_state = ship->GetState();
         if(ship_state == ShipState::kRoaming) {
@@ -37,17 +38,10 @@ void Sailor::Start() {
 
 
 void Sailor::GoRest() {
-    next_target = nullptr;
     SetState(SailorState::kWalking);
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
-    SetState(SailorState::kStanding);
-    previous_target = next_target;
-
+    Walk(nullptr, 3);
     SetState(SailorState::kResting);
-    usleep(1000000);
+    usleep(4000000);
     SetState(SailorState::kStanding);
 }
 
@@ -67,7 +61,7 @@ void Sailor::SetState(SailorState new_state) {
 
 void Sailor::OperateMast() {
     SetState(SailorState::kMast);
-    for(int i = 0; i < 10; i++){
+    for(int i = 0; i < 60; i++){
         usleep(100000);
         SetProgress((float)i / 9);
         float wind_angle = ship->world->wind->GetVelocity().Angle();
@@ -88,12 +82,8 @@ void Sailor::OperateMast() {
 
 
 void Sailor::GoOperateMast() {
-    next_target = operated_mast.get();
     SetState(SailorState::kWalking);
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
+    Walk(operated_mast.get(), 2);
     SetState(SailorState::kStanding);
     previous_target = next_target;
 
@@ -103,20 +93,14 @@ void Sailor::GoOperateMast() {
 void Sailor::WaitForMast() {
     SetState(SailorState::kWaitingMast);
     {
-        lock_guard<mutex> guard(sailor_mutex);
         operated_mast = ship->distributor->RequestMast(this);
     }
     SetState(SailorState::kStanding);
 }
 
 void Sailor::GoWaitForMast() {
-    next_target = ship->right_junction.get();
     SetState(SailorState::kWalking);
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
-    previous_target = next_target;
+    Walk(ship->right_junction.get(), 3);
     SetState(SailorState::kStanding);
 
     WaitForMast();
@@ -187,12 +171,7 @@ bool Sailor::IsUpperDeck() {
 
 void Sailor::GoWaitForCannon() {
     SetState(SailorState::kWalking);
-    next_target = ship->use_right_cannons ? ship->right_junction.get() : ship->left_junction.get();
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
-    previous_target = next_target;
+    Walk(ship->use_right_cannons ? ship->right_junction.get() : ship->left_junction.get(), 3);
     SetState(SailorState::kStanding);
 
     WaitForCannon();
@@ -215,19 +194,13 @@ void Sailor::WaitForCannon() {
 
 void Sailor::GoUseCannon() {
     SetState(SailorState::kWalking);
-    next_target = operated_cannon;
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
-    previous_target = next_target;
-
+    Walk(operated_cannon, 2);
     UseCannon();
 }
 
 void Sailor::UseCannon() {
     SetState(SailorState::kCannon);
-
+    usleep(2000000);
     auto cannon_owners = operated_cannon->GetOwners();
     if(cannon_owners.first == this){
         operated_cannon->WaitUntilLoaded();
@@ -239,6 +212,17 @@ void Sailor::UseCannon() {
 
     operated_cannon->Release(this);
     SetState(SailorState::kStanding);
+}
+
+void Sailor::Walk(void *next, float seconds) {
+    next_target = next;
+    float seconds_per_step = 0.05;
+    int steps = seconds / seconds_per_step;
+    for(int i = 0; i < steps; i++){
+        SetProgress((float)i / (steps - 1));
+        usleep(seconds_per_step * 1000000);
+    }
+    previous_target = next_target;
 }
 
 

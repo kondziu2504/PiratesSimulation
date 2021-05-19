@@ -6,5 +6,6 @@
 #define PIRATESSIMULATION_UTIL_H
 
 float AngleDifference(float angle1, float angle2);
+float RandomTime(float min, float max);
 
 #endif //PIRATESSIMULATION_UTIL_H

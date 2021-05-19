@@ -16,6 +16,7 @@
 #include "Wind.h"
 #include "Util.h"
 #include "Cannonball.h"
+#include "Cannon.h"
 
 using namespace std;
 
@@ -99,7 +100,7 @@ void Monitor::Update() {
     while(true)
     {
         Update();
-        usleep(100000);
+        usleep(80000);
     }
 }
 
@@ -208,6 +209,18 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
                 case SailorState::kWaitingStairs:
                     state_text = "Czeka na schody";
                     break;
+                case SailorState::kCannon:
+                    state_text = "Obsluguje armate";
+                    break;
+                case SailorState::kWaitingCannon:
+                    state_text = "Czeka na armate";
+                    break;
+                case SailorState::kStanding:
+                    state_text = "Stoi";
+                    break;
+                case SailorState::kWaitingMast:
+                    state_text = "Czeka na maszt";
+                    break;
             }
             string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
             mvaddstr(line++, indentation, sailor_text.c_str());
@@ -229,6 +242,40 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
         mast_index++;
     }
     indentation -= 2;
+    mvaddstr(line++, indentation, "Armaty:");
+    indentation++;
+    mvaddstr(line++, indentation, "Lewa strona:");
+    indentation++;
+    int cannon_ind = 0;
+    for(auto cannon : ship->left_cannons){
+        int owners = 0;
+        auto cannon_owners = cannon->GetOwners();
+        if(cannon_owners.first != nullptr)
+            owners++;
+        if(cannon_owners.second != nullptr)
+            owners++;
+        string cannon_message = "Armata " + to_string(cannon_ind) + " Obslugiwana przez: " + to_string(owners) +
+                (owners == 2 ? "(Max)" : "");
+        mvaddstr(line++, indentation, cannon_message.c_str());
+        cannon_ind++;
+    }
+    indentation--;
+    mvaddstr(line++, indentation, "Prawa strona:");
+    indentation++;
+    cannon_ind = 0;
+    for(auto cannon : ship->right_cannons){
+        int owners = 0;
+        auto cannon_owners = cannon->GetOwners();
+        if(cannon_owners.first != nullptr)
+            owners++;
+        if(cannon_owners.second != nullptr)
+            owners++;
+        string cannon_message = "Armata " + to_string(cannon_ind) + " Obslugiwana przez: " + to_string(owners) +
+                                (owners == 2 ? "(Max)" : "");
+        mvaddstr(line++, indentation, cannon_message.c_str());
+        cannon_ind++;
+    }
+    indentation--;
 }
 
 [[noreturn]] void Monitor::InputThread() {
@@ -294,7 +341,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
         elements_positions->insert(make_pair(ship->right_junction.get(), Vec2(width * 0.75, height/2)));
         elements_positions->insert(make_pair(ship->left_junction.get(), Vec2(width * 0.25, height/2)));
-        elements_positions->insert(make_pair(ship->stairs_mutex.get(), Vec2(width/2, width/2)));
+        elements_positions->insert(make_pair(ship->stairs_mutex.get(), Vec2(width/2, width/3)));
         elements_positions->insert(make_pair(nullptr, Vec2(width * 0.75, height * 0.25)));
     }
 
@@ -391,7 +438,7 @@ void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_p
 void Monitor::DrawShipInfo(int ship_ind) {
     auto ship = world->ships[ship_ind];
     DrawDashboard(ship);
-    DrawShipDeck(ship, 40, 0, 20, 40);
+    DrawShipDeck(ship, 40, 0, 29, 50);
     DrawWindDir(71, 0, 18);
     DrawShipDir(71, 20, 18, ship);
     DrawSailTarget(71, 40, 18, ship);

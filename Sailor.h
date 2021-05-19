@@ -52,6 +52,7 @@ class Sailor {
     void WaitForCannon();
     void GoUseCannon();
     void UseCannon();
+    void Walk(void * next, float seconds);
 public:
     bool IsUpperDeck();
     void * GetPreviousTarget();

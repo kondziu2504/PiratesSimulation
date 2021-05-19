@@ -176,9 +176,10 @@ bool Ship::LookForEnemy() {
 
 void Ship::GetInPosition() {
     float target_angle = (enemy->GetPos() - GetPos()).Angle() - M_PI_2;
+    //TODO: use_right_cannons = angle_diff > 0;
+    use_right_cannons = false;
     float current_angle = GetDir().Angle();
     float angle_diff = AngleDifference(target_angle, current_angle);;
-    use_right_cannons = angle_diff > 0;
     while(abs(current_angle - target_angle) > M_PI / 180.f){
         float angle_diff = AngleDifference(target_angle, current_angle);
         float angle_change = min(abs(angle_diff), 0.1f);

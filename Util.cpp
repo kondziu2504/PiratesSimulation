@@ -4,6 +4,10 @@
 
 #include <cmath>
 #include "Util.h"
+#include <random>
+
+std::mt19937 mt;
+
 
 float AngleDifference(float angle1, float angle2){
     float angle_diff = angle1 - angle2;
@@ -14,5 +18,10 @@ float AngleDifference(float angle1, float angle2){
             angle_diff -= 2 * M_PI;
     }
     return angle_diff;
+}
+
+float RandomTime(float min, float max){
+    std::uniform_real_distribution dis(min, max);
+    return dis(mt);
 }
 
