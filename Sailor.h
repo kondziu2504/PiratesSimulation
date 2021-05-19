@@ -22,14 +22,10 @@ class Sailor {
     SailorState currentState = SailorState::kResting;
 
     std::mutex target_mutex;
-
     float activity_progress;
-
     bool upper_deck = true;
-
     Ship * ship;
-    std::shared_ptr<Mast> operated_mast;
-    Cannon * operated_cannon = nullptr;
+
     void * previous_target = nullptr;
     void * next_target = nullptr;
 
@@ -54,6 +50,8 @@ class Sailor {
     void UseCannon();
     void Walk(void * next, float seconds);
 public:
+    std::shared_ptr<Mast> operated_mast = nullptr;
+    Cannon * operated_cannon = nullptr;
     bool IsUpperDeck();
     void * GetPreviousTarget();
     void * GetNextTarget();

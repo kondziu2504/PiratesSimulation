@@ -402,12 +402,44 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
     for(auto sailor : *ship->sailors){
         if(sailor->IsUpperDeck()){
-            void * prev_target = sailor->GetPreviousTarget();
-            void * next_target = sailor->GetNextTarget();
-            float progress = sailor->GetProgress();
-            Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
-            Vec2 next_target_pos = elements_positions->find(next_target)->second;
-            Vec2 tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
+            Vec2 tile_pos;
+            SailorState sailor_state = sailor->GetState();
+            if(sailor_state == SailorState::kCannon){
+                Vec2 cannon_pos = elements_positions->find(sailor->operated_cannon)->second;
+                if(sailor->operated_cannon->GetOwners().first == sailor.get()){
+                    tile_pos = cannon_pos + Vec2(0,1);
+                }else
+                    tile_pos = cannon_pos - Vec2(0,1);
+            }else if(sailor_state == SailorState::kMast){
+                auto mast_owners = ship->distributor->masts_owners->at(sailor->operated_mast);
+                Vec2 mast_pos = elements_positions->at(sailor->operated_mast.get());
+                int ind = 0;
+                for(auto mast_owner : *mast_owners){
+                    if(mast_owner == sailor.get())
+                        break;
+                    else
+                        ind++;
+                }
+                switch(ind){
+                    case 0:
+                        tile_pos = mast_pos + Vec2(0, -1); break;
+                    case 1:
+                        tile_pos = mast_pos + Vec2(1, 0); break;
+                    case 2:
+                        tile_pos = mast_pos + Vec2(0, 1); break;
+                    case 3:
+                        tile_pos = mast_pos + Vec2(-1, 0); break;
+                    default:
+                        break;
+                }
+            } else{
+                void * prev_target = sailor->GetPreviousTarget();
+                void * next_target = sailor->GetNextTarget();
+                float progress = sailor->GetProgress();
+                Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
+                Vec2 next_target_pos = elements_positions->find(next_target)->second;
+                tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
+            }
             auto sailor_color = GetColor(sailor.get());
             SetColor(sailor_color, COLOR_BLACK);
             mvaddch(tile_pos.y + y_offset, tile_pos.x + x_offset, 'S');
