@@ -41,7 +41,7 @@ void Sailor::GoRest() {
     SetState(SailorState::kWalking);
     Walk(nullptr, 3);
     SetState(SailorState::kResting);
-    usleep(4000000);
+    usleep(RandomTime(3,5) * 1000000);
     SetState(SailorState::kStanding);
 }
 

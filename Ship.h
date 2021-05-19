@@ -52,7 +52,7 @@ public:
     std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
     std::shared_ptr<MastDistributor> distributor;
 
-    Ship(Vec2 pos, Vec2 direction, std::shared_ptr<World> world);
+    Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, std::shared_ptr<World> world);
     void ApplyWind(Vec2 wind);
     Vec2 GetPos();
     Vec2 GetDir();

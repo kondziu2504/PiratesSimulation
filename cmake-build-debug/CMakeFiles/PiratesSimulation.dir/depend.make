@@ -78,6 +78,7 @@ CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../World.cpp
 CMakeFiles/PiratesSimulation.dir/World.cpp.o: ../World.h
 
 CMakeFiles/PiratesSimulation.dir/main.cpp.o: ../Monitor.h
+CMakeFiles/PiratesSimulation.dir/main.cpp.o: ../Sailor.h
 CMakeFiles/PiratesSimulation.dir/main.cpp.o: ../Ship.h
 CMakeFiles/PiratesSimulation.dir/main.cpp.o: ../Vec2.h
 CMakeFiles/PiratesSimulation.dir/main.cpp.o: ../World.h

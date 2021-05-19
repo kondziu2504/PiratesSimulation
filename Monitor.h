@@ -12,6 +12,7 @@
 #include <ncurses.h>
 #include <unordered_set>
 #include <unordered_map>
+#include "Sailor.h"
 
 enum class MonitorDisplayMode {kMap, kDashboard};
 
@@ -25,6 +26,11 @@ class Monitor {
     int curr_column = 0, curr_row = 0;
     std::mutex current_ship_mutex;
     int current_ship_ind = 0;
+
+    static const std::vector<int> kSailorsColors;
+
+    static std::unordered_map<Sailor *, int> sailors_assigned_colors;
+    static int color_id;
 
     sp<std::unordered_set<sp<Ship>>> visualized_ships;
     sp<std::unordered_map<void *, Vec2>> elements_positions;
@@ -51,6 +57,13 @@ private:
     void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
     void DrawShipInfo(int ship_ind);
     void DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+    int GetColor(Sailor * sailor);
+
+    void InitColorpairs();
+    short CursColor(int fg);
+    int ColorNum(int fg, int bg);
+    void SetColor(int fg, int bg);
+    void UnsetColor(int fg, int bg);
 
     [[noreturn]] void InputThread();
 

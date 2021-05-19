@@ -16,7 +16,7 @@
 
 using namespace std;
 
-Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
+Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, shared_ptr<World> world){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
@@ -24,15 +24,15 @@ Ship::Ship(Vec2 pos, Vec2 direction,  shared_ptr<World> world){
     masts = make_shared<vector<shared_ptr<Mast>>>();
     left_junction = make_shared<int>();
     right_junction = make_shared<int>();
-    for(int i = 0; i < 3; i++)
+    for(int i = 0; i < masts_count; i++)
         masts->push_back(make_shared<Mast>());
     distributor = make_shared<MastDistributor>(masts);
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < cannons_per_side; i++){
         right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
         left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
     }
     sailors = make_shared<vector<shared_ptr<Sailor>>>();
-    for(int i = 0; i < 24; i++){
+    for(int i = 0; i < sailors_count; i++){
         shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
         sailor->Start();
         sailors->push_back(sailor);

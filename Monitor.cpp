@@ -23,6 +23,10 @@ using namespace std;
 #define COLOR_BROWN 8
 #define COLOR_GRAY 9
 
+const vector<int> Monitor::kSailorsColors = {COLOR_RED, COLOR_CYAN, COLOR_MAGENTA, COLOR_YELLOW, COLOR_GREEN};
+unordered_map<Sailor *, int> Monitor::sailors_assigned_colors = unordered_map<Sailor*, int>();
+int Monitor::color_id = 0;
+
 Monitor::Monitor(shared_ptr<World> world) {
     this->world = world;
 
@@ -66,6 +70,8 @@ void Monitor::Initialize() {
     init_color(COLOR_MAGENTA, 1000, 500, 1000);
     init_color(COLOR_BROWN, 500, 275, 0);
     init_color(COLOR_GRAY, 300, 300, 300);
+
+    InitColorpairs();
 
     init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
     init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BROWN );
@@ -179,6 +185,8 @@ void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewpo
     }
 }
 
+
+
 void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     int line = 0;
     int indentation = 0;
@@ -223,7 +231,10 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
                     break;
             }
             string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
+            auto sailor_color = GetColor(sailor.get());
+            SetColor(sailor_color, 0);
             mvaddstr(line++, indentation, sailor_text.c_str());
+            UnsetColor(sailor_color, 0);
             sailor_index++;
         }
     }
@@ -347,7 +358,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
     char deck_ch = ' ';
     for(int y = 0; y < width/2; y++){
-        for(int x = width/2 - y; x < width/2 + y; x++){
+        for(int x = width/2 - y; x <= width/2 + y; x++){
             DrawTile(y + y_offset, x + x_offset, deck_ch, Tile::kShip);
         }
     }
@@ -397,7 +408,10 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
             Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
             Vec2 next_target_pos = elements_positions->find(next_target)->second;
             Vec2 tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
-            DrawTile(tile_pos.y + y_offset, tile_pos.x + x_offset, 'S', Tile::kSailor);
+            auto sailor_color = GetColor(sailor.get());
+            SetColor(sailor_color, COLOR_BLACK);
+            mvaddch(tile_pos.y + y_offset, tile_pos.x + x_offset, 'S');
+            UnsetColor(sailor_color, COLOR_BLACK);
         }
     }
 }
@@ -461,4 +475,66 @@ void Monitor::DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_
             DrawTile(cannonball_pos.y + y_offset - y_viewport, cannonball_pos.x + x_offset - x_viewport, 'O', Tile::kCannonball);
         }
     }
+}
+
+int Monitor::GetColor(Sailor *sailor) {
+    if(sailors_assigned_colors.find(sailor) == sailors_assigned_colors.end()){
+        sailors_assigned_colors[sailor] = color_id++;
+    }
+    int color_ind = sailors_assigned_colors.at(sailor);
+    return kSailorsColors.at(color_ind % kSailorsColors.size());
+}
+
+short Monitor::CursColor(int fg){
+    switch (7 & fg) {           /* RGB */
+        case 0:                     /* 000 */
+            return (COLOR_BLACK);
+        case 1:                     /* 001 */
+            return (COLOR_RED);
+        case 2:                     /* 010 */
+            return (COLOR_GREEN);
+        case 3:                     /* 011 */
+            return (COLOR_YELLOW);
+        case 4:                     /* 100 */
+            return (COLOR_BLUE);
+        case 5:                     /* 101 */
+            return (COLOR_MAGENTA);
+        case 6:                     /* 110 */
+            return (COLOR_CYAN);
+        case 7:                     /* 111 */
+            return (COLOR_WHITE);
+        default:
+            return (COLOR_BLACK);
+    }
+}
+
+void Monitor::InitColorpairs(){
+    int fg, bg;
+    int colorpair;
+
+    for (bg = 0; bg <= 7; bg++) {
+        for (fg = 0; fg <= 7; fg++) {
+            colorpair = ColorNum(fg, bg);
+            init_pair(colorpair, CursColor(fg), CursColor(bg));
+        }
+    }
+}
+
+int Monitor::ColorNum(int fg, int bg)
+{
+    int B, bbb, ffff;
+
+    B = 1 << 7;
+    bbb = (7 & bg) << 4;
+    ffff = 7 & fg;
+
+    return (B | bbb | ffff);
+}
+
+void Monitor::SetColor(int fg, int bg) {
+    attron(COLOR_PAIR(ColorNum(fg, bg)));
+}
+
+void Monitor::UnsetColor(int fg, int bg) {
+    attroff(COLOR_PAIR(ColorNum(fg, bg)));
 }
