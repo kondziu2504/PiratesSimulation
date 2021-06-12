@@ -17,7 +17,7 @@ class World;
 class Sailor;
 class Cannon;
 
-enum class ShipState{kRoaming, kFighting};
+enum class ShipState{kRoaming, kFighting, kSinking, kDestroyed};
 
 class Ship {
 
@@ -34,7 +34,7 @@ class Ship {
     bool LookForEnemy();
     void GetInPosition();
     void AdjustDirection();
-    [[noreturn]] void UpdateThread();
+    void UpdateThread();
 public:
     int hp = 10;
     bool use_right_cannons = true;
@@ -47,17 +47,18 @@ public:
     std::vector<std::shared_ptr<Cannon>> left_cannons;
     std::shared_ptr<std::mutex> stairs_mutex;
 
-    std::shared_ptr<World> world;
+    World * world;
     std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
     std::mutex sailors_mutex;
     std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
     std::shared_ptr<MastDistributor> distributor;
 
-    Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, std::shared_ptr<World> world);
+    Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
     void ApplyWind(Vec2 wind);
     Vec2 GetPos();
     Vec2 GetDir();
     void Start();
+    void Destroy();
 };
 
 

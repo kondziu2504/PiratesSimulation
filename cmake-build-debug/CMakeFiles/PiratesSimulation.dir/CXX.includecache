@@ -6,23 +6,31 @@
 
 #IncludeRegexTransform: 
 
-/home/konrad/CLionProjects/PiratesSimulation/Cannonball.cpp
-unistd.h
--
-Cannonball.h
-/home/konrad/CLionProjects/PiratesSimulation/Cannonball.h
-thread
+/home/konrad/CLionProjects/PiratesSimulation/Monitor.h
+memory
 -
 World.h
 /home/konrad/CLionProjects/PiratesSimulation/World.h
-Ship.h
-/home/konrad/CLionProjects/PiratesSimulation/Ship.h
-
-/home/konrad/CLionProjects/PiratesSimulation/Cannonball.h
-mutex
--
 Vec2.h
 /home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+pthread.h
+-
+ncurses.h
+-
+unordered_set
+-
+unordered_map
+-
+Sailor.h
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+
+/home/konrad/CLionProjects/PiratesSimulation/Sailor.h
+random
+-
+mutex
+-
+atomic
+-
 
 /home/konrad/CLionProjects/PiratesSimulation/Ship.h
 Vec2.h
@@ -43,4 +51,20 @@ vector
 -
 mutex
 -
+
+/home/konrad/CLionProjects/PiratesSimulation/main.cpp
+iostream
+-
+World.h
+/home/konrad/CLionProjects/PiratesSimulation/World.h
+Monitor.h
+/home/konrad/CLionProjects/PiratesSimulation/Monitor.h
+memory
+-
+ncurses.h
+-
+Vec2.h
+/home/konrad/CLionProjects/PiratesSimulation/Vec2.h
+Ship.h
+/home/konrad/CLionProjects/PiratesSimulation/Ship.h
 

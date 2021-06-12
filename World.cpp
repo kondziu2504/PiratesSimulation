@@ -41,3 +41,37 @@ void World::AddShip(std::shared_ptr<Ship> ship) {
     ships.push_back(ship);
     ship->Start();
 }
+
+void World::GenerateShip() {
+    Vec2 pos;
+    bool goodField;
+    do{
+        goodField = true;
+        pos = Vec2(rand() % width, rand() % height);
+        for(int x = - 10; x <= 10; x++) {
+            for(int y = -10; y <= 10; y++) {
+                Vec2 newPos = Vec2(pos.x + x, pos.y + y);
+                if (newPos.x < 0 || newPos.x >= width || newPos.y < 0 || newPos.y >= height) {
+                    goodField = false;
+                    break;
+                }
+                if(map[newPos.y * width + newPos.x]) {
+                    goodField = false;
+                    break;
+                }
+            }
+            if (!goodField)
+                break;
+        }
+    }while(!goodField);
+
+    Vec2 direction = Vec2::FromAngle((float)rand() / RAND_MAX * 6.28);
+    int sailors = 10 + rand() % 25;
+    int masts = 2 + rand() % 3;
+    int cannonsPerSide = 2 + rand() % 3;
+
+    lock_guard<mutex> guard(shipsMutex);
+    auto newShip = make_shared<Ship>(pos, direction, sailors, masts, cannonsPerSide, this);
+    ships.push_back(newShip);
+    newShip->Start();
+}

@@ -25,6 +25,7 @@ public:
     std::shared_ptr<Wind> wind;
     World(int width, int height, int seed);
     void AddShip(std::shared_ptr<Ship> ship);
+    void GenerateShip();
 };
 
 

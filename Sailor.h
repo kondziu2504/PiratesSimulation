@@ -7,13 +7,14 @@
 
 #include <random>
 #include <mutex>
+#include <atomic>
 
 class Cannon;
 class Ship;
 class Mast;
 
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
-        kWaitingStairs, kStairs, kWaitingCannon, kCannon};
+        kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
 class Sailor {
     std::mt19937 mt;
@@ -31,7 +32,9 @@ class Sailor {
 
     std::mutex sailor_mutex;
 
-    [[noreturn]] void ThreadFun();
+
+
+    void ThreadFun();
     void OperateMast();
     void GoOperateMast();
     void WaitForMast();
@@ -49,7 +52,9 @@ class Sailor {
     void GoUseCannon();
     void UseCannon();
     void Walk(void * next, float seconds);
+
 public:
+    std::atomic<bool> dying = false;
     std::shared_ptr<Mast> operated_mast = nullptr;
     Cannon * operated_cannon = nullptr;
     bool IsUpperDeck();
@@ -58,6 +63,7 @@ public:
     float GetProgress();
     explicit Sailor(Ship * ship);
     void Start();
+    void Kill();
     SailorState GetState();
 };
 

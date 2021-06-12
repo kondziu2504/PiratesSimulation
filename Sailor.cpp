@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <unistd.h>
+#include <iostream>
 #include "Sailor.h"
 #include "Mast.h"
 #include "Ship.h"
@@ -20,7 +21,7 @@ void Sailor::Start() {
     sailor_thread.detach();
 }
 
-[[noreturn]] void Sailor::ThreadFun() {
+void Sailor::ThreadFun() {
     usleep(RandomTime(0,10) * 1000000);
     while(true){
         ShipState ship_state = ship->GetState();
@@ -30,6 +31,10 @@ void Sailor::Start() {
         }else if(ship_state == ShipState::kFighting){
             GoWaitForCannon();
             GoUseCannon();
+        }
+        if (dying) {
+            SetState(SailorState::kDead);
+            return;
         }
         GoRest();
         //GoUseStairs();
@@ -204,8 +209,10 @@ void Sailor::UseCannon() {
     auto cannon_owners = operated_cannon->GetOwners();
     if(cannon_owners.first == this){
         operated_cannon->WaitUntilLoaded();
-        Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
-        operated_cannon->Shoot(ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1 : -1));
+        if(operated_cannon->Loaded()) {
+            Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
+            operated_cannon->Shoot(ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1 : -1));
+        }
     }else if(cannon_owners.second == this){
         operated_cannon->Load();
     }
@@ -223,6 +230,11 @@ void Sailor::Walk(void *next, float seconds) {
         usleep(seconds_per_step * 1000000);
     }
     previous_target = next_target;
+}
+
+void Sailor::Kill(){
+    dying = true;
+    while(GetState() != SailorState::kDead);
 }
 
 

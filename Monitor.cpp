@@ -82,6 +82,7 @@ void Monitor::Initialize() {
     init_pair(static_cast<short>(Tile::kStairs), COLOR_YELLOW, COLOR_BLACK);
     init_pair(static_cast<short>(Tile::kCannon), COLOR_WHITE, COLOR_BLACK);
     init_pair(static_cast<short>(Tile::kCannonball), COLOR_WHITE, COLOR_BLACK);
+    init_pair(static_cast<short>(Tile::kDestroyed), COLOR_GRAY, COLOR_BLACK);
 }
 
 void Monitor::Stop() {
@@ -169,7 +170,8 @@ void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_
                     DrawTile(
                             tile_pos.y + y_offset - y_viewport,
                             tile_pos.x + x_offset - x_viewport,
-                            texture[i][j], Tile::kShip);
+                            texture[i][j],
+                            ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed ? Tile::kShip : Tile::kDestroyed);
                 }
             }
         }
@@ -191,7 +193,8 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     int line = 0;
     int indentation = 0;
     indentation = 0;
-    string header = "Statek " + to_string(ship->hp);
+    string health = ship->GetState() == ShipState::kDestroyed ? "Zniszczony" : "Zdrowie: " + to_string(ship->hp);
+    string header = "Statek(" + health + ")";
     mvaddstr(line++, 0, header.c_str());
     indentation += 2;
     mvaddstr(line++, indentation, "Marynarze:");
@@ -228,6 +231,9 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
                     break;
                 case SailorState::kWaitingMast:
                     state_text = "Czeka na maszt";
+                    break;
+                case SailorState::kDead:
+                    state_text = "Martwy";
                     break;
             }
             string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;

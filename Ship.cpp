@@ -16,7 +16,7 @@
 
 using namespace std;
 
-Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, shared_ptr<World> world){
+Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
@@ -49,15 +49,21 @@ void Ship::Start() {
     shipThread.detach();
 }
 
-[[noreturn]] void Ship::UpdateThread() {
+void Ship::UpdateThread() {
     while(true){
         ShipState current_state = GetState();
+        if(current_state == ShipState::kDestroyed)
+            return;
         if(current_state == ShipState::kRoaming){
             LookForEnemy();
             AdjustDirection();
             usleep(100000);
         }else if(current_state == ShipState::kFighting){
             GetInPosition();
+            if(enemy->GetState() == ShipState::kSinking || enemy->GetState() == ShipState::kDestroyed) {
+                enemy = nullptr;
+                SetState(ShipState::kRoaming);
+            }
         }
     }
 }
@@ -158,8 +164,9 @@ void Ship::PrepareForFight(Ship *ship) {
 bool Ship::LookForEnemy() {
     lock_guard<mutex> guard(world->shipsMutex);
     for(auto ship : world->ships){
-        auto got = ship.get();
-        if(ship.get() != this){
+        if(ship.get() != this &&
+        ship->GetState() != ShipState::kSinking &&
+        ship->GetState() != ShipState::kDestroyed){
             int lookout_radius = 9;
 
             float dist = (ship->GetPos() - GetPos()).Distance();
@@ -191,4 +198,34 @@ void Ship::GetInPosition() {
         usleep(100000);
     }
 
+}
+
+void Ship::Destroy() {
+    auto shipState = GetState();
+    if(shipState == ShipState::kSinking || shipState == ShipState::kDestroyed)
+        return;
+    SetState(ShipState::kSinking);
+    thread destroyThread([&](){
+        vector<thread> killThreads;
+        for(auto sailor : *sailors)
+            killThreads.emplace_back(thread([=]() {sailor->Kill();}));
+
+        for(auto & killThread : killThreads)
+            killThread.join();
+
+        SetState(ShipState::kDestroyed);
+        {
+            lock_guard<mutex> guard(world->shipsMutex);
+            auto it = world->ships.begin();
+            while (it != world->ships.end()) {
+                if (it->get() == this) {
+                    world->ships.erase(it);
+                    break;
+                }
+                it++;
+            }
+        }
+        world->GenerateShip();
+    });
+    destroyThread.detach();
 }
