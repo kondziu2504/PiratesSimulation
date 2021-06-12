@@ -36,11 +36,19 @@ class Monitor {
     sp<std::unordered_map<void *, Vec2>> elements_positions;
 
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed};
+
+    std::atomic<bool> stop = false;
+    std::atomic<bool> stopped = false;
 public:
     Monitor(std::shared_ptr<World> world);
 
     void Start();
     void Stop();
+
+    void NextShip();
+    void PrevShip();
+    void ChangeDisplayMode();
+
 private:
     void Update();
     void Initialize();
@@ -65,10 +73,7 @@ private:
     void SetColor(int fg, int bg);
     void UnsetColor(int fg, int bg);
 
-    [[noreturn]] void InputThread();
-
-
-    [[noreturn]] void UpdateThread();
+    void UpdateThread();
 };
 
 

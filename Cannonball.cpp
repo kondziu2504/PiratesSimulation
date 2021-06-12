@@ -34,7 +34,7 @@ void Cannonball::CannonThread() {
                     if( (ship->GetPos() - GetPos()).Distance() < 3) {
                         ship->hp--;
                         if(ship->hp <= 0){
-                            ship->Destroy();
+                            ship->Destroy(true);
                         }
                     }
                 return;

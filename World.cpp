@@ -75,3 +75,17 @@ void World::GenerateShip() {
     ships.push_back(newShip);
     newShip->Start();
 }
+
+void World::Stop() {
+    {
+        lock_guard<mutex> guard(shipsMutex);
+        for (auto ship : ships) {
+            ship->Destroy(false);
+        }
+    }
+    while(true) {
+        lock_guard<mutex> guard(shipsMutex);
+        if(ships.empty())
+            break;
+    }
+}

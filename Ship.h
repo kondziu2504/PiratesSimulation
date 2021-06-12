@@ -58,7 +58,7 @@ public:
     Vec2 GetPos();
     Vec2 GetDir();
     void Start();
-    void Destroy();
+    void Destroy(bool respawn);
 };
 
 

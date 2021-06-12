@@ -187,7 +187,7 @@ void Ship::GetInPosition() {
     use_right_cannons = false;
     float current_angle = GetDir().Angle();
     float angle_diff = AngleDifference(target_angle, current_angle);;
-    while(abs(current_angle - target_angle) > M_PI / 180.f){
+    while(abs(current_angle - target_angle) > M_PI / 180.f * 5.f){
         float angle_diff = AngleDifference(target_angle, current_angle);
         float angle_change = min(abs(angle_diff), 0.1f);
         {
@@ -200,12 +200,12 @@ void Ship::GetInPosition() {
 
 }
 
-void Ship::Destroy() {
+void Ship::Destroy(bool respawn) {
     auto shipState = GetState();
     if(shipState == ShipState::kSinking || shipState == ShipState::kDestroyed)
         return;
     SetState(ShipState::kSinking);
-    thread destroyThread([&](){
+    thread destroyThread([this, respawn]{
         vector<thread> killThreads;
         for(auto sailor : *sailors)
             killThreads.emplace_back(thread([=]() {sailor->Kill();}));
@@ -225,7 +225,8 @@ void Ship::Destroy() {
                 it++;
             }
         }
-        world->GenerateShip();
+        if(respawn)
+            world->GenerateShip();
     });
     destroyThread.detach();
 }

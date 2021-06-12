@@ -35,7 +35,9 @@ Wind::Wind(World * world) {
 }
 
 void Wind::UpdateVelocity() {
-
+    float currentAngle = velocity.Angle();
+    float newAngle = currentAngle + (((float)rand() / RAND_MAX) - 0.5f) / 3.f;
+    velocity = Vec2::FromAngle(newAngle);
 }
 
 Vec2 Wind::GetVelocity() {

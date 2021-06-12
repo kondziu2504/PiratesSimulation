@@ -3,6 +3,7 @@
 #include "Monitor.h"
 #include <memory>
 #include <ncurses.h>
+#include <thread>
 #include "Vec2.h"
 #include "Ship.h"
 
@@ -24,14 +25,25 @@ int main(int argc, char *argv[]) {
     world->AddShip(make_shared<Ship>(Vec2(15,16), Vec2(1,0), 5, 2, 2, world.get()));
     world->AddShip(make_shared<Ship>(Vec2(55,18), Vec2(1, 0), 24, 3, 3, world.get()));
     world->AddShip(make_shared<Ship>(Vec2(95,15), Vec2(-1,0), 5, 2, 2, world.get()));
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 2; i++)
         world->GenerateShip();
     Monitor monitor(world);
     monitor.Start();
-    //while(true);
 
-    //while(getchar() != 27);
+    while(true){
+        char key = getchar();
+        if(key == ' '){
+            monitor.ChangeDisplayMode();
+        }else if(key == 'a'){
+            monitor.PrevShip();
+        }else if(key == 'd'){
+            monitor.NextShip();
+        }else if(key == 27){
+            world->Stop();
+            monitor.Stop();
+            break;
+        }
+    }
 
-    endwin();
     return 0;
 }

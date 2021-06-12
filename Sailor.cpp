@@ -210,7 +210,10 @@ void Sailor::UseCannon() {
     if(cannon_owners.first == this){
         operated_cannon->WaitUntilLoaded();
         if(operated_cannon->Loaded()) {
-            Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * 8;
+            float distance = 5;
+            if(ship->enemy != nullptr)
+                distance = (ship->enemy->GetPos() - ship->GetPos()).Distance();
+            Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * distance;
             operated_cannon->Shoot(ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1 : -1));
         }
     }else if(cannon_owners.second == this){

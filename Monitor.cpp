@@ -38,10 +38,8 @@ Monitor::Monitor(shared_ptr<World> world) {
 void Monitor::Start() {
     Initialize();
     thread monitorThread(&Monitor::UpdateThread, this);
-    //monitorThread.detach();
-    thread inputThread(&Monitor::InputThread, this);
-    inputThread.detach();
-    monitorThread.join();
+    monitorThread.detach();
+    //monitorThread.join();
 }
 
 void Monitor::Initialize() {
@@ -86,7 +84,9 @@ void Monitor::Initialize() {
 }
 
 void Monitor::Stop() {
-
+    stop = true;
+    while(!stopped);
+    endwin();
 }
 
 void Monitor::Update() {
@@ -103,10 +103,14 @@ void Monitor::Update() {
     refresh();
 }
 
-[[noreturn]] void Monitor::UpdateThread() {
+void Monitor::UpdateThread() {
     while(true)
     {
         Update();
+        if (stop) {
+            stopped = true;
+            return;
+        }
         usleep(80000);
     }
 }
@@ -293,29 +297,6 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
         cannon_ind++;
     }
     indentation--;
-}
-
-[[noreturn]] void Monitor::InputThread() {
-    while(true){
-        char key = getchar();
-        if(key == ' '){
-             lock_guard<mutex> guard(display_mode_mutex);
-            if(display_mode == MonitorDisplayMode::kMap)
-                display_mode = MonitorDisplayMode::kDashboard;
-            else
-                display_mode = MonitorDisplayMode::kMap;
-        }else if(key == 'a'){
-            lock_guard<mutex> guard(current_ship_mutex);
-            current_ship_ind--;
-            if(current_ship_ind < 0)
-                current_ship_ind = world->ships.size() - 1;
-        }else if(key == 'd'){
-            lock_guard<mutex> guard(current_ship_mutex);
-            current_ship_ind++;
-            if(current_ship_ind >= world->ships.size())
-                current_ship_ind = 0;
-        }
-    }
 }
 
 void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height) {
@@ -575,4 +556,26 @@ void Monitor::SetColor(int fg, int bg) {
 
 void Monitor::UnsetColor(int fg, int bg) {
     attroff(COLOR_PAIR(ColorNum(fg, bg)));
+}
+
+void Monitor::NextShip() {
+    lock_guard<mutex> guard(current_ship_mutex);
+    current_ship_ind++;
+    if(current_ship_ind >= world->ships.size())
+        current_ship_ind = 0;
+}
+
+void Monitor::PrevShip() {
+    lock_guard<mutex> guard(current_ship_mutex);
+    current_ship_ind--;
+    if(current_ship_ind < 0)
+        current_ship_ind = world->ships.size() - 1;
+}
+
+void Monitor::ChangeDisplayMode() {
+    lock_guard<mutex> guard(display_mode_mutex);
+    if(display_mode == MonitorDisplayMode::kMap)
+        display_mode = MonitorDisplayMode::kDashboard;
+    else
+        display_mode = MonitorDisplayMode::kMap;
 }
