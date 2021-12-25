@@ -38,6 +38,6 @@ void Mast::Adjust() {
     AdjustAngle(angle_diff);
 }
 
-Mast::Mast(Ship * ship) : ShipObject(ship->shipObjectIdGenerator.get()) {
+Mast::Mast(Ship * ship) {
     this->ship = ship;
 }

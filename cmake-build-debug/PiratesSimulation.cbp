@@ -130,16 +130,7 @@
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Ship.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
-		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/ShipObject.cpp">
-			<Option target="PiratesSimulation"/>
-		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/ShipObject.h">
-			<Option target="PiratesSimulation"/>
-		</Unit>
-		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.cpp">
-			<Option target="PiratesSimulation"/>
-		</Unit>
-		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.h">
 			<Option target="PiratesSimulation"/>
 		</Unit>
 		<Unit filename="/home/konrad/CLionProjects/PiratesSimulation/Stairs.cpp">

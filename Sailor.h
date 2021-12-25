@@ -8,7 +8,6 @@
 #include <random>
 #include <mutex>
 #include <atomic>
-#include "ShipObjectIdGenerator.h"
 #include "ShipObject.h"
 
 class Cannon;
@@ -30,15 +29,14 @@ class Sailor {
     //Sailor activity/travel
     std::mutex target_mutex;
     float activity_progress;
-    int previous_target = ShipObjectIdGenerator::kNoObject;
-    int next_target = ShipObjectIdGenerator::kNoObject;
+    std::shared_ptr<ShipObject> previous_target = nullptr;
+    std::shared_ptr<ShipObject> next_target = nullptr;
 
     //Operated elements
     std::shared_ptr<Mast> operated_mast = nullptr;
     std::shared_ptr<Cannon> operated_cannon = nullptr;
 
     std::atomic<bool> dying = false;
-
 
     void ThreadFun();
     void OperateMast();
@@ -48,15 +46,13 @@ class Sailor {
     void GoRest();
     void SetState(SailorState new_state);
     void SetProgress(float progress);
-    void SetPreviousTarget(int target);
-    void SetNextTarget(int target);
     void UseStairs();
     void GoUseStairs();
     void GoWaitForCannon();
     void WaitForCannon();
     void GoUseCannon();
     void UseCannon();
-    void Walk(int next, float seconds);
+    void GoTo(std::shared_ptr<ShipObject> shipObject, float walkDuration);
 
 public:
     explicit Sailor(Ship * ship);
@@ -71,8 +67,8 @@ public:
     [[nodiscard]] std::shared_ptr<Cannon> GetOperatedCannon() const;
 
     //Sailor activities/travel
-    int GetPreviousTarget();
-    int GetNextTarget();
+    std::shared_ptr<ShipObject> GetPreviousTarget();
+    std::shared_ptr<ShipObject> GetNextTarget();
     float GetProgress();
 };
 

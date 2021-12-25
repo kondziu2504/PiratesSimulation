@@ -16,8 +16,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/konrad/CLionProjects/PiratesSimulation/Monitor.cpp" "CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Monitor.cpp.o.d"
   "/home/konrad/CLionProjects/PiratesSimulation/Sailor.cpp" "CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Sailor.cpp.o.d"
   "/home/konrad/CLionProjects/PiratesSimulation/Ship.cpp" "CMakeFiles/PiratesSimulation.dir/Ship.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Ship.cpp.o.d"
-  "/home/konrad/CLionProjects/PiratesSimulation/ShipObject.cpp" "CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o.d"
-  "/home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.cpp" "CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o.d"
   "/home/konrad/CLionProjects/PiratesSimulation/Stairs.cpp" "CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o.d"
   "/home/konrad/CLionProjects/PiratesSimulation/Util.cpp" "CMakeFiles/PiratesSimulation.dir/Util.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Util.cpp.o.d"
   "/home/konrad/CLionProjects/PiratesSimulation/Vec2.cpp" "CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o" "gcc" "CMakeFiles/PiratesSimulation.dir/Vec2.cpp.o.d"

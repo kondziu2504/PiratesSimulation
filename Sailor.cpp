@@ -13,7 +13,6 @@
 #include "MastDistributor.h"
 #include "Util.h"
 #include "Cannon.h"
-#include "ShipObjectIdGenerator.h"
 
 using namespace std;
 
@@ -47,7 +46,7 @@ void Sailor::ThreadFun() {
 
 void Sailor::GoRest() {
     SetState(SailorState::kWalking);
-    Walk(ShipObjectIdGenerator::kNoObject, 3);
+    GoTo(ship->restingPoint, 3);
     SetState(SailorState::kResting);
     usleep(RandomTime(3,5) * 1000000);
     SetState(SailorState::kStanding);
@@ -86,7 +85,7 @@ void Sailor::OperateMast() {
 
 void Sailor::GoOperateMast() {
     SetState(SailorState::kWalking);
-    Walk(operated_mast->GetId(), 2);
+    GoTo(operated_mast, 2);
     SetState(SailorState::kStanding);
     previous_target = next_target;
 
@@ -103,7 +102,7 @@ void Sailor::WaitForMast() {
 
 void Sailor::GoWaitForMast() {
     SetState(SailorState::kWalking);
-    Walk(ship->right_junction->GetId(), 3);
+    GoTo(ship->right_junction, 3);
     SetState(SailorState::kStanding);
 
     WaitForMast();
@@ -119,22 +118,12 @@ void Sailor::SetProgress(float progress) {
     activity_progress = progress;
 }
 
-void Sailor::SetPreviousTarget(int target) {
-    lock_guard<mutex> guard(target_mutex);
-    previous_target = target;
-}
-
-void Sailor::SetNextTarget(int target) {
-    lock_guard<mutex> guard(target_mutex);
-    next_target = target;
-}
-
-int Sailor::GetPreviousTarget() {
+std::shared_ptr<ShipObject> Sailor::GetPreviousTarget() {
     lock_guard<mutex> guard(target_mutex);
     return previous_target;
 }
 
-int Sailor::GetNextTarget() {
+std::shared_ptr<ShipObject> Sailor::GetNextTarget() {
     lock_guard<mutex> guard(target_mutex);
     return next_target;
 }
@@ -156,7 +145,7 @@ void Sailor::UseStairs() {
 
 void Sailor::GoUseStairs() {
     SetState(SailorState::kWalking);
-    next_target = ship->stairs->GetId();
+    next_target = ship->stairs;
     for(int i = 0; i < 10; i++){
         SetProgress((float)i / 9);
         usleep(100000);
@@ -174,7 +163,7 @@ bool Sailor::IsUpperDeck() {
 
 void Sailor::GoWaitForCannon() {
     SetState(SailorState::kWalking);
-    Walk(ship->use_right_cannons ? ship->right_junction->GetId() : ship->left_junction->GetId(), 3);
+    GoTo(ship->use_right_cannons ? ship->right_junction : ship->left_junction, 3);
     SetState(SailorState::kStanding);
 
     WaitForCannon();
@@ -197,7 +186,7 @@ void Sailor::WaitForCannon() {
 
 void Sailor::GoUseCannon() {
     SetState(SailorState::kWalking);
-    Walk(operated_cannon->GetId(), 2);
+    GoTo(operated_cannon, 2);
     UseCannon();
 }
 
@@ -222,10 +211,10 @@ void Sailor::UseCannon() {
     SetState(SailorState::kStanding);
 }
 
-void Sailor::Walk(int next, float seconds) {
-    next_target = next;
+void Sailor::GoTo(shared_ptr<ShipObject> shipObject, float walkDuration) {
+    next_target = shipObject;
     float seconds_per_step = 0.05;
-    int steps = seconds / seconds_per_step;
+    int steps = walkDuration / seconds_per_step;
     for(int i = 0; i < steps; i++){
         SetProgress((float)i / (steps - 1));
         usleep(seconds_per_step * 1000000);
@@ -249,5 +238,6 @@ std::shared_ptr<Cannon> Sailor::GetOperatedCannon() const {
 bool Sailor::GetIsDying() const{
     return dying;
 }
+
 
 

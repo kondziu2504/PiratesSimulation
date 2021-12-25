@@ -21,10 +21,10 @@ Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int can
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
-    stairs = make_shared<Stairs>(shipObjectIdGenerator.get());
+    stairs = make_shared<Stairs>();
     masts = make_shared<vector<shared_ptr<Mast>>>();
-    left_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
-    right_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
+    left_junction = make_shared<ShipObject>();
+    right_junction = make_shared<ShipObject>();
     for(int i = 0; i < masts_count; i++)
         masts->push_back(make_shared<Mast>(this));
     distributor = make_shared<MastDistributor>(masts);

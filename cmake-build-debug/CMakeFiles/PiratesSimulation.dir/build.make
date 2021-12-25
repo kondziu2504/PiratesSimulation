@@ -251,38 +251,10 @@ CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/Cannonball.cpp -o CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.s
 
-CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o: CMakeFiles/PiratesSimulation.dir/flags.make
-CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o: ../ShipObjectIdGenerator.cpp
-CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o: CMakeFiles/PiratesSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o -MF CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o.d -o CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o -c /home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.cpp
-
-CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.cpp > CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.i
-
-CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/ShipObjectIdGenerator.cpp -o CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.s
-
-CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o: CMakeFiles/PiratesSimulation.dir/flags.make
-CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o: ../ShipObject.cpp
-CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o: CMakeFiles/PiratesSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o -MF CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o.d -o CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o -c /home/konrad/CLionProjects/PiratesSimulation/ShipObject.cpp
-
-CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/konrad/CLionProjects/PiratesSimulation/ShipObject.cpp > CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.i
-
-CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/konrad/CLionProjects/PiratesSimulation/ShipObject.cpp -o CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.s
-
 CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o: CMakeFiles/PiratesSimulation.dir/flags.make
 CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o: ../Stairs.cpp
 CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o: CMakeFiles/PiratesSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o -MF CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o.d -o CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o -c /home/konrad/CLionProjects/PiratesSimulation/Stairs.cpp
 
 CMakeFiles/PiratesSimulation.dir/Stairs.cpp.i: cmake_force
@@ -308,8 +280,6 @@ PiratesSimulation_OBJECTS = \
 "CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.o" \
 "CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o" \
 "CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o" \
-"CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o" \
-"CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o" \
 "CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o"
 
 # External object files for target PiratesSimulation
@@ -328,12 +298,10 @@ PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Util.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/BedDistributor.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Cannon.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Cannonball.cpp.o
-PiratesSimulation: CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o
-PiratesSimulation: CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/Stairs.cpp.o
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/build.make
 PiratesSimulation: CMakeFiles/PiratesSimulation.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Linking CXX executable PiratesSimulation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable PiratesSimulation"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/PiratesSimulation.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

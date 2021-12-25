@@ -297,7 +297,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
 }
 
 void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height) {
-    sp<std::unordered_map<int, Vec2>> elements_positions = make_shared<unordered_map<int, Vec2>>();
+    sp<std::unordered_map<shared_ptr<ShipObject>, Vec2>> elements_positions = make_shared<unordered_map<shared_ptr<ShipObject>, Vec2>>();
 
     {
         //Generate positions
@@ -312,7 +312,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
         int mast_y = first_mast_y;
         for (auto mast: *masts) {
-            elements_positions->insert(make_pair(mast->GetId(), Vec2(width / 2, mast_y)));
+            elements_positions->insert(make_pair(mast, Vec2(width / 2, mast_y)));
             if (masts->size() > 1) {
                 mast_y += (last_mast_y - first_mast_y) / (masts->size() - 1);
             }
@@ -322,7 +322,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         auto right_cannons = ship->right_cannons;
         int cannon_y_delta = height / (right_cannons.size() + 1);
         for (auto cannon: right_cannons) {
-            elements_positions->insert(make_pair(cannon->GetId(), Vec2(width - 1, cannon_y)));
+            elements_positions->insert(make_pair(cannon, Vec2(width - 1, cannon_y)));
             cannon_y += cannon_y_delta;
         }
 
@@ -330,14 +330,14 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         auto left_cannons = ship->left_cannons;
         cannon_y_delta = height / (left_cannons.size() + 1);
         for (auto cannon: left_cannons) {
-            elements_positions->insert(make_pair(cannon->GetId(), Vec2(0, cannon_y)));
+            elements_positions->insert(make_pair(cannon, Vec2(0, cannon_y)));
             cannon_y += cannon_y_delta;
         }
 
-        elements_positions->insert(make_pair(ship->right_junction->GetId(), Vec2(width * 0.75, height / 2)));
-        elements_positions->insert(make_pair(ship->left_junction->GetId(), Vec2(width * 0.25, height / 2)));
-        elements_positions->insert(make_pair(ship->stairs->GetId(), Vec2(width / 2, width / 3)));
-        elements_positions->insert(make_pair(ShipObjectIdGenerator::kNoObject, Vec2(width * 0.75, height * 0.25)));
+        elements_positions->insert(make_pair(ship->right_junction, Vec2(width * 0.75, height / 2)));
+        elements_positions->insert(make_pair(ship->left_junction, Vec2(width * 0.25, height / 2)));
+        elements_positions->insert(make_pair(ship->stairs, Vec2(width / 2, width / 3)));
+        elements_positions->insert(make_pair(ship->restingPoint, Vec2(width * 0.75, height * 0.25)));
     }
 
     char deck_ch = ' ';
@@ -359,16 +359,16 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
     }
 
-    Vec2 stairs_pos = elements_positions->find(ship->stairs->GetId())->second;
+    Vec2 stairs_pos = elements_positions->find(ship->stairs)->second;
     DrawTile(stairs_pos.y + y_offset, stairs_pos.x + x_offset, '=', Tile::kStairs);
 
     for(auto cannon : ship->right_cannons){
-        Vec2 cannon_pos = elements_positions->find(cannon->GetId())->second;
+        Vec2 cannon_pos = elements_positions->find(cannon)->second;
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }
 
     for(auto cannon : ship->left_cannons){
-        Vec2 cannon_pos = elements_positions->find(cannon->GetId())->second;
+        Vec2 cannon_pos = elements_positions->find(cannon)->second;
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }
 
@@ -379,7 +379,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         for(int i = 0; i < mast_width; i++){
             Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
-            Vec2 mast_pos = elements_positions->find(mast->GetId())->second;
+            Vec2 mast_pos = elements_positions->find(mast)->second;
             DrawTile(y_offset + mast_pos.y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + mast_pos.x, ch, Tile::kSail);
         }
     }
@@ -389,14 +389,14 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
             Vec2 tile_pos;
             SailorState sailor_state = sailor->GetState();
             if(sailor_state == SailorState::kCannon){
-                Vec2 cannon_pos = elements_positions->find(sailor->GetOperatedCannon()->GetId())->second;
+                Vec2 cannon_pos = elements_positions->find(sailor->GetOperatedCannon())->second;
                 if(sailor->GetOperatedCannon()->GetOwners().first == sailor.get()){
                     tile_pos = cannon_pos + Vec2(0,1);
                 }else
                     tile_pos = cannon_pos - Vec2(0,1);
             }else if(sailor_state == SailorState::kMast){
                 auto mast_owners = ship->distributor->masts_owners->at(sailor->GetOperatedMast());
-                Vec2 mast_pos = elements_positions->at(sailor->GetOperatedMast()->GetId());
+                Vec2 mast_pos = elements_positions->at(sailor->GetOperatedMast());
                 int ind = 0;
                 for(auto mast_owner : *mast_owners){
                     if(mast_owner == sailor.get())
@@ -417,8 +417,8 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
                         break;
                 }
             } else{
-                int prev_target = sailor->GetPreviousTarget();
-                int next_target = sailor->GetNextTarget();
+                shared_ptr<ShipObject> prev_target = sailor->GetPreviousTarget();
+                shared_ptr<ShipObject> next_target = sailor->GetNextTarget();
                 float progress = sailor->GetProgress();
                 Vec2 prev_target_pos = elements_positions->find(prev_target)->second;
                 Vec2 next_target_pos = elements_positions->find(next_target)->second;

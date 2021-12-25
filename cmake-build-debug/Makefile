@@ -321,54 +321,6 @@ Ship.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/Ship.cpp.s
 .PHONY : Ship.cpp.s
 
-ShipObject.o: ShipObject.cpp.o
-.PHONY : ShipObject.o
-
-# target to build an object file
-ShipObject.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.o
-.PHONY : ShipObject.cpp.o
-
-ShipObject.i: ShipObject.cpp.i
-.PHONY : ShipObject.i
-
-# target to preprocess a source file
-ShipObject.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.i
-.PHONY : ShipObject.cpp.i
-
-ShipObject.s: ShipObject.cpp.s
-.PHONY : ShipObject.s
-
-# target to generate assembly for a file
-ShipObject.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObject.cpp.s
-.PHONY : ShipObject.cpp.s
-
-ShipObjectIdGenerator.o: ShipObjectIdGenerator.cpp.o
-.PHONY : ShipObjectIdGenerator.o
-
-# target to build an object file
-ShipObjectIdGenerator.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.o
-.PHONY : ShipObjectIdGenerator.cpp.o
-
-ShipObjectIdGenerator.i: ShipObjectIdGenerator.cpp.i
-.PHONY : ShipObjectIdGenerator.i
-
-# target to preprocess a source file
-ShipObjectIdGenerator.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.i
-.PHONY : ShipObjectIdGenerator.cpp.i
-
-ShipObjectIdGenerator.s: ShipObjectIdGenerator.cpp.s
-.PHONY : ShipObjectIdGenerator.s
-
-# target to generate assembly for a file
-ShipObjectIdGenerator.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/PiratesSimulation.dir/build.make CMakeFiles/PiratesSimulation.dir/ShipObjectIdGenerator.cpp.s
-.PHONY : ShipObjectIdGenerator.cpp.s
-
 Stairs.o: Stairs.cpp.o
 .PHONY : Stairs.o
 
@@ -546,12 +498,6 @@ help:
 	@echo "... Ship.o"
 	@echo "... Ship.i"
 	@echo "... Ship.s"
-	@echo "... ShipObject.o"
-	@echo "... ShipObject.i"
-	@echo "... ShipObject.s"
-	@echo "... ShipObjectIdGenerator.o"
-	@echo "... ShipObjectIdGenerator.i"
-	@echo "... ShipObjectIdGenerator.s"
 	@echo "... Stairs.o"
 	@echo "... Stairs.i"
 	@echo "... Stairs.s"

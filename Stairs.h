@@ -12,7 +12,7 @@
 class Stairs : public ShipObject {
 public:
     std::mutex mutex;
-    Stairs(ShipObjectIdGenerator * shipObjectIdGenerator) : ShipObject(shipObjectIdGenerator) {}
+    Stairs() {}
 };
 
 
