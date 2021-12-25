@@ -38,7 +38,7 @@ void Sailor::ThreadFun() {
 void Sailor::GoRest() {
     GoTo(ship->restingPoint);
     SetState(SailorState::kResting);
-    usleep(RandomTime(3,5) * 1000000);
+    SleepSeconds(RandomTime(3,5));
     SetState(SailorState::kStanding);
 }
 
@@ -93,10 +93,7 @@ void Sailor::UseStairs() {
     SetState(SailorState::kWaitingStairs);
     lock_guard<mutex> guard(ship->stairs->mutex);
     SetState(SailorState::kStairs);
-    DoRepeatedlyForATime(
-            [=](float progress) -> void { SetProgress(progress);},
-            2.f
-            );
+    ProgressAction(2.f);
     upper_deck = !upper_deck;
     SetState(SailorState::kStanding);
 }
@@ -104,10 +101,7 @@ void Sailor::UseStairs() {
 void Sailor::GoUseStairs() {
     SetState(SailorState::kWalking);
     next_target = ship->stairs;
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
+    ProgressAction(2.f);
     previous_target = next_target;
     SetState(SailorState::kStanding);
 
@@ -130,13 +124,13 @@ void Sailor::WaitForCannon() {
                 return;
             }
         }
-        usleep(100000);
+        SleepSeconds(0.1f);
     }
 }
 
 void Sailor::UseCannon() {
     SetState(SailorState::kCannon);
-    usleep(2000000);
+    SleepSeconds(2);
     auto cannon_owners = assigned_cannon->GetOwners();
     if(cannon_owners.first == this){
         assigned_cannon->WaitUntilLoaded();
@@ -158,10 +152,7 @@ void Sailor::UseCannon() {
 void Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
     SetState(SailorState::kWalking);
     next_target = std::move(shipObject);
-    DoRepeatedlyForATime(
-            [=](float progress) -> void { SetProgress(progress);},
-            3.f
-            );
+    ProgressAction(3.f);
     previous_target = next_target;
     SetState(SailorState::kStanding);
 }
@@ -203,13 +194,10 @@ void Sailor::GoUseCannonProcedure() {
 
 void Sailor::ContinuouslyAdjustMast() {
     const float workTime = 6.f;
-
-    DoRepeatedlyForATime(
-            [=](float progress) -> void {
-                operated_mast->Adjust();
-                SetProgress(progress);
-            },
-            workTime);
+    ProgressAction(workTime,
+                   [=](float progress) -> void {
+                       operated_mast->Adjust();
+                   });
 }
 
 void Sailor::ReleaseMast() {
@@ -227,6 +215,17 @@ void Sailor::OperateTheShip() {
     }else if(ship_state == ShipState::kFighting){
         GoUseCannonProcedure();
     }
+}
+
+void Sailor::ProgressAction(float actionTotalTime, std::function<void(float progress)> action) {
+    DoRepeatedlyForATime(
+            [=](float progress) -> void {
+                if(action != nullptr)
+                    action(progress);
+                SetProgress(progress);
+                },
+            actionTotalTime
+    );
 }
 
 

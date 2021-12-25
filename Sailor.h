@@ -9,6 +9,7 @@
 #include <mutex>
 #include <atomic>
 #include "ShipObject.h"
+#include "Util.h"
 
 class Cannon;
 class Ship;
@@ -54,6 +55,7 @@ class Sailor {
     void GoUseCannonProcedure();
 
     void GoRest();
+    void ProgressAction(float actionTotalTime, std::function<void(float progress)> action = nullptr);
 
     void SetState(SailorState new_state);
     void SetProgress(float progress);
