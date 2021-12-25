@@ -23,17 +23,21 @@ class Sailor : public ShipObject {
     const static std::uniform_real_distribution<double> distribution;
 
     SailorState currentState = SailorState::kResting;
+    std::mutex sailor_mutex;
+    Ship * ship;
+    bool upper_deck = true;
 
+    //Sailor activity/travel
     std::mutex target_mutex;
     float activity_progress;
-    bool upper_deck = true;
-    Ship * ship;
-
     int previous_target = ShipObjectIdGenerator::kNoObject;
     int next_target = ShipObjectIdGenerator::kNoObject;
 
-    std::mutex sailor_mutex;
+    //Operated elements
+    std::shared_ptr<Mast> operated_mast = nullptr;
+    std::shared_ptr<Cannon> operated_cannon = nullptr;
 
+    std::atomic<bool> dying = false;
 
 
     void ThreadFun();
@@ -41,7 +45,6 @@ class Sailor : public ShipObject {
     void GoOperateMast();
     void WaitForMast();
     void GoWaitForMast();
-
     void GoRest();
     void SetState(SailorState new_state);
     void SetProgress(float progress);
@@ -56,17 +59,21 @@ class Sailor : public ShipObject {
     void Walk(int next, float seconds);
 
 public:
-    std::atomic<bool> dying = false;
-    std::shared_ptr<Mast> operated_mast = nullptr;
-    Cannon * operated_cannon = nullptr;
-    bool IsUpperDeck();
-    int GetPreviousTarget();
-    int GetNextTarget();
-    float GetProgress();
     explicit Sailor(Ship * ship);
     void Start();
     void Kill();
+    [[nodiscard]] bool GetIsDying() const;
     SailorState GetState();
+    bool IsUpperDeck();
+
+    //Operated elements
+    [[nodiscard]] std::shared_ptr<Mast> GetOperatedMast() const;
+    [[nodiscard]] std::shared_ptr<Cannon> GetOperatedCannon() const;
+
+    //Sailor activities/travel
+    int GetPreviousTarget();
+    int GetNextTarget();
+    float GetProgress();
 };
 
 

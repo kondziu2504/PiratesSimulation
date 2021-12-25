@@ -389,14 +389,14 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
             Vec2 tile_pos;
             SailorState sailor_state = sailor->GetState();
             if(sailor_state == SailorState::kCannon){
-                Vec2 cannon_pos = elements_positions->find(sailor->operated_cannon->GetId())->second;
-                if(sailor->operated_cannon->GetOwners().first == sailor.get()){
+                Vec2 cannon_pos = elements_positions->find(sailor->GetOperatedCannon()->GetId())->second;
+                if(sailor->GetOperatedCannon()->GetOwners().first == sailor.get()){
                     tile_pos = cannon_pos + Vec2(0,1);
                 }else
                     tile_pos = cannon_pos - Vec2(0,1);
             }else if(sailor_state == SailorState::kMast){
-                auto mast_owners = ship->distributor->masts_owners->at(sailor->operated_mast);
-                Vec2 mast_pos = elements_positions->at(sailor->operated_mast->GetId());
+                auto mast_owners = ship->distributor->masts_owners->at(sailor->GetOperatedMast());
+                Vec2 mast_pos = elements_positions->at(sailor->GetOperatedMast()->GetId());
                 int ind = 0;
                 for(auto mast_owner : *mast_owners){
                     if(mast_owner == sailor.get())

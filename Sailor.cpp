@@ -191,7 +191,7 @@ void Sailor::WaitForCannon() {
         auto side_cannons = ship->use_right_cannons ? ship->right_cannons : ship->left_cannons;
         for(auto cannon : side_cannons){
             if(cannon->TryClaim(this)){
-                operated_cannon = cannon.get();
+                operated_cannon = cannon;
                 SetState(SailorState::kWaitingCannon);
                 return;
             }
@@ -241,6 +241,18 @@ void Sailor::Walk(int next, float seconds) {
 void Sailor::Kill(){
     dying = true;
     while(GetState() != SailorState::kDead);
+}
+
+std::shared_ptr<Mast> Sailor::GetOperatedMast() const {
+    return operated_mast;
+}
+
+std::shared_ptr<Cannon> Sailor::GetOperatedCannon() const {
+    return operated_cannon;
+}
+
+bool Sailor::GetIsDying() const{
+    return dying;
 }
 
 
