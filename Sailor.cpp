@@ -72,7 +72,7 @@ void Sailor::OperateMast() {
     for(int i = 0; i < 60; i++){
         usleep(100000);
         SetProgress((float)i / 9);
-        operated_mast->Operate(this);
+        operated_mast->Adjust();
     }
 
     ship->distributor->ReleaseMast(operated_mast, this);

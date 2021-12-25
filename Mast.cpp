@@ -29,7 +29,7 @@ int Mast::GetMaxSlots() const {
     return max_slots;
 }
 
-void Mast::Operate(Sailor * sailor) {
+void Mast::Adjust() {
     float wind_angle = ship->world->wind->GetVelocity().Angle();
     float absolute_mast_angle = ship->GetDir().Angle() + GetAngle();
     float angle_diff = AngleDifference(wind_angle, absolute_mast_angle);
@@ -38,6 +38,6 @@ void Mast::Operate(Sailor * sailor) {
     AdjustAngle(angle_diff);
 }
 
-Mast::Mast(Ship *ship) : ShipObject(ship->shipObjectIdGenerator.get()) {
+Mast::Mast(Ship * ship) : ShipObject(ship->shipObjectIdGenerator.get()) {
     this->ship = ship;
 }

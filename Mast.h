@@ -9,24 +9,23 @@
 #include <mutex>
 #include <condition_variable>
 #include "ShipObject.h"
-#include "Operable.h"
 
 class MastDistributor;
+class Ship;
 
-
-class Mast : public ShipObject, public Operable {
+class Mast : public ShipObject{
     int max_slots = 4;
     float angle = 0.f;
-
     Ship * ship;
-
     std::mutex mast_mutex;
+
+    void AdjustAngle(float angle_delta);
+
 public:
     [[nodiscard]] int GetMaxSlots() const;
     float GetAngle();
-    void AdjustAngle(float angle_delta);
     explicit Mast(Ship * ship);
-    void Operate(Sailor * sailor) override;
+    void Adjust();
 };
 
 
