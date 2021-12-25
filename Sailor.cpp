@@ -65,17 +65,8 @@ void Sailor::SetState(SailorState new_state) {
 
 void Sailor::OperateMast() {
     SetState(SailorState::kMast);
-    for(int i = 0; i < 60; i++){
-        usleep(100000);
-        SetProgress((float)i / 9);
-        operated_mast->Adjust();
-    }
-
-    ship->distributor->ReleaseMast(operated_mast, this);
-    {
-        lock_guard<mutex> guard(sailor_mutex);
-        operated_mast = nullptr;
-    }
+    ContinuouslyAdjustMast();
+    ReleaseMast();
     SetState(SailorState::kStanding);
 }
 
@@ -221,6 +212,28 @@ void Sailor::GoUseCannonProcedure() {
     WaitForCannon();
     GoTo(assigned_cannon);
     UseCannon();
+}
+
+void Sailor::ContinuouslyAdjustMast() {
+    //Time in seconds
+    const float totalWorkTime = 6.f;
+    const float workPeriod = 0.1f;
+
+    float timeLeft = totalWorkTime;
+    while(timeLeft > 0){
+        SleepSeconds(workPeriod);
+        operated_mast->Adjust();
+        timeLeft -= workPeriod;
+        SetProgress(1.f - (timeLeft / totalWorkTime));
+    }
+}
+
+void Sailor::ReleaseMast() {
+    ship->distributor->ReleaseMast(operated_mast, this);
+    {
+        lock_guard<mutex> guard(sailor_mutex);
+        operated_mast = nullptr;
+    }
 }
 
 

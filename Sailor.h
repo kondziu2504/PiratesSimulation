@@ -43,9 +43,12 @@ class Sailor {
     void GoTo(std::shared_ptr<ShipObject> shipObject);
     [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
 
+    //Mast operations
     void OperateMast();
     void WaitForMast();
     void GoUseMastProcedure();
+    void ContinuouslyAdjustMast();
+    void ReleaseMast();
 
     void WaitForCannon();
     void UseCannon();

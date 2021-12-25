@@ -6,6 +6,8 @@
 #include "Util.h"
 #include <random>
 #include <mutex>
+#include <unistd.h>
+
 std::mt19937 mt;
 
 using namespace std;
@@ -29,3 +31,6 @@ float RandomTime(float min, float max){
     return dis(mt);
 }
 
+float SleepSeconds(float seconds){
+    usleep(1'000'000);
+}
