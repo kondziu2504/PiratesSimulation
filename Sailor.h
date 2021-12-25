@@ -18,7 +18,7 @@ class Mast;
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
         kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
-class Sailor : public ShipObject {
+class Sailor {
     const static std::mt19937 mt;
     const static std::uniform_real_distribution<double> distribution;
 

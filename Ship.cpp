@@ -26,7 +26,7 @@ Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int can
     left_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
     right_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
     for(int i = 0; i < masts_count; i++)
-        masts->push_back(make_shared<Mast>(shipObjectIdGenerator.get()));
+        masts->push_back(make_shared<Mast>(this));
     distributor = make_shared<MastDistributor>(masts);
     for(int i = 0; i < cannons_per_side; i++){
         right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));

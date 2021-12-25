@@ -53,7 +53,7 @@ void Sailor::GoRest() {
     SetState(SailorState::kStanding);
 }
 
-Sailor::Sailor(Ship * ship) : ShipObject(ship->shipObjectIdGenerator.get()){
+Sailor::Sailor(Ship * ship) {
     this->ship = ship;
 }
 
@@ -72,12 +72,7 @@ void Sailor::OperateMast() {
     for(int i = 0; i < 60; i++){
         usleep(100000);
         SetProgress((float)i / 9);
-        float wind_angle = ship->world->wind->GetVelocity().Angle();
-        float absolute_mast_angle = ship->GetDir().Angle() + operated_mast->GetAngle();
-        float angle_diff = AngleDifference(wind_angle, absolute_mast_angle);
-        float angle_change = min(abs(angle_diff), (float)M_PI / 180.f);
-        angle_diff = angle_change * (angle_diff >= 0 ? 1 : -1);
-        operated_mast->AdjustAngle(angle_diff);
+        operated_mast->Operate(this);
     }
 
     ship->distributor->ReleaseMast(operated_mast, this);

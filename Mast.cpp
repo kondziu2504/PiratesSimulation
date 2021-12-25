@@ -4,6 +4,10 @@
 
 #include <cmath>
 #include "Mast.h"
+#include "Ship.h"
+#include "World.h"
+#include "Wind.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -21,6 +25,19 @@ void Mast::AdjustAngle(float angle_delta) {
         this->angle += 2 * M_PI;
 }
 
-float Mast::GetMaxSlots() {
+int Mast::GetMaxSlots() const {
     return max_slots;
+}
+
+void Mast::Operate(Sailor * sailor) {
+    float wind_angle = ship->world->wind->GetVelocity().Angle();
+    float absolute_mast_angle = ship->GetDir().Angle() + GetAngle();
+    float angle_diff = AngleDifference(wind_angle, absolute_mast_angle);
+    float angle_change = min(abs(angle_diff), (float)M_PI / 180.f);
+    angle_diff = angle_change * (angle_diff >= 0.f ? 1.f : -1.f);
+    AdjustAngle(angle_diff);
+}
+
+Mast::Mast(Ship *ship) : ShipObject(ship->shipObjectIdGenerator.get()) {
+    this->ship = ship;
 }
