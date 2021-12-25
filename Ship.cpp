@@ -55,7 +55,7 @@ void Ship::UpdateThread() {
         ShipState current_state = GetState();
         if(current_state == ShipState::kDestroyed)
             return;
-        if(current_state == ShipState::kRoaming){
+        if(current_state == ShipState::kWandering){
             LookForEnemy();
             AdjustDirection();
             usleep(100000);
@@ -63,7 +63,7 @@ void Ship::UpdateThread() {
             GetInPosition();
             if(enemy->GetState() == ShipState::kSinking || enemy->GetState() == ShipState::kDestroyed) {
                 enemy = nullptr;
-                SetState(ShipState::kRoaming);
+                SetState(ShipState::kWandering);
             }
         }
     }

@@ -20,14 +20,14 @@ class World;
 class Sailor;
 class Cannon;
 
-enum class ShipState{kRoaming, kFighting, kSinking, kDestroyed};
+enum class ShipState{kWandering, kFighting, kSinking, kDestroyed};
 
 class Ship {
 
     Vec2 pos;
     std::mutex pos_mutex;
     Vec2 direction;
-    ShipState state = ShipState::kRoaming;
+    ShipState state = ShipState::kWandering;
     std::mutex state_mutex;
 
     void SetState(ShipState new_state);

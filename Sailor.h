@@ -34,25 +34,30 @@ class Sailor {
 
     //Operated elements
     std::shared_ptr<Mast> operated_mast = nullptr;
-    std::shared_ptr<Cannon> operated_cannon = nullptr;
+    std::shared_ptr<Cannon> assigned_cannon = nullptr;
 
     std::atomic<bool> dying = false;
 
     void ThreadFun();
+
+    void GoTo(std::shared_ptr<ShipObject> shipObject);
+    [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
+
     void OperateMast();
-    void GoOperateMast();
     void WaitForMast();
-    void GoWaitForMast();
+    void GoUseMastProcedure();
+
+    void WaitForCannon();
+    void UseCannon();
+    void GoUseCannonProcedure();
+
     void GoRest();
+
     void SetState(SailorState new_state);
     void SetProgress(float progress);
+
     void UseStairs();
     void GoUseStairs();
-    void GoWaitForCannon();
-    void WaitForCannon();
-    void GoUseCannon();
-    void UseCannon();
-    void GoTo(std::shared_ptr<ShipObject> shipObject, float walkDuration);
 
 public:
     explicit Sailor(Ship * ship);

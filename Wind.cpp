@@ -22,7 +22,7 @@ void Wind::Start() {
             lock_guard<mutex> guard(world->shipsMutex);
             for(shared_ptr<Ship> ship : world->ships){
                 auto shipState = ship->GetState();
-                if(shipState == ShipState::kRoaming)
+                if(shipState == ShipState::kWandering)
                     ship->ApplyWind(velocity);
             }
         }
