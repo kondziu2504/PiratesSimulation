@@ -31,6 +31,19 @@ float RandomTime(float min, float max){
     return dis(mt);
 }
 
-float SleepSeconds(float seconds){
-    usleep(1'000'000);
+void SleepSeconds(float seconds){
+    usleep((unsigned int)(1'000'000 * seconds));
+}
+
+void DoRepeatedlyForATime(const std::function<void(float progress)>& action, float totalTimeInSeconds, float updatePeriodInSeconds){
+    if(totalTimeInSeconds <= 0 || updatePeriodInSeconds <= 0)
+        return;
+
+    float timeLeft = totalTimeInSeconds;
+    while(timeLeft > 0){
+        if(action != nullptr)
+            action(1.f - (timeLeft / totalTimeInSeconds));
+        SleepSeconds(updatePeriodInSeconds);
+        timeLeft -= updatePeriodInSeconds;
+    }
 }

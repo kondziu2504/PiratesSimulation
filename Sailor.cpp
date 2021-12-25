@@ -5,6 +5,7 @@
 #include <thread>
 #include <unistd.h>
 #include <iostream>
+#include <utility>
 #include "Sailor.h"
 #include "Mast.h"
 #include "Ship.h"
@@ -16,28 +17,20 @@
 
 using namespace std;
 
-const std::uniform_real_distribution<double> Sailor::distribution = std::uniform_real_distribution(4.0, 6.0);
-
 void Sailor::Start() {
     thread sailor_thread(&Sailor::ThreadFun, this);
     sailor_thread.detach();
 }
 
 void Sailor::ThreadFun() {
-    usleep(RandomTime(0,10) * 1000000);
+    SleepSeconds(RandomTime(0,10));
     while(true){
-        ShipState ship_state = ship->GetState();
-        if(ship_state == ShipState::kWandering) {
-            GoUseMastProcedure();
-        }else if(ship_state == ShipState::kFighting){
-            GoUseCannonProcedure();
-        }
+        OperateTheShip();
         if (dying) {
             SetState(SailorState::kDead);
             return;
         }
         GoRest();
-        //GoUseStairs();
     }
 }
 
@@ -100,14 +93,11 @@ void Sailor::UseStairs() {
     SetState(SailorState::kWaitingStairs);
     lock_guard<mutex> guard(ship->stairs->mutex);
     SetState(SailorState::kStairs);
-    for(int i = 0; i < 10; i++){
-        SetProgress((float)i / 9);
-        usleep(100000);
-    }
-    {
-        lock_guard<mutex> guard(sailor_mutex);
-        upper_deck = !upper_deck;
-    }
+    DoRepeatedlyForATime(
+            [=](float progress) -> void { SetProgress(progress);},
+            2.f
+            );
+    upper_deck = !upper_deck;
     SetState(SailorState::kStanding);
 }
 
@@ -167,14 +157,11 @@ void Sailor::UseCannon() {
 
 void Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
     SetState(SailorState::kWalking);
-    const float kWalkDuration = 3.f;
-    next_target = shipObject;
-    float seconds_per_step = 0.05;
-    int steps = kWalkDuration / seconds_per_step;
-    for(int i = 0; i < steps; i++){
-        SetProgress((float)i / (steps - 1));
-        usleep(seconds_per_step * 1000000);
-    }
+    next_target = std::move(shipObject);
+    DoRepeatedlyForATime(
+            [=](float progress) -> void { SetProgress(progress);},
+            3.f
+            );
     previous_target = next_target;
     SetState(SailorState::kStanding);
 }
@@ -215,17 +202,14 @@ void Sailor::GoUseCannonProcedure() {
 }
 
 void Sailor::ContinuouslyAdjustMast() {
-    //Time in seconds
-    const float totalWorkTime = 6.f;
-    const float workPeriod = 0.1f;
+    const float workTime = 6.f;
 
-    float timeLeft = totalWorkTime;
-    while(timeLeft > 0){
-        SleepSeconds(workPeriod);
-        operated_mast->Adjust();
-        timeLeft -= workPeriod;
-        SetProgress(1.f - (timeLeft / totalWorkTime));
-    }
+    DoRepeatedlyForATime(
+            [=](float progress) -> void {
+                operated_mast->Adjust();
+                SetProgress(progress);
+            },
+            workTime);
 }
 
 void Sailor::ReleaseMast() {
@@ -233,6 +217,15 @@ void Sailor::ReleaseMast() {
     {
         lock_guard<mutex> guard(sailor_mutex);
         operated_mast = nullptr;
+    }
+}
+
+void Sailor::OperateTheShip() {
+    ShipState ship_state = ship->GetState();
+    if(ship_state == ShipState::kWandering) {
+        GoUseMastProcedure();
+    }else if(ship_state == ShipState::kFighting){
+        GoUseCannonProcedure();
     }
 }
 

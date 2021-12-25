@@ -18,13 +18,10 @@ enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
         kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
 class Sailor {
-    const static std::mt19937 mt;
-    const static std::uniform_real_distribution<double> distribution;
-
     SailorState currentState = SailorState::kResting;
     std::mutex sailor_mutex;
     Ship * ship;
-    bool upper_deck = true;
+    std::atomic<bool> upper_deck = true;
 
     //Sailor activity/travel
     std::mutex target_mutex;
@@ -42,6 +39,8 @@ class Sailor {
 
     void GoTo(std::shared_ptr<ShipObject> shipObject);
     [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
+
+    void OperateTheShip();
 
     //Mast operations
     void OperateMast();
