@@ -8,9 +8,11 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "ShipObject.h"
+
 class MastDistributor;
 
-class Mast {
+class Mast : public ShipObject {
     int max_slots = 4;
     float angle = 0.f;
 
@@ -19,6 +21,7 @@ public:
     float GetMaxSlots();
     float GetAngle();
     void AdjustAngle(float angle_delta);
+    Mast(ShipObjectIdGenerator * shipObjectIdGenerator) : ShipObject(shipObjectIdGenerator) {}
 };
 
 

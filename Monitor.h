@@ -32,9 +32,6 @@ class Monitor {
     static std::unordered_map<Sailor *, int> sailors_assigned_colors;
     static int color_id;
 
-    sp<std::unordered_set<sp<Ship>>> visualized_ships;
-    sp<std::unordered_map<void *, Vec2>> elements_positions;
-
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed};
 
     std::atomic<bool> stop = false;

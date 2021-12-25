@@ -15,7 +15,7 @@ class World;
 template<typename T>
 using sp = std::shared_ptr<T>;
 
-class Cannon {
+class Cannon : public ShipObject {
     std::mutex ownership_mutex;
     std::pair<Sailor *, Sailor *> owners;
 

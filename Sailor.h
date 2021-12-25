@@ -8,6 +8,8 @@
 #include <random>
 #include <mutex>
 #include <atomic>
+#include "ShipObjectIdGenerator.h"
+#include "ShipObject.h"
 
 class Cannon;
 class Ship;
@@ -16,9 +18,9 @@ class Mast;
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
         kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
-class Sailor {
-    std::mt19937 mt;
-    std::uniform_real_distribution<double> distribution = std::uniform_real_distribution(4.0, 6.0);
+class Sailor : public ShipObject {
+    const static std::mt19937 mt;
+    const static std::uniform_real_distribution<double> distribution;
 
     SailorState currentState = SailorState::kResting;
 
@@ -27,8 +29,8 @@ class Sailor {
     bool upper_deck = true;
     Ship * ship;
 
-    void * previous_target = nullptr;
-    void * next_target = nullptr;
+    int previous_target = ShipObjectIdGenerator::kNoObject;
+    int next_target = ShipObjectIdGenerator::kNoObject;
 
     std::mutex sailor_mutex;
 
@@ -43,23 +45,23 @@ class Sailor {
     void GoRest();
     void SetState(SailorState new_state);
     void SetProgress(float progress);
-    void SetPreviousTarget(void * target);
-    void SetNextTarget(void * target);
+    void SetPreviousTarget(int target);
+    void SetNextTarget(int target);
     void UseStairs();
     void GoUseStairs();
     void GoWaitForCannon();
     void WaitForCannon();
     void GoUseCannon();
     void UseCannon();
-    void Walk(void * next, float seconds);
+    void Walk(int next, float seconds);
 
 public:
     std::atomic<bool> dying = false;
     std::shared_ptr<Mast> operated_mast = nullptr;
     Cannon * operated_cannon = nullptr;
     bool IsUpperDeck();
-    void * GetPreviousTarget();
-    void * GetNextTarget();
+    int GetPreviousTarget();
+    int GetNextTarget();
     float GetProgress();
     explicit Sailor(Ship * ship);
     void Start();

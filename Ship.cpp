@@ -13,6 +13,7 @@
 #include "Sailor.h"
 #include "Util.h"
 #include "Cannon.h"
+#include "Stairs.h"
 
 using namespace std;
 
@@ -20,12 +21,12 @@ Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int can
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
-    stairs_mutex = make_shared<mutex>();
+    stairs = make_shared<Stairs>(shipObjectIdGenerator.get());
     masts = make_shared<vector<shared_ptr<Mast>>>();
-    left_junction = make_shared<int>();
-    right_junction = make_shared<int>();
+    left_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
+    right_junction = make_shared<ShipObject>(shipObjectIdGenerator.get());
     for(int i = 0; i < masts_count; i++)
-        masts->push_back(make_shared<Mast>());
+        masts->push_back(make_shared<Mast>(shipObjectIdGenerator.get()));
     distributor = make_shared<MastDistributor>(masts);
     for(int i = 0; i < cannons_per_side; i++){
         right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));

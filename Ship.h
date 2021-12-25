@@ -10,6 +10,10 @@
 #include <mutex>
 #include <memory>
 #include <vector>
+#include "ShipObjectIdGenerator.h"
+#include "ShipObject.h"
+#include "Stairs.h"
+#include <memory>
 
 class MastDistributor;
 class Mast;
@@ -36,16 +40,18 @@ class Ship {
     void AdjustDirection();
     void UpdateThread();
 public:
+    const std::unique_ptr<ShipObjectIdGenerator> shipObjectIdGenerator = std::make_unique<ShipObjectIdGenerator>();
+
     int hp = 10;
     bool use_right_cannons = true;
-    std::shared_ptr<void> left_junction;
-    std::shared_ptr<void> right_junction;
+    std::shared_ptr<ShipObject> left_junction;
+    std::shared_ptr<ShipObject> right_junction;
     float length = 6;
     ShipState GetState();
     Ship * enemy = nullptr;
     std::vector<std::shared_ptr<Cannon>> right_cannons;
     std::vector<std::shared_ptr<Cannon>> left_cannons;
-    std::shared_ptr<std::mutex> stairs_mutex;
+    std::shared_ptr<Stairs> stairs;
 
     World * world;
     std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;

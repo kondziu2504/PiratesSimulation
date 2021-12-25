@@ -65,7 +65,7 @@ void Cannon::Release(Sailor *sailor) {
         owners.second = nullptr;
 }
 
-Cannon::Cannon(Ship * ship, float relative_pos_along) {
+Cannon::Cannon(Ship * ship, float relative_pos_along) : ShipObject(ship->shipObjectIdGenerator.get()) {
     this->ship = ship;
     this->relative_pos_along = relative_pos_along;
     owners.first = owners.second = nullptr;
