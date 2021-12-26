@@ -10,6 +10,7 @@
 #include <atomic>
 #include "ShipObject.h"
 #include "Util.h"
+#include "Vec2.h"
 
 class Cannon;
 class Ship;
@@ -39,9 +40,14 @@ class Sailor {
     void ThreadFun();
 
     void GoTo(std::shared_ptr<ShipObject> shipObject);
-    [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
 
     void OperateTheShip();
+
+    [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
+    [[nodiscard]] std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
+    Vec2 CalculateCannonTarget() const;
+    void FulfillAssignedCannonRole();
+    bool TryClaimFirstUnoccupiedCannon();
 
     //Mast operations
     void OperateMast();

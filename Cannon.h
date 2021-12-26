@@ -28,7 +28,7 @@ public:
     explicit Cannon(Ship * ship, float relative_pos_along);
     std::pair<Sailor *, Sailor *> GetOwners();
     bool Loaded();
-    void WaitUntilLoaded();
+    void WaitUntilLoadedOrTimeout();
     void Load();
     void Shoot(Vec2 target);
     bool TryClaim(Sailor * sailor);

@@ -1,10 +1,4 @@
-//
-// Created by konrad on 16.05.2021.
-//
-
 #include <thread>
-#include <unistd.h>
-#include <iostream>
 #include <utility>
 #include "Sailor.h"
 #include "Mast.h"
@@ -116,35 +110,17 @@ bool Sailor::IsUpperDeck() {
 void Sailor::WaitForCannon() {
     SetState(SailorState::kWaitingCannon);
     while(true){
-        auto side_cannons = ship->use_right_cannons ? ship->right_cannons : ship->left_cannons;
-        for(auto cannon : side_cannons){
-            if(cannon->TryClaim(this)){
-                assigned_cannon = cannon;
-                SetState(SailorState::kWaitingCannon);
-                return;
-            }
-        }
-        SleepSeconds(0.1f);
+        if(TryClaimFirstUnoccupiedCannon())
+            return;
+        else
+            SleepSeconds(0.1f);
     }
 }
 
 void Sailor::UseCannon() {
     SetState(SailorState::kCannon);
     SleepSeconds(2);
-    auto cannon_owners = assigned_cannon->GetOwners();
-    if(cannon_owners.first == this){
-        assigned_cannon->WaitUntilLoaded();
-        if(assigned_cannon->Loaded()) {
-            float distance = 5;
-            if(ship->enemy != nullptr)
-                distance = (ship->enemy->GetPos() - ship->GetPos()).Distance();
-            Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * distance;
-            assigned_cannon->Shoot(ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1 : -1));
-        }
-    }else if(cannon_owners.second == this){
-        assigned_cannon->Load();
-    }
-
+    FulfillAssignedCannonRole();
     assigned_cannon->Release(this);
     SetState(SailorState::kStanding);
 }
@@ -219,13 +195,49 @@ void Sailor::OperateTheShip() {
 
 void Sailor::ProgressAction(float actionTotalTime, std::function<void(float progress)> action) {
     DoRepeatedlyForATime(
-            [=](float progress) -> void {
+            [=](float progress) -> void
+            {
                 if(action != nullptr)
                     action(progress);
                 SetProgress(progress);
-                },
+            },
             actionTotalTime
     );
+}
+
+std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
+    return ship->use_right_cannons ? ship->right_cannons : ship->left_cannons;
+}
+
+Vec2 Sailor::CalculateCannonTarget() const {
+    float distance = 5;
+    if(ship->enemy != nullptr)
+        distance = (ship->enemy->GetPos() - ship->GetPos()).Distance();
+    Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * distance;
+    return ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1.f : -1.f);
+}
+
+void Sailor::FulfillAssignedCannonRole() {
+    auto cannon_owners = assigned_cannon->GetOwners();
+    if(cannon_owners.first == this){
+        assigned_cannon->WaitUntilLoadedOrTimeout();
+        if(assigned_cannon->Loaded())
+            assigned_cannon->Shoot(CalculateCannonTarget());
+    }else if(cannon_owners.second == this){
+        assigned_cannon->Load();
+    }
+}
+
+bool Sailor::TryClaimFirstUnoccupiedCannon() {
+    auto side_cannons = GetFightingSideCannons();
+    for(const auto& cannon : side_cannons){
+        if(cannon->TryClaim(this)){
+            assigned_cannon = cannon;
+            SetState(SailorState::kStanding);
+            return true;
+        }
+    }
+    return false;
 }
 
 

@@ -45,7 +45,7 @@ bool Cannon::Loaded() {
     return loaded;
 }
 
-void Cannon::WaitUntilLoaded() {
+void Cannon::WaitUntilLoadedOrTimeout() {
     unique_lock<mutex> lock(loaded_mutex);
     //c_var_loaded.wait(lock, [&]{return loaded;});
     c_var_loaded.wait_for(lock, chrono::seconds(5), [&]{return loaded;});
