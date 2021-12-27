@@ -21,9 +21,9 @@ void Cannon::Shoot(Vec2 target) {
     lock_guard<mutex> guard(loaded_mutex);
     loaded = true;
     {
-        lock_guard<mutex> guard_cannonballs(ship->world->cannonballs_mutex);
+        lock_guard<mutex> guard_cannonballs(ship->GetWorld()->cannonballs_mutex);
         Vec2 origin_offset = ship->GetDir() * ship->GetLength() * (0.5 - relative_pos_along);
-        ship->world->cannonballs.push_back(make_shared<Cannonball>(ship->world, ship->GetPos() + origin_offset, target + origin_offset));
+        ship->GetWorld()->cannonballs.push_back(make_shared<Cannonball>(ship->GetWorld(), ship->GetPos() + origin_offset, target + origin_offset));
     }
     loaded = false;
 }

@@ -275,3 +275,19 @@ std::shared_ptr<Stairs> Ship::GetStairs() {
 std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
     return resting_point;
 }
+
+World *Ship::GetWorld() {
+    return world;
+}
+
+std::vector<std::shared_ptr<Sailor>> Ship::GetSailors() {
+    return *sailors;
+}
+
+std::vector<std::shared_ptr<Mast>> Ship::GetMasts() {
+    return *masts;
+}
+
+std::shared_ptr<MastDistributor> Ship::GetMastDistributor() {
+    return distributor;
+}

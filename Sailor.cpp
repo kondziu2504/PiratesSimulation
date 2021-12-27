@@ -59,7 +59,7 @@ void Sailor::OperateMast() {
 
 void Sailor::WaitForMast() {
     SetState(SailorState::kWaitingMast);
-    operated_mast = ship->distributor->RequestMast(this);
+    operated_mast = ship->GetMastDistributor()->RequestMast(this);
     SetState(SailorState::kStanding);
 }
 
@@ -177,7 +177,7 @@ void Sailor::ContinuouslyAdjustMast() {
 }
 
 void Sailor::ReleaseMast() {
-    ship->distributor->ReleaseMast(operated_mast, this);
+    ship->GetMastDistributor()->ReleaseMast(operated_mast, this);
     {
         lock_guard<mutex> guard(sailor_mutex);
         operated_mast = nullptr;

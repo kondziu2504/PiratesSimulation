@@ -202,8 +202,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     {
         indentation += 2;
         int sailor_index = 0;
-        lock_guard<mutex> guard(ship->sailors_mutex);
-        for(auto sailor : *ship->sailors){
+        for(auto sailor : ship->GetSailors()){
             string state_text = "";
             switch (sailor->GetState()) {
                 case SailorState::kResting:
@@ -249,8 +248,8 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     mvaddstr(line++, indentation, "Maszty:");
     int mast_index = 0;
     indentation += 2;
-    lock_guard<mutex> guard(ship->distributor->free_masts_mutex);
-    for(auto mast_owners_pair : *ship->distributor->masts_owners){
+    lock_guard<mutex> guard(ship->GetMastDistributor()->free_masts_mutex);
+    for(auto mast_owners_pair : *ship->GetMastDistributor()->masts_owners){
         bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
         string mast_text =
                 "Maszt " + to_string(mast_index) +
@@ -301,9 +300,9 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
 
     {
         //Generate positions
-        auto masts = ship->masts;
+        auto masts = ship->GetMasts();
         int first_mast_y, last_mast_y;
-        if (masts->size() == 1)
+        if (masts.size() == 1)
             first_mast_y = height / 2;
         else {
             first_mast_y = height / 4;
@@ -311,10 +310,10 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
 
         int mast_y = first_mast_y;
-        for (auto mast: *masts) {
+        for (auto mast: masts) {
             elements_positions->insert(make_pair(mast, Vec2(width / 2, mast_y)));
-            if (masts->size() > 1) {
-                mast_y += (last_mast_y - first_mast_y) / (masts->size() - 1);
+            if (masts.size() > 1) {
+                mast_y += (last_mast_y - first_mast_y) / (masts.size() - 1);
             }
         }
 
@@ -372,10 +371,10 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }
 
-    auto masts = ship->masts;
+    auto masts = ship->GetMasts();
     int mast_ind = 0;
     int mast_width = (width * 1.8) / 2  - 1;
-    for(auto mast : *masts){
+    for(auto mast : masts){
         for(int i = 0; i < mast_width; i++){
             Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
@@ -384,7 +383,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
     }
 
-    for(auto sailor : *ship->sailors){
+    for(auto sailor : ship->GetSailors()){
         if(sailor->IsUpperDeck()){
             Vec2 tile_pos;
             SailorState sailor_state = sailor->GetState();
@@ -395,7 +394,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
                 }else
                     tile_pos = cannon_pos - Vec2(0,1);
             }else if(sailor_state == SailorState::kMast){
-                auto mast_owners = ship->distributor->masts_owners->at(sailor->GetOperatedMast());
+                auto mast_owners = ship->GetMastDistributor()->masts_owners->at(sailor->GetOperatedMast());
                 Vec2 mast_pos = elements_positions->at(sailor->GetOperatedMast());
                 int ind = 0;
                 for(auto mast_owner : *mast_owners){

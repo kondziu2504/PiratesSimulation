@@ -45,6 +45,13 @@ class Ship {
     std::shared_ptr<Stairs> stairs;
     std::shared_ptr<ShipObject> resting_point;
 
+    World * world;
+
+    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
+
+    std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
+    std::shared_ptr<MastDistributor> distributor;
+
     void SetState(ShipState new_state);
 
     void EngageFight(Ship * ship);
@@ -64,6 +71,7 @@ public:
 
     ShipState GetState();
     Ship * GetEnemy();
+    World * GetWorld();
 
     std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
     std::vector<std::shared_ptr<Cannon>> GetRightCannons();
@@ -71,11 +79,10 @@ public:
     std::shared_ptr<Stairs> GetStairs();
     std::shared_ptr<ShipObject> GetRestingPoint();
 
-    World * world;
-    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
-    std::mutex sailors_mutex;
-    std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
-    std::shared_ptr<MastDistributor> distributor;
+    std::vector<std::shared_ptr<Sailor>> GetSailors();
+
+    std::vector<std::shared_ptr<Mast>> GetMasts();
+    std::shared_ptr<MastDistributor> GetMastDistributor();
 
     Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
     void ApplyWind(Vec2 wind);
