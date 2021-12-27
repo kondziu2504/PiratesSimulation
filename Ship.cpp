@@ -17,7 +17,8 @@
 
 using namespace std;
 
-Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world){
+Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world) : sailors(
+        GenerateSailors(sailors_count)){
     this->pos = pos;
     this->world = world;
     this->direction = direction.Normalized();
@@ -31,12 +32,6 @@ Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int can
     for(int i = 0; i < cannons_per_side; i++){
         right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
         left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
-    }
-    sailors = make_shared<vector<shared_ptr<Sailor>>>();
-    for(int i = 0; i < sailors_count; i++){
-        shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
-        sailor->Start();
-        sailors->push_back(sailor);
     }
 }
 
@@ -280,14 +275,24 @@ World *Ship::GetWorld() {
     return world;
 }
 
-std::vector<std::shared_ptr<Sailor>> Ship::GetSailors() {
+vector<shared_ptr<Sailor>> Ship::GetSailors() {
     return *sailors;
 }
 
-std::vector<std::shared_ptr<Mast>> Ship::GetMasts() {
+vector<shared_ptr<Mast>> Ship::GetMasts() {
     return *masts;
 }
 
-std::shared_ptr<MastDistributor> Ship::GetMastDistributor() {
+shared_ptr<MastDistributor> Ship::GetMastDistributor() {
     return distributor;
+}
+
+shared_ptr<vector<shared_ptr<Sailor>>> Ship::GenerateSailors(int sailors_count) {
+    auto generated_sailors = make_shared<vector<shared_ptr<Sailor>>>();
+    for(int i = 0; i < sailors_count; i++){
+        shared_ptr<Sailor> sailor = make_shared<Sailor>(this);
+        sailor->Start();
+        generated_sailors->push_back(sailor);
+    }
+    return generated_sailors;
 }
