@@ -1,3 +1,0 @@
-/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/konrad/CLionProjects/PiratesSimulation/cmake-build-debug/CMakeFiles/PiratesSimulation.dir
