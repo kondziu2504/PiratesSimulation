@@ -32,8 +32,8 @@ void Cannonball::CannonThread() {
                 dead = true;
                 for(auto ship : world->ships)
                     if( (ship->GetPos() - GetPos()).Distance() < 3) {
-                        ship->hp--;
-                        if(ship->hp <= 0){
+                        ship->Hit(1);
+                        if(ship->GetHP() <= 0){
                             ship->Destroy(true);
                         }
                     }

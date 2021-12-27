@@ -30,7 +30,7 @@ void Sailor::ThreadFun() {
 
 
 void Sailor::GoRest() {
-    GoTo(ship->restingPoint);
+    GoTo(ship->GetRestingPoint());
     SetState(SailorState::kResting);
     SleepSeconds(RandomTime(3,5));
     SetState(SailorState::kStanding);
@@ -85,7 +85,7 @@ std::shared_ptr<ShipObject> Sailor::GetNextTarget() {
 
 void Sailor::UseStairs() {
     SetState(SailorState::kWaitingStairs);
-    lock_guard<mutex> guard(ship->stairs->mutex);
+    lock_guard<mutex> guard(ship->GetStairs()->mutex);
     SetState(SailorState::kStairs);
     ProgressAction(2.f);
     upper_deck = !upper_deck;
@@ -94,7 +94,7 @@ void Sailor::UseStairs() {
 
 void Sailor::GoUseStairs() {
     SetState(SailorState::kWalking);
-    next_target = ship->stairs;
+    next_target = ship->GetStairs();
     ProgressAction(2.f);
     previous_target = next_target;
     SetState(SailorState::kStanding);
@@ -151,11 +151,11 @@ bool Sailor::GetIsDying() const {
 }
 
 std::shared_ptr<ShipObject> Sailor::GetFightingSideJunction() const {
-    return ship->use_right_cannons ? ship->right_junction : ship->left_junction;
+    return ship->GetUseRightCannons() ? ship->GetRightJunction() : ship->GetLeftJunction();
 }
 
 void Sailor::GoUseMastProcedure() {
-    GoTo(ship->right_junction);
+    GoTo(ship->GetRightJunction());
     WaitForMast();
     GoTo(operated_mast);
     OperateMast();
@@ -206,15 +206,15 @@ void Sailor::ProgressAction(float actionTotalTime, std::function<void(float prog
 }
 
 std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
-    return ship->use_right_cannons ? ship->right_cannons : ship->left_cannons;
+    return ship->GetUseRightCannons() ? ship->GetRightCannons() : ship->GetLeftCannons();
 }
 
 Vec2 Sailor::CalculateCannonTarget() const {
     float distance = 5;
-    if(ship->enemy != nullptr)
-        distance = (ship->enemy->GetPos() - ship->GetPos()).Distance();
+    if(ship->GetEnemy() != nullptr)
+        distance = (ship->GetEnemy()->GetPos() - ship->GetPos()).Distance();
     Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * distance;
-    return ship->GetPos() + perpendicular * (ship->use_right_cannons ? 1.f : -1.f);
+    return ship->GetPos() + perpendicular * (ship->GetUseRightCannons() ? 1.f : -1.f);
 }
 
 void Sailor::FulfillAssignedCannonRole() {

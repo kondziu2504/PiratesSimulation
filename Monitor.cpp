@@ -194,7 +194,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     int line = 0;
     int indentation = 0;
     indentation = 0;
-    string health = ship->GetState() == ShipState::kDestroyed ? "Zniszczony" : "Zdrowie: " + to_string(ship->hp);
+    string health = ship->GetState() == ShipState::kDestroyed ? "Zniszczony" : "Zdrowie: " + to_string(ship->GetHP());
     string header = "Statek(" + health + ")";
     mvaddstr(line++, 0, header.c_str());
     indentation += 2;
@@ -265,7 +265,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     mvaddstr(line++, indentation, "Lewa strona:");
     indentation++;
     int cannon_ind = 0;
-    for(auto cannon : ship->left_cannons){
+    for(auto cannon : ship->GetLeftCannons()){
         int owners = 0;
         auto cannon_owners = cannon->GetOwners();
         if(cannon_owners.first != nullptr)
@@ -281,7 +281,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     mvaddstr(line++, indentation, "Prawa strona:");
     indentation++;
     cannon_ind = 0;
-    for(auto cannon : ship->right_cannons){
+    for(auto cannon : ship->GetRightCannons()){
         int owners = 0;
         auto cannon_owners = cannon->GetOwners();
         if(cannon_owners.first != nullptr)
@@ -319,7 +319,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
 
         int cannon_y = height / 3;
-        auto right_cannons = ship->right_cannons;
+        auto right_cannons = ship->GetRightCannons();
         int cannon_y_delta = height / (right_cannons.size() + 1);
         for (auto cannon: right_cannons) {
             elements_positions->insert(make_pair(cannon, Vec2(width - 1, cannon_y)));
@@ -327,17 +327,17 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
 
         cannon_y = height / 3;
-        auto left_cannons = ship->left_cannons;
+        auto left_cannons = ship->GetLeftCannons();
         cannon_y_delta = height / (left_cannons.size() + 1);
         for (auto cannon: left_cannons) {
             elements_positions->insert(make_pair(cannon, Vec2(0, cannon_y)));
             cannon_y += cannon_y_delta;
         }
 
-        elements_positions->insert(make_pair(ship->right_junction, Vec2(width * 0.75, height / 2)));
-        elements_positions->insert(make_pair(ship->left_junction, Vec2(width * 0.25, height / 2)));
-        elements_positions->insert(make_pair(ship->stairs, Vec2(width / 2, width / 3)));
-        elements_positions->insert(make_pair(ship->restingPoint, Vec2(width * 0.75, height * 0.25)));
+        elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2(width * 0.75, height / 2)));
+        elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2(width * 0.25, height / 2)));
+        elements_positions->insert(make_pair(ship->GetStairs(), Vec2(width / 2, width / 3)));
+        elements_positions->insert(make_pair(ship->GetRestingPoint(), Vec2(width * 0.75, height * 0.25)));
     }
 
     char deck_ch = ' ';
@@ -359,15 +359,15 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
         }
     }
 
-    Vec2 stairs_pos = elements_positions->find(ship->stairs)->second;
+    Vec2 stairs_pos = elements_positions->find(ship->GetStairs())->second;
     DrawTile(stairs_pos.y + y_offset, stairs_pos.x + x_offset, '=', Tile::kStairs);
 
-    for(auto cannon : ship->right_cannons){
+    for(auto cannon : ship->GetRightCannons()){
         Vec2 cannon_pos = elements_positions->find(cannon)->second;
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }
 
-    for(auto cannon : ship->left_cannons){
+    for(auto cannon : ship->GetLeftCannons()){
         Vec2 cannon_pos = elements_positions->find(cannon)->second;
         DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
     }

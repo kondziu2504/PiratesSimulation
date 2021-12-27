@@ -231,3 +231,47 @@ void Ship::Destroy(bool respawn) {
     });
     destroyThread.detach();
 }
+
+int Ship::GetHP() const {
+    return hp;
+}
+
+void Ship::Hit(int damage) {
+    hp = max(0, hp - damage);
+}
+
+bool Ship::GetUseRightCannons() const {
+    return use_right_cannons;
+}
+
+float Ship::GetLength() const {
+    return length;
+}
+
+std::shared_ptr<ShipObject> Ship::GetLeftJunction() {
+    return left_junction;
+}
+
+std::shared_ptr<ShipObject> Ship::GetRightJunction() {
+    return right_junction;
+}
+
+Ship *Ship::GetEnemy() {
+    return enemy;
+}
+
+std::vector<std::shared_ptr<Cannon>> Ship::GetLeftCannons() {
+    return left_cannons;
+}
+
+std::vector<std::shared_ptr<Cannon>> Ship::GetRightCannons() {
+    return right_cannons;
+}
+
+std::shared_ptr<Stairs> Ship::GetStairs() {
+    return stairs;
+}
+
+std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
+    return resting_point;
+}

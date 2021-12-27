@@ -30,6 +30,21 @@ class Ship {
     ShipState state = ShipState::kWandering;
     std::mutex state_mutex;
 
+    int hp = 10;
+    bool use_right_cannons = true;
+    float length = 6;
+
+    std::shared_ptr<ShipObject> left_junction;
+    std::shared_ptr<ShipObject> right_junction;
+
+    Ship * enemy = nullptr;
+
+    std::vector<std::shared_ptr<Cannon>> right_cannons;
+    std::vector<std::shared_ptr<Cannon>> left_cannons;
+
+    std::shared_ptr<Stairs> stairs;
+    std::shared_ptr<ShipObject> resting_point;
+
     void SetState(ShipState new_state);
 
     void EngageFight(Ship * ship);
@@ -40,17 +55,21 @@ class Ship {
     void UpdateThread();
 
 public:
-    int hp = 10;
-    bool use_right_cannons = true;
-    std::shared_ptr<ShipObject> left_junction;
-    std::shared_ptr<ShipObject> right_junction;
-    float length = 6;
+    [[nodiscard]] int GetHP() const;
+    void Hit(int damage);
+    [[nodiscard]] bool GetUseRightCannons() const;
+    [[nodiscard]] float GetLength() const;
+    std::shared_ptr<ShipObject> GetLeftJunction();
+    std::shared_ptr<ShipObject> GetRightJunction();
+
     ShipState GetState();
-    Ship * enemy = nullptr;
-    std::vector<std::shared_ptr<Cannon>> right_cannons;
-    std::vector<std::shared_ptr<Cannon>> left_cannons;
-    std::shared_ptr<Stairs> stairs;
-    std::shared_ptr<ShipObject> restingPoint;
+    Ship * GetEnemy();
+
+    std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
+    std::vector<std::shared_ptr<Cannon>> GetRightCannons();
+
+    std::shared_ptr<Stairs> GetStairs();
+    std::shared_ptr<ShipObject> GetRestingPoint();
 
     World * world;
     std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> sailors;
