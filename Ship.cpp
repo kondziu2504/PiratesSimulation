@@ -30,8 +30,8 @@ Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int can
         masts->push_back(make_shared<Mast>(this));
     distributor = make_shared<MastDistributor>(masts);
     for(int i = 0; i < cannons_per_side; i++){
-        right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
-        left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / 4));
+        right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / cannons_per_side));
+        left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / cannons_per_side));
     }
 }
 
@@ -53,7 +53,7 @@ void Ship::UpdateThread() {
         if(current_state == ShipState::kWandering){
             LookForEnemy();
             AdjustDirection();
-            usleep(100000);
+            SleepSeconds(0.1f);
         }else if(current_state == ShipState::kFighting){
             GetInPosition();
             if(enemy->GetState() == ShipState::kSinking || enemy->GetState() == ShipState::kDestroyed) {
@@ -70,59 +70,18 @@ Vec2 Ship::GetDir() {
 }
 
 void Ship::AdjustDirection() {
-    Vec2 totalCorrection(0, 0);
-    int scan_dist = 9;
-    int closest_tile = scan_dist;
-    for(int j = 0; j < 16; j++){
-        Vec2 checkDir = Vec2::FromAngle((float)j/16 * 2 * M_PI);
-        for(int i = 0; i < scan_dist; i++){
-            Vec2 scannedTile = pos + checkDir * i;
-            scannedTile.x = (int)scannedTile.x;
-            scannedTile.y = (int)scannedTile.y;
-            bool tileOutsideWorld = scannedTile.x < 0 || scannedTile.x >= world->width ||
-                    scannedTile.y < 0 || scannedTile.y > world->height;
-            if(world->map[scannedTile.y * world->width + scannedTile.x] || tileOutsideWorld){
-                if(!(pos - scannedTile).Distance() == 0){
-                    Vec2 correction_dir = (pos - scannedTile).Normalized();
-                    float significance = (float)(scan_dist - i) / scan_dist;
-                    closest_tile = min(closest_tile, i);
-                    totalCorrection = totalCorrection + correction_dir * significance;
-                }
-            }
-        }
-    }
-    {
-        lock_guard<mutex> guard(world->shipsMutex);
-        for(shared_ptr<Ship> ship : world->ships){
-            if(&(*ship) != &(*this)){
-                Vec2 ship_pos = ship->GetPos();
-                float dist = (pos - ship_pos).Distance();
-                if(dist < scan_dist && dist > 0){
-                    Vec2 correction_dir = (pos - ship_pos).Normalized();
-                    float significance = (float)(scan_dist - dist) / scan_dist;
-                    closest_tile = min(closest_tile, (int)dist);
-                    totalCorrection = totalCorrection + correction_dir * significance;
-                }
-            }
-        }
-    }
-
-
-
-    if(totalCorrection.Distance() != 0){
-        Vec2 normalizedCorrection = totalCorrection.Normalized();
-        float correctionSignificance = (float)(scan_dist - closest_tile) / scan_dist;
-        if(direction.Dot(normalizedCorrection) > 0)
-            correctionSignificance = 0;
-        direction = direction + normalizedCorrection * correctionSignificance;
-        direction = direction.Normalized();
-    }
+    const int scan_dist = 9;
+    int closest_tile_dist = scan_dist;
+    Vec2 total_correction(0, 0);
+    total_correction += CalculateCorrectionAgainstLand(scan_dist, closest_tile_dist);
+    total_correction += CalculateCorrectionAgainstShips(scan_dist, closest_tile_dist);
+    ApplyCorrection(scan_dist, closest_tile_dist, total_correction);
 }
 
 void Ship::ApplyWind(Vec2 wind) {
     if(GetState() == ShipState::kFighting)
             return;
-    float wind_power = wind.Distance();
+    float wind_power = wind.Length();
     float effective_power = 0;
     for(shared_ptr<Mast> mast : *masts){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
@@ -165,7 +124,7 @@ bool Ship::LookForEnemy() {
         ship->GetState() != ShipState::kDestroyed){
             int lookout_radius = 9;
 
-            float dist = (ship->GetPos() - GetPos()).Distance();
+            float dist = (ship->GetPos() - GetPos()).Length();
             Vec2 enemy_pos = ship->GetPos();
             Vec2 this_pos = GetPos();
             if(dist < lookout_radius){
@@ -188,7 +147,7 @@ void Ship::GetInPosition() {
         float angle_change = min(abs(angle_diff), 0.1f);
         {
             lock_guard<mutex> guard(pos_mutex);
-            direction = direction.Rotate(angle_change * (angle_diff > 0 ? 1 : -1));
+            direction = direction.Rotated(angle_change * (angle_diff > 0 ? 1 : -1));
         }
         current_angle = GetDir().Angle();
         usleep(100000);
@@ -296,3 +255,56 @@ shared_ptr<vector<shared_ptr<Sailor>>> Ship::GenerateSailors(int sailors_count) 
     }
     return generated_sailors;
 }
+
+Vec2 Ship::CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const {
+    Vec2 correction(0, 0);
+    for(int j = 0; j < 16; j++){
+        Vec2 checkDir = Vec2::FromAngle((float)j/16 * 2 * M_PI);
+        for(int i = 0; i < scan_dist; i++){
+            Vec2 scannedTile = pos + checkDir * i;
+            scannedTile.x = (int)scannedTile.x;
+            scannedTile.y = (int)scannedTile.y;
+            bool tileOutsideWorld = scannedTile.x < 0 || scannedTile.x >= world->width ||
+                                    scannedTile.y < 0 || scannedTile.y > world->height;
+            if(world->map[scannedTile.y * world->width + scannedTile.x] || tileOutsideWorld){
+                if(!(pos - scannedTile).Length() == 0){
+                    Vec2 correction_dir = (pos - scannedTile).Normalized();
+                    float significance = (float)(scan_dist - i) / scan_dist;
+                    closest_tile_dist = min(closest_tile_dist, i);
+                    correction = correction + correction_dir * significance;
+                }
+            }
+        }
+    }
+    return correction;
+}
+
+Vec2 Ship::CalculateCorrectionAgainstShips(int scan_dist, int &closest_tile_dist) const {
+    Vec2 correction;
+    lock_guard<mutex> guard(world->shipsMutex);
+    for(shared_ptr<Ship> ship : world->ships){
+        if(&(*ship) != &(*this)){
+            Vec2 ship_pos = ship->GetPos();
+            float dist = (pos - ship_pos).Length();
+            if(dist < scan_dist && dist > 0){
+                Vec2 correction_dir = (pos - ship_pos).Normalized();
+                float significance = (float)(scan_dist - dist) / scan_dist;
+                closest_tile_dist = min(closest_tile_dist, (int)dist);
+                correction = correction + correction_dir * significance;
+            }
+        }
+    }
+    return correction;
+}
+
+void Ship::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction) {
+    if(correction.Length() != 0){
+        Vec2 normalized_correction = correction.Normalized();
+        float correction_significance = (float)(scan_dist - closest_tile_dist) / scan_dist;
+        if(direction.Dot(normalized_correction) > 0)
+            correction_significance = 0;
+        direction = direction + normalized_correction * correction_significance;
+        direction = direction.Normalized();
+    }
+}
+

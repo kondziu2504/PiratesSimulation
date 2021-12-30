@@ -27,6 +27,8 @@ public:
     void AddShip(std::shared_ptr<Ship> ship);
     void GenerateShip();
     void Stop();
+    [[nodiscard]] bool TileInsideWorld(int x, int y) const;
+    [[nodiscard]] bool IsLandAt(int x, int y) const;
 };
 
 

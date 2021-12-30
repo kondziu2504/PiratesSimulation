@@ -163,7 +163,7 @@ void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_
                 float width = texture.size();
                 Vec2 rotatedLocal = Vec2(
                         j - length / 2,
-                        i - width / 2).Rotate( ship_dir.Angle());
+                        i - width / 2).Rotated(ship_dir.Angle());
                 Vec2 tile_pos = Vec2((int)ship_pos.x + rotatedLocal.x, (int)ship_pos.y + rotatedLocal.y);
                 if(tile_pos.x >= x_viewport && tile_pos.x < x_viewport + viewport_width
                     && tile_pos.y >= y_viewport && tile_pos.y < y_viewport + viewport_height)
@@ -376,7 +376,7 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
     int mast_width = (width * 1.8) / 2  - 1;
     for(auto mast : masts){
         for(int i = 0; i < mast_width; i++){
-            Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotate(mast->GetAngle());
+            Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotated(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
             Vec2 mast_pos = elements_positions->find(mast)->second;
             DrawTile(y_offset + mast_pos.y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + mast_pos.x, ch, Tile::kSail);
@@ -438,11 +438,11 @@ void Monitor::DrawCircleIndicator(int x_offset, int y_offset, float angle, strin
     Vec2 circle_center(x_offset + arrow_length, y_offset + arrow_length + 1);
     for(int i = 0; i < angles; i++){
         float angle = (float)i / angles * 2 * M_PI;
-        Vec2 local_pos = Vec2(arrow_length - 1, 0).Rotate(angle);
+        Vec2 local_pos = Vec2(arrow_length - 1, 0).Rotated(angle);
         DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kGray);
     }
     for(int i = 0; i < arrow_length; i++){
-        Vec2 local_pos = Vec2(i, 0).Rotate(angle);
+        Vec2 local_pos = Vec2(i, 0).Rotated(angle);
         DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kSail);
     }
 }

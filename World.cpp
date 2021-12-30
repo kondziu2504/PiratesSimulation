@@ -89,3 +89,11 @@ void World::Stop() {
             break;
     }
 }
+
+bool World::TileInsideWorld(int x, int y) const {
+    return x < 0 || x >= width || y < 0 || y > height;
+}
+
+bool World::IsLandAt(int x, int y) const {
+    return map[y * width + x];
+}

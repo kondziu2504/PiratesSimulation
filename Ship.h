@@ -60,6 +60,10 @@ class Ship {
 
     void UpdateThread();
 
+    Vec2 CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const;
+    Vec2 CalculateCorrectionAgainstShips(int scan_dist, int& closest_tile_dist) const;
+    void ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction);
+
 public:
     Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
 

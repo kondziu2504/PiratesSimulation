@@ -8,19 +8,22 @@
 
 struct Vec2 {
     float x, y;
-    Vec2(){}
-    Vec2(float x, float y);
-    float Distance();
-    Vec2 Normalized();
-    Vec2 Rotate(float angle);
-    float Angle();
-    static Vec2 FromAngle(float angle);
-    float Dot(const Vec2 & b);
-    Vec2 operator+(const Vec2 & b);
-    Vec2 operator-(const Vec2 & b);
-    Vec2 operator*(float b);
-    Vec2 operator/(float b);
 
+    Vec2() : Vec2(0, 0) {}
+    Vec2(float x, float y);
+
+    [[nodiscard]] float Length() const;
+    [[nodiscard]] Vec2 Normalized() const;
+    [[nodiscard]] Vec2 Rotated(float angle) const;
+    [[nodiscard]] float Angle() const;
+    static Vec2 FromAngle(float angle);
+    [[nodiscard]] float Dot(const Vec2 & b) const;
+
+    Vec2 operator+(const Vec2 & b) const;
+    Vec2 operator-(const Vec2 & b) const;
+    Vec2 operator*(float b) const;
+    Vec2 operator/(float b) const;
+    Vec2& operator+=(const Vec2 & b);
 };
 
 
