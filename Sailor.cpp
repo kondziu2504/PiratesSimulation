@@ -213,8 +213,8 @@ Vec2 Sailor::CalculateCannonTarget() const {
     float distance = 5;
     if(ship->GetEnemy() != nullptr)
         distance = (ship->GetEnemy()->GetPos() - ship->GetPos()).Length();
-    Vec2 perpendicular = Vec2::FromAngle(ship->GetDir().Angle() - M_PI_2).Normalized() * distance;
-    return ship->GetPos() + perpendicular * (ship->GetUseRightCannons() ? 1.f : -1.f);
+    Vec2 perpendicular_right = Vec2::FromAngle(ship->GetDir().Angle() + M_PI_2).Normalized() * distance;
+    return ship->GetPos() + perpendicular_right * (ship->GetUseRightCannons() ? 1.f : -1.f);
 }
 
 void Sailor::FulfillAssignedCannonRole() {

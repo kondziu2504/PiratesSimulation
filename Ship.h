@@ -13,6 +13,7 @@
 #include "ShipObject.h"
 #include "Stairs.h"
 #include <memory>
+#include <atomic>
 
 class MastDistributor;
 class Mast;
@@ -27,8 +28,7 @@ class Ship {
     Vec2 pos;
     std::mutex pos_mutex;
     Vec2 direction;
-    ShipState state = ShipState::kWandering;
-    std::mutex state_mutex;
+    std::atomic<ShipState> state = ShipState::kWandering;
     int hp = 10;
 
     World * world;
@@ -54,6 +54,8 @@ class Ship {
     void PrepareForFight(Ship * ship);
     bool LookForEnemy();
     void GetInPosition();
+    void StartTurningTowardsAngle(float target_angle);
+    float DetermineAngleToFaceEnemy();
 
     void SetState(ShipState new_state);
     void AdjustDirection();

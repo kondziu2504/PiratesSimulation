@@ -89,18 +89,18 @@ void Ship::ApplyWind(Vec2 wind) {
         effective_power += wind_power * mast_effectiveness;
     }
 
-    effective_power = max(effective_power, 0.05f);
+    const float MIN_EFFECTIVE_POWER = 0.05f;
+    effective_power = max(effective_power, MIN_EFFECTIVE_POWER);
+
     lock_guard<mutex> guard(pos_mutex);
     pos = pos + direction * effective_power;
 }
 
 ShipState Ship::GetState() {
-    lock_guard<mutex> guard(state_mutex);
     return state;
 }
 
 void Ship::SetState(ShipState new_state) {
-    lock_guard<mutex> guard(state_mutex);
     state = new_state;
 }
 
@@ -122,11 +122,8 @@ bool Ship::LookForEnemy() {
         if(ship.get() != this &&
         ship->GetState() != ShipState::kSinking &&
         ship->GetState() != ShipState::kDestroyed){
-            int lookout_radius = 9;
-
+            const int lookout_radius = 9;
             float dist = (ship->GetPos() - GetPos()).Length();
-            Vec2 enemy_pos = ship->GetPos();
-            Vec2 this_pos = GetPos();
             if(dist < lookout_radius){
                 EngageFight(ship.get());
                 return true;
@@ -137,22 +134,8 @@ bool Ship::LookForEnemy() {
 }
 
 void Ship::GetInPosition() {
-    float target_angle = (enemy->GetPos() - GetPos()).Angle() - M_PI_2;
-    //TODO: use_right_cannons = angle_diff > 0;
-    use_right_cannons = false;
-    float current_angle = GetDir().Angle();
-    float angle_diff = AngleDifference(target_angle, current_angle);;
-    while(abs(current_angle - target_angle) > M_PI / 180.f * 5.f){
-        float angle_diff = AngleDifference(target_angle, current_angle);
-        float angle_change = min(abs(angle_diff), 0.1f);
-        {
-            lock_guard<mutex> guard(pos_mutex);
-            direction = direction.Rotated(angle_change * (angle_diff > 0 ? 1 : -1));
-        }
-        current_angle = GetDir().Angle();
-        usleep(100000);
-    }
-
+    float fighting_angle = DetermineAngleToFaceEnemy();
+    StartTurningTowardsAngle(fighting_angle);
 }
 
 void Ship::Destroy(bool respawn) {
@@ -301,10 +284,44 @@ void Ship::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction
     if(correction.Length() != 0){
         Vec2 normalized_correction = correction.Normalized();
         float correction_significance = (float)(scan_dist - closest_tile_dist) / scan_dist;
+        lock_guard<mutex> guard(pos_mutex);
         if(direction.Dot(normalized_correction) > 0)
             correction_significance = 0;
         direction = direction + normalized_correction * correction_significance;
         direction = direction.Normalized();
     }
+}
+
+void Ship::StartTurningTowardsAngle(float target_angle) {
+    auto CurrentAngle = [&]() -> float {return GetDir().Angle();};
+    const float kMaxDeviationFromTargetAngle = M_PI / 180.f * 5.f;
+    auto CurrentDeviation = [&]() -> float {return abs(CurrentAngle() - target_angle);};
+
+    while(CurrentDeviation() > kMaxDeviationFromTargetAngle){
+        float angle_diff = AngleDifference(target_angle, CurrentAngle());
+        const float kAngleCorrection = min(abs(angle_diff), 0.1f) * (angle_diff > 0 ? 1 : -1);
+        {
+            lock_guard<mutex> guard(pos_mutex);
+            direction = direction.Rotated(kAngleCorrection);
+        }
+        SleepSeconds(0.1f);
+    }
+}
+
+float Ship::DetermineAngleToFaceEnemy() {
+    Vec2 to_enemy = enemy->GetPos() - GetPos();
+    Vec2 dir_with_cannons_on_left = to_enemy.Rotated(M_PI_2);
+    Vec2 dir_with_cannons_on_right = to_enemy.Rotated(-M_PI_2);
+    float target_angle;
+    float to_cannons_left_required_rotation = abs(AngleDifference(GetDir().Angle(), dir_with_cannons_on_left.Angle()));
+    float to_cannons_right_required_rotation = abs(AngleDifference(GetDir().Angle(), dir_with_cannons_on_right.Angle()));
+    if(to_cannons_left_required_rotation < to_cannons_right_required_rotation) {
+        target_angle = dir_with_cannons_on_left.Angle();
+        use_right_cannons = false;
+    } else {
+        target_angle = dir_with_cannons_on_right.Angle();
+        use_right_cannons = true;
+    }
+    return target_angle;
 }
 
