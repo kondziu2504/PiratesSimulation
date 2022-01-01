@@ -31,12 +31,8 @@ void Cannonball::CannonThread() {
             if(progress_copy >= 1.f){
                 dead = true;
                 for(auto ship : world->ships)
-                    if((ship->GetPos() - GetPos()).Length() < 3) {
+                    if((ship->GetPos() - GetPos()).Length() < 3)
                         ship->Hit(1);
-                        if(ship->GetHP() <= 0){
-                            ship->Destroy(true);
-                        }
-                    }
                 return;
             }
         }

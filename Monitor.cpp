@@ -17,6 +17,7 @@
 #include "Util.h"
 #include "Cannonball.h"
 #include "Cannon.h"
+#include "ShipLayout.h"
 
 using namespace std;
 

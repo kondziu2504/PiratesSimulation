@@ -8,6 +8,7 @@
 #include "MastDistributor.h"
 #include "Util.h"
 #include "Cannon.h"
+#include "ShipLayout.h"
 
 using namespace std;
 

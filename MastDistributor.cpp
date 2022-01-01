@@ -8,10 +8,10 @@
 
 using namespace std;
 
-MastDistributor::MastDistributor(std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts) {
+MastDistributor::MastDistributor(std::vector<std::shared_ptr<Mast>> masts) {
     this->masts = masts;
     masts_owners = make_shared<map<sp<Mast>, sp<vector<Sailor*>>>>();
-    for(shared_ptr<Mast> mast : *masts){
+    for(shared_ptr<Mast> mast : masts){
             masts_owners->insert(make_pair(mast, make_shared<vector<Sailor*>>()));
     }
 }

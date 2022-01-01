@@ -14,30 +14,21 @@
 #include "Util.h"
 #include "Cannon.h"
 #include "Stairs.h"
+#include "ShipLayout.h"
 
 using namespace std;
 
-Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world) : sailors(
-        GenerateSailors(sailors_count)){
-    this->pos = pos;
-    this->world = world;
-    this->direction = direction.Normalized();
-    stairs = make_shared<Stairs>();
-    masts = make_shared<vector<shared_ptr<Mast>>>();
-    left_junction = make_shared<ShipObject>();
-    right_junction = make_shared<ShipObject>();
-    for(int i = 0; i < masts_count; i++)
-        masts->push_back(make_shared<Mast>(this));
-    distributor = make_shared<MastDistributor>(masts);
-    for(int i = 0; i < cannons_per_side; i++){
-        right_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / cannons_per_side));
-        left_cannons.push_back(make_shared<Cannon>(this, (float)(i + 1) / cannons_per_side));
-    }
+Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world) :
+        sailors(GenerateSailors(sailors_count)),
+        WorldObject(direction.Normalized(), pos, world)
+{
+        ship_layout = make_shared<ShipLayout>(masts_count, cannons_per_side, length, this);
+        distributor = make_shared<MastDistributor>(ship_layout->GetMasts());
 }
 
 Vec2 Ship::GetPos() {
-    lock_guard<mutex> guard(pos_mutex);
-    return pos;
+    lock_guard<mutex> guard(world_object_mutex);
+    return position;
 }
 
 void Ship::Start() {
@@ -65,7 +56,7 @@ void Ship::UpdateThread() {
 }
 
 Vec2 Ship::GetDir() {
-    lock_guard<mutex> guard(pos_mutex);
+    lock_guard<mutex> guard(world_object_mutex);
     return direction;
 }
 
@@ -83,7 +74,7 @@ void Ship::ApplyWind(Vec2 wind) {
             return;
     float wind_power = wind.Length();
     float effective_power = 0;
-    for(shared_ptr<Mast> mast : *masts){
+    for(shared_ptr<Mast> mast : ship_layout->GetMasts()){
         Vec2 absolute_mast_dir = Vec2::FromAngle(GetDir().Angle() + mast->GetAngle());
         float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;
@@ -92,8 +83,8 @@ void Ship::ApplyWind(Vec2 wind) {
     const float MIN_EFFECTIVE_POWER = 0.05f;
     effective_power = max(effective_power, MIN_EFFECTIVE_POWER);
 
-    lock_guard<mutex> guard(pos_mutex);
-    pos = pos + direction * effective_power;
+    lock_guard<mutex> guard(world_object_mutex);
+    position = position + direction * effective_power;
 }
 
 ShipState Ship::GetState() {
@@ -175,6 +166,9 @@ int Ship::GetHP() const {
 
 void Ship::Hit(int damage) {
     hp = max(0, hp - damage);
+    if(hp <= 0){
+        Destroy(true);
+    }
 }
 
 bool Ship::GetUseRightCannons() const {
@@ -185,49 +179,14 @@ float Ship::GetLength() const {
     return length;
 }
 
-std::shared_ptr<ShipObject> Ship::GetLeftJunction() {
-    return left_junction;
-}
-
-std::shared_ptr<ShipObject> Ship::GetRightJunction() {
-    return right_junction;
-}
-
 Ship *Ship::GetEnemy() {
     return enemy;
-}
-
-std::vector<std::shared_ptr<Cannon>> Ship::GetLeftCannons() {
-    return left_cannons;
-}
-
-std::vector<std::shared_ptr<Cannon>> Ship::GetRightCannons() {
-    return right_cannons;
-}
-
-std::shared_ptr<Stairs> Ship::GetStairs() {
-    return stairs;
-}
-
-std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
-    return resting_point;
-}
-
-World *Ship::GetWorld() {
-    return world;
 }
 
 vector<shared_ptr<Sailor>> Ship::GetSailors() {
     return *sailors;
 }
 
-vector<shared_ptr<Mast>> Ship::GetMasts() {
-    return *masts;
-}
-
-shared_ptr<MastDistributor> Ship::GetMastDistributor() {
-    return distributor;
-}
 
 shared_ptr<vector<shared_ptr<Sailor>>> Ship::GenerateSailors(int sailors_count) {
     auto generated_sailors = make_shared<vector<shared_ptr<Sailor>>>();
@@ -244,14 +203,14 @@ Vec2 Ship::CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist)
     for(int j = 0; j < 16; j++){
         Vec2 checkDir = Vec2::FromAngle((float)j/16 * 2 * M_PI);
         for(int i = 0; i < scan_dist; i++){
-            Vec2 scannedTile = pos + checkDir * i;
+            Vec2 scannedTile = position + checkDir * i;
             scannedTile.x = (int)scannedTile.x;
             scannedTile.y = (int)scannedTile.y;
             bool tileOutsideWorld = scannedTile.x < 0 || scannedTile.x >= world->width ||
                                     scannedTile.y < 0 || scannedTile.y > world->height;
             if(world->map[scannedTile.y * world->width + scannedTile.x] || tileOutsideWorld){
-                if(!(pos - scannedTile).Length() == 0){
-                    Vec2 correction_dir = (pos - scannedTile).Normalized();
+                if(!(position - scannedTile).Length() == 0){
+                    Vec2 correction_dir = (position - scannedTile).Normalized();
                     float significance = (float)(scan_dist - i) / scan_dist;
                     closest_tile_dist = min(closest_tile_dist, i);
                     correction = correction + correction_dir * significance;
@@ -268,9 +227,9 @@ Vec2 Ship::CalculateCorrectionAgainstShips(int scan_dist, int &closest_tile_dist
     for(shared_ptr<Ship> ship : world->ships){
         if(&(*ship) != &(*this)){
             Vec2 ship_pos = ship->GetPos();
-            float dist = (pos - ship_pos).Length();
+            float dist = (position - ship_pos).Length();
             if(dist < scan_dist && dist > 0){
-                Vec2 correction_dir = (pos - ship_pos).Normalized();
+                Vec2 correction_dir = (position - ship_pos).Normalized();
                 float significance = (float)(scan_dist - dist) / scan_dist;
                 closest_tile_dist = min(closest_tile_dist, (int)dist);
                 correction = correction + correction_dir * significance;
@@ -284,7 +243,7 @@ void Ship::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction
     if(correction.Length() != 0){
         Vec2 normalized_correction = correction.Normalized();
         float correction_significance = (float)(scan_dist - closest_tile_dist) / scan_dist;
-        lock_guard<mutex> guard(pos_mutex);
+        lock_guard<mutex> guard(world_object_mutex);
         if(direction.Dot(normalized_correction) > 0)
             correction_significance = 0;
         direction = direction + normalized_correction * correction_significance;
@@ -301,7 +260,7 @@ void Ship::StartTurningTowardsAngle(float target_angle) {
         float angle_diff = AngleDifference(target_angle, CurrentAngle());
         const float kAngleCorrection = min(abs(angle_diff), 0.1f) * (angle_diff > 0 ? 1 : -1);
         {
-            lock_guard<mutex> guard(pos_mutex);
+            lock_guard<mutex> guard(world_object_mutex);
             direction = direction.Rotated(kAngleCorrection);
         }
         SleepSeconds(0.1f);
@@ -324,4 +283,37 @@ float Ship::DetermineAngleToFaceEnemy() {
     }
     return target_angle;
 }
+
+std::shared_ptr<ShipObject> Ship::GetLeftJunction() {
+    return ship_layout->GetLeftJunction();
+}
+
+std::shared_ptr<ShipObject> Ship::GetRightJunction() {
+    return ship_layout->GetRightJunction();
+}
+
+std::vector<std::shared_ptr<Cannon>> Ship::GetLeftCannons() {
+    return ship_layout->GetLeftCannons();
+}
+
+std::vector<std::shared_ptr<Cannon>> Ship::GetRightCannons() {
+    return ship_layout->GetRightCannons();
+}
+
+std::shared_ptr<Stairs> Ship::GetStairs() {
+    return ship_layout->GetStairs();
+}
+
+std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
+    return ship_layout->GetRestingPoint();
+}
+
+std::shared_ptr<MastDistributor> Ship::GetMastDistributor() {
+    return distributor;
+}
+
+std::vector<std::shared_ptr<Mast>> Ship::GetMasts() {
+    return ship_layout->GetMasts();
+}
+
 

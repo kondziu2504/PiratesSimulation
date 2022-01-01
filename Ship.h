@@ -12,6 +12,8 @@
 #include <vector>
 #include "ShipObject.h"
 #include "Stairs.h"
+#include "WorldObject.h"
+#include "ShipLayout.h"
 #include <memory>
 #include <atomic>
 
@@ -23,29 +25,18 @@ class Cannon;
 
 enum class ShipState{kWandering, kFighting, kSinking, kDestroyed};
 
-class Ship {
-    // Ship status
-    Vec2 pos;
-    std::mutex pos_mutex;
-    Vec2 direction;
+class Ship : public WorldObject{
+    std::mutex world_object_mutex;
     std::atomic<ShipState> state = ShipState::kWandering;
     int hp = 10;
 
-    World * world;
+    std::shared_ptr<ShipLayout> ship_layout;
+    std::shared_ptr<MastDistributor> distributor;
+
     bool use_right_cannons = true;
     float length = 6;
     Ship * enemy = nullptr;
     const std::shared_ptr<const std::vector<std::shared_ptr<Sailor>>> sailors;
-    std::shared_ptr<MastDistributor> distributor;
-
-    // Ship objects
-    std::shared_ptr<ShipObject> left_junction;
-    std::shared_ptr<ShipObject> right_junction;
-    std::vector<std::shared_ptr<Cannon>> left_cannons;
-    std::vector<std::shared_ptr<Cannon>> right_cannons;
-    std::shared_ptr<Stairs> stairs;
-    std::shared_ptr<ShipObject> resting_point;
-    std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
 
     std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count);
 
@@ -81,17 +72,14 @@ public:
     [[nodiscard]] float GetLength() const;
     ShipState GetState();
     Ship * GetEnemy();
-    World * GetWorld();
     std::vector<std::shared_ptr<Sailor>> GetSailors();
-    std::shared_ptr<MastDistributor> GetMastDistributor();
-
-    // Ship objects
     std::shared_ptr<ShipObject> GetLeftJunction();
     std::shared_ptr<ShipObject> GetRightJunction();
     std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
     std::vector<std::shared_ptr<Cannon>> GetRightCannons();
     std::shared_ptr<Stairs> GetStairs();
     std::shared_ptr<ShipObject> GetRestingPoint();
+    std::shared_ptr<MastDistributor> GetMastDistributor();
     std::vector<std::shared_ptr<Mast>> GetMasts();
 };
 

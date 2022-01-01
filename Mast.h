@@ -9,6 +9,8 @@
 #include <mutex>
 #include <condition_variable>
 #include "ShipObject.h"
+#include "Wind.h"
+#include "WorldObject.h"
 
 class MastDistributor;
 class Ship;
@@ -16,15 +18,17 @@ class Ship;
 class Mast : public ShipObject{
     int max_slots = 4;
     float angle = 0.f;
-    Ship * ship;
+
+    WorldObject * parent;
     std::mutex mast_mutex;
 
     void AdjustAngle(float angle_delta);
 
 public:
+    explicit Mast(WorldObject * parent) : parent(parent) {};
+
     [[nodiscard]] int GetMaxSlots() const;
     float GetAngle();
-    explicit Mast(Ship * ship);
     void Adjust();
 };
 

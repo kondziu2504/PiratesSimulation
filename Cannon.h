@@ -8,7 +8,9 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
-#include "Ship.h"
+#include "WorldObject.h"
+#include "ShipObject.h"
+#include <functional>
 
 class Sailor;
 class World;
@@ -19,13 +21,14 @@ class Cannon : public ShipObject {
     std::mutex ownership_mutex;
     std::pair<Sailor *, Sailor *> owners;
 
-    Ship * ship;
-    float relative_pos_along;
+    WorldObject * parent;
+
+    Vec2 local_pos;
     std::mutex loaded_mutex;
     bool loaded = false;
     std::condition_variable c_var_loaded;
 public:
-    explicit Cannon(Ship * ship, float relative_pos_along);
+    explicit Cannon(Vec2 local_pos, WorldObject * parent);
     std::pair<Sailor *, Sailor *> GetOwners();
     bool Loaded();
     void WaitUntilLoadedOrTimeout();
