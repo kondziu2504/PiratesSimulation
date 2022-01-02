@@ -149,8 +149,8 @@ void Monitor::DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewpo
 }
 
 void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
-    Vec2 ship_pos = ship->GetPos();
-    Vec2 ship_dir = ship->GetDir();
+    Vec2 ship_pos = ship->GetPosition();
+    Vec2 ship_dir = ship->GetDirection();
 
     vector<string> texture = {
             "TTMMMFF",
@@ -455,12 +455,12 @@ void Monitor::DrawWindDir(int x_offset, int y_offset, int size) {
 }
 
 void Monitor::DrawShipDir(int x_offset, int y_offset, int size, shared_ptr<Ship> ship) {
-    DrawCircleIndicator(x_offset, y_offset, ship->GetDir().Angle(), "Kierunek statku", size);
+    DrawCircleIndicator(x_offset, y_offset, ship->GetDirection().Angle(), "Kierunek statku", size);
 }
 
 void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship) {
     float wind_angle = world->wind->GetVelocity().Angle();
-    float ship_angle = ship->GetDir().Angle();
+    float ship_angle = ship->GetDirection().Angle();
     DrawCircleIndicator(x_offset, y_offset, AngleDifference(wind_angle, ship_angle) - M_PI / 2, "Docelowy kat zagli",
                         size);
 }
@@ -474,8 +474,8 @@ void Monitor::DrawShipInfo(int ship_ind) {
     DrawSailTarget(71, 40, 18, ship);
     int preview_size = 50;
     DrawWorld(90, 0,
-              ship->GetPos().x - preview_size/2,
-              ship->GetPos().y - preview_size/2,
+              ship->GetPosition().x - preview_size/2,
+              ship->GetPosition().y - preview_size/2,
               preview_size, preview_size);
 }
 

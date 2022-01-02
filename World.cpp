@@ -7,6 +7,7 @@
 #include "PerlinNoise.hpp"
 #include "Ship.h"
 #include "Wind.h"
+#include <thread>
 
 using namespace std;
 
@@ -39,7 +40,8 @@ World::World(int width, int height, int seed) {
 void World::AddShip(std::shared_ptr<Ship> ship) {
     lock_guard<mutex> guard(shipsMutex);
     ships.push_back(ship);
-    ship->Start();
+    thread ship_thread(&Ship::Start, ship);
+    ship_thread.detach();
 }
 
 void World::GenerateShip() {

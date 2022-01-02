@@ -37,8 +37,9 @@ void Sailor::GoRest() {
     SetState(SailorState::kStanding);
 }
 
-Sailor::Sailor(Ship * ship) {
-    this->ship = ship;
+Sailor::Sailor(ShipBody *ship_body, WorldObject *parent) {
+    this->ship = ship_body;
+    this->parent = parent;
 }
 
 SailorState Sailor::GetState() {
@@ -152,7 +153,7 @@ bool Sailor::GetIsDying() const {
 }
 
 std::shared_ptr<ShipObject> Sailor::GetFightingSideJunction() const {
-    return ship->GetUseRightCannons() ? ship->GetRightJunction() : ship->GetLeftJunction();
+    return use_right_cannons ? ship->GetRightJunction() : ship->GetLeftJunction();
 }
 
 void Sailor::GoUseMastProcedure() {
@@ -186,10 +187,9 @@ void Sailor::ReleaseMast() {
 }
 
 void Sailor::OperateTheShip() {
-    ShipState ship_state = ship->GetState();
-    if(ship_state == ShipState::kWandering) {
+    if(current_order == SailorOrder::kOperateMasts) {
         GoUseMastProcedure();
-    }else if(ship_state == ShipState::kFighting){
+    }else if(current_order == SailorOrder::kOperateCannons){
         GoUseCannonProcedure();
     }
 }
@@ -207,15 +207,15 @@ void Sailor::ProgressAction(float actionTotalTime, std::function<void(float prog
 }
 
 std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
-    return ship->GetUseRightCannons() ? ship->GetRightCannons() : ship->GetLeftCannons();
+    return use_right_cannons ? ship->GetRightCannons() : ship->GetLeftCannons();
 }
 
 Vec2 Sailor::CalculateCannonTarget() const {
     float distance = 5;
-    if(ship->GetEnemy() != nullptr)
-        distance = (ship->GetEnemy()->GetPos() - ship->GetPos()).Length();
-    Vec2 perpendicular_right = Vec2::FromAngle(ship->GetDir().Angle() + M_PI_2).Normalized() * distance;
-    return ship->GetPos() + perpendicular_right * (ship->GetUseRightCannons() ? 1.f : -1.f);
+    if(cannon_target != nullptr)
+        distance = (cannon_target->GetPosition() - parent->GetPosition()).Length();
+    Vec2 perpendicular_right = Vec2::FromAngle(parent->GetDirection().Angle() + M_PI_2).Normalized() * distance;
+    return parent->GetPosition() + perpendicular_right * (use_right_cannons ? 1.f : -1.f);
 }
 
 void Sailor::FulfillAssignedCannonRole() {
@@ -239,6 +239,14 @@ bool Sailor::TryClaimFirstUnoccupiedCannon() {
         }
     }
     return false;
+}
+
+void Sailor::SetCurrentOrder(SailorOrder new_order) {
+    current_order = new_order;
+}
+
+void Sailor::SetCannonTarget(WorldObject * cannon_target) {
+    this->cannon_target = cannon_target;
 }
 
 

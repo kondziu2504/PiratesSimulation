@@ -14,6 +14,9 @@
 #include "Stairs.h"
 #include "WorldObject.h"
 #include "ShipLayout.h"
+#include "ShipBody.h"
+#include "Crew.h"
+#include "ShipController.h"
 #include <memory>
 #include <atomic>
 
@@ -23,39 +26,15 @@ class World;
 class Sailor;
 class Cannon;
 
-enum class ShipState{kWandering, kFighting, kSinking, kDestroyed};
-
-class Ship : public WorldObject{
+class Ship : public WorldObject {
     std::mutex world_object_mutex;
-    std::atomic<ShipState> state = ShipState::kWandering;
-    int hp = 10;
 
-    std::shared_ptr<ShipLayout> ship_layout;
-    std::shared_ptr<MastDistributor> distributor;
-
-    bool use_right_cannons = true;
-    float length = 6;
-    Ship * enemy = nullptr;
-    const std::shared_ptr<const std::vector<std::shared_ptr<Sailor>>> sailors;
-
-    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count);
-
-    // Fighting
-    void EngageFight(Ship * ship);
-    void PrepareForFight(Ship * ship);
-    bool LookForEnemy();
-    void GetInPosition();
-    void StartTurningTowardsAngle(float target_angle);
-    float DetermineAngleToFaceEnemy();
-
-    void SetState(ShipState new_state);
-    void AdjustDirection();
+    std::shared_ptr<ShipBody> ship_body;
+    std::shared_ptr<Crew> crew;
+    std::shared_ptr<ShipController> ship_controller;
 
     void UpdateThread();
 
-    Vec2 CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const;
-    Vec2 CalculateCorrectionAgainstShips(int scan_dist, int& closest_tile_dist) const;
-    void ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction);
 
 public:
     Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
@@ -64,14 +43,12 @@ public:
     void Destroy(bool respawn);
 
     void ApplyWind(Vec2 wind);
-    Vec2 GetPos();
-    Vec2 GetDir();
     [[nodiscard]] int GetHP() const;
     void Hit(int damage);
-    [[nodiscard]] bool GetUseRightCannons() const;
     [[nodiscard]] float GetLength() const;
+
     ShipState GetState();
-    Ship * GetEnemy();
+
     std::vector<std::shared_ptr<Sailor>> GetSailors();
     std::shared_ptr<ShipObject> GetLeftJunction();
     std::shared_ptr<ShipObject> GetRightJunction();
@@ -81,6 +58,7 @@ public:
     std::shared_ptr<ShipObject> GetRestingPoint();
     std::shared_ptr<MastDistributor> GetMastDistributor();
     std::vector<std::shared_ptr<Mast>> GetMasts();
+    void PrepareForFight(Ship * enemy);
 };
 
 

@@ -5,7 +5,6 @@
 #include "ShipLayout.h"
 #include <memory>
 #include "Mast.h"
-#include "MastDistributor.h"
 #include "Cannon.h"
 
 using namespace std;

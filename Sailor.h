@@ -11,6 +11,7 @@
 #include "ShipObject.h"
 #include "Util.h"
 #include "Vec2.h"
+#include "ShipBody.h"
 
 class Cannon;
 class Ship;
@@ -19,11 +20,19 @@ class Mast;
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
         kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
+enum class SailorOrder {kOperateCannons, kOperateMasts};
+
 class Sailor {
     SailorState currentState = SailorState::kResting;
     std::mutex sailor_mutex;
-    Ship * ship;
+    ShipBody * ship;
+    WorldObject * parent;
+
     std::atomic<bool> upper_deck = true;
+
+    SailorOrder current_order = SailorOrder::kOperateMasts;
+    WorldObject * cannon_target = nullptr;
+    bool use_right_cannons = false;
 
     //Sailor activity/travel
     std::mutex target_mutex;
@@ -70,12 +79,14 @@ class Sailor {
     void GoUseStairs();
 
 public:
-    explicit Sailor(Ship * ship);
+    explicit Sailor(ShipBody *ship_body, WorldObject *parent);
     void Start();
     void Kill();
     [[nodiscard]] bool GetIsDying() const;
     SailorState GetState();
     bool IsUpperDeck();
+    void SetCurrentOrder(SailorOrder new_order);
+    void SetCannonTarget(WorldObject * cannon_target);
 
     //Operated elements
     [[nodiscard]] std::shared_ptr<Mast> GetOperatedMast() const;

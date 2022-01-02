@@ -10,15 +10,17 @@
 #include "World.h"
 
 class WorldObject {
-protected:
     Vec2 position;
     Vec2 direction;
     World * world;
+    std::mutex _mutex;
 
 public:
     WorldObject(Vec2 direction, Vec2 position, World * world) : direction(direction), position(position), world(world) {};
     Vec2 GetPosition();
+    void SetPosition(Vec2 new_pos);
     Vec2 GetDirection();
+    void SetDirection(Vec2 new_dir);
     World * GetWorld();
 };
 
