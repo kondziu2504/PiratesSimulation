@@ -167,6 +167,7 @@ SailorActionStatus Sailor::GoUseMastProcedure() {
     if(GoTo(operated_mast) == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
     OperateMast();
+    return SailorActionStatus::kSuccess;
 }
 
 SailorActionStatus Sailor::GoUseCannonProcedure() {
@@ -178,6 +179,7 @@ SailorActionStatus Sailor::GoUseCannonProcedure() {
         return SailorActionStatus::kKilledDuringAction;
     if(UseCannon() == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
+    return SailorActionStatus::kSuccess;
 }
 
 SailorActionStatus Sailor::ContinuouslyAdjustMast() {
@@ -202,6 +204,7 @@ SailorActionStatus Sailor::OperateTheShip() {
     }else if(current_order == SailorOrder::kOperateCannons){
         return GoUseCannonProcedure();
     }
+    return SailorActionStatus::kSuccess;
 }
 
 SailorActionStatus Sailor::ProgressAction(float actionTotalTime, std::function<void(float progress)> action) {
