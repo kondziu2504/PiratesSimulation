@@ -179,5 +179,14 @@ void ShipController::Start() {
                 crew->SetCannonsTarget(nullptr);
             }
         }
+        if(kill){
+            SetState(ShipState::kDestroyed);
+            return;
+        }
     }
+}
+
+void ShipController::Kill() {
+    kill = true;
+    SetState(ShipState::kSinking);
 }

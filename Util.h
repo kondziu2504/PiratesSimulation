@@ -10,6 +10,6 @@
 float AngleDifference(float angle1, float angle2);
 float RandomTime(float min, float max);
 void SleepSeconds(float seconds);
-void DoRepeatedlyForATime(const std::function<void(float progress)>& action, float totalTimeInSeconds, float updatePeriodInSeconds = 0.1f);
+void DoRepeatedlyForATime(const std::function<void(float progress, bool & stop)>& action, float totalTimeInSeconds, float updatePeriodInSeconds = 0.1f);
 
 #endif //PIRATESSIMULATION_UTIL_H

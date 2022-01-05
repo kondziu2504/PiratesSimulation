@@ -13,28 +13,25 @@
 using namespace std;
 
 void Sailor::Start() {
-    thread sailor_thread(&Sailor::ThreadFun, this);
-    sailor_thread.detach();
-}
-
-void Sailor::ThreadFun() {
-    SleepSeconds(RandomTime(0,10));
+    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction)
+        return;
     while(true){
-        OperateTheShip();
-        if (dying) {
-            SetState(SailorState::kDead);
-            return;
-        }
-        GoRest();
+        if(OperateTheShip() == SailorActionStatus::kKilledDuringAction)
+            break;
+        if(GoRest() == SailorActionStatus::kKilledDuringAction)
+            break;
     }
+    SetState(SailorState::kDead);
+    return;
 }
 
-
-void Sailor::GoRest() {
+SailorActionStatus Sailor::GoRest() {
     GoTo(ship->GetRestingPoint());
     SetState(SailorState::kResting);
-    SleepSeconds(RandomTime(3,5));
+    if(SleepAndCheckKilled(RandomTime(3,5)) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     SetState(SailorState::kStanding);
+    return SailorActionStatus::kSuccess;
 }
 
 Sailor::Sailor(ShipBody *ship_body, WorldObject *parent) {
@@ -52,11 +49,13 @@ void Sailor::SetState(SailorState new_state) {
     currentState = new_state;
 }
 
-void Sailor::OperateMast() {
+SailorActionStatus Sailor::OperateMast() {
     SetState(SailorState::kMast);
-    ContinuouslyAdjustMast();
+    if(ContinuouslyAdjustMast() == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     ReleaseMast();
     SetState(SailorState::kStanding);
+    return SailorActionStatus::kSuccess;
 }
 
 void Sailor::WaitForMast() {
@@ -109,30 +108,35 @@ bool Sailor::IsUpperDeck() {
     return upper_deck;
 }
 
-void Sailor::WaitForCannon() {
+SailorActionStatus Sailor::WaitForCannon() {
     SetState(SailorState::kWaitingCannon);
     while(true){
         if(TryClaimFirstUnoccupiedCannon())
-            return;
+            return SailorActionStatus::kSuccess;
         else
-            SleepSeconds(0.1f);
+            if(SleepAndCheckKilled(0.1f) == SailorActionStatus::kKilledDuringAction)
+                return SailorActionStatus::kKilledDuringAction;
     }
 }
 
-void Sailor::UseCannon() {
+SailorActionStatus Sailor::UseCannon() {
     SetState(SailorState::kCannon);
-    SleepSeconds(2);
+    if(SleepAndCheckKilled(2) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     FulfillAssignedCannonRole();
     assigned_cannon->Release(this);
     SetState(SailorState::kStanding);
+    return SailorActionStatus::kSuccess;
 }
 
-void Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
+SailorActionStatus Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
     SetState(SailorState::kWalking);
     next_target = std::move(shipObject);
-    ProgressAction(3.f);
+    if(ProgressAction(3.f) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     previous_target = next_target;
     SetState(SailorState::kStanding);
+    return SailorActionStatus::kSuccess;
 }
 
 void Sailor::Kill(){
@@ -156,23 +160,29 @@ std::shared_ptr<ShipObject> Sailor::GetFightingSideJunction() const {
     return use_right_cannons ? ship->GetRightJunction() : ship->GetLeftJunction();
 }
 
-void Sailor::GoUseMastProcedure() {
-    GoTo(ship->GetRightJunction());
+SailorActionStatus Sailor::GoUseMastProcedure() {
+    if(GoTo(ship->GetRightJunction()) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     WaitForMast();
-    GoTo(operated_mast);
+    if(GoTo(operated_mast) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
     OperateMast();
 }
 
-void Sailor::GoUseCannonProcedure() {
-    GoTo(GetFightingSideJunction());
-    WaitForCannon();
-    GoTo(assigned_cannon);
-    UseCannon();
+SailorActionStatus Sailor::GoUseCannonProcedure() {
+    if(GoTo(GetFightingSideJunction()) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
+    if(WaitForCannon() == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
+    if(GoTo(assigned_cannon) == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
+    if(UseCannon() == SailorActionStatus::kKilledDuringAction)
+        return SailorActionStatus::kKilledDuringAction;
 }
 
-void Sailor::ContinuouslyAdjustMast() {
+SailorActionStatus Sailor::ContinuouslyAdjustMast() {
     const float workTime = 6.f;
-    ProgressAction(workTime,
+    return ProgressAction(workTime,
                    [=](float progress) -> void {
                        operated_mast->Adjust();
                    });
@@ -186,24 +196,30 @@ void Sailor::ReleaseMast() {
     }
 }
 
-void Sailor::OperateTheShip() {
+SailorActionStatus Sailor::OperateTheShip() {
     if(current_order == SailorOrder::kOperateMasts) {
-        GoUseMastProcedure();
+        return GoUseMastProcedure();
     }else if(current_order == SailorOrder::kOperateCannons){
-        GoUseCannonProcedure();
+        return GoUseCannonProcedure();
     }
 }
 
-void Sailor::ProgressAction(float actionTotalTime, std::function<void(float progress)> action) {
+SailorActionStatus Sailor::ProgressAction(float actionTotalTime, std::function<void(float progress)> action) {
+    SailorActionStatus action_status = SailorActionStatus::kSuccess;
     DoRepeatedlyForATime(
-            [=](float progress) -> void
+            [&](float progress, bool & stop) -> void
             {
                 if(action != nullptr)
                     action(progress);
                 SetProgress(progress);
+                if(dying){
+                    action_status = SailorActionStatus::kKilledDuringAction;
+                    stop = true;
+                }
             },
             actionTotalTime
     );
+    return action_status;
 }
 
 std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
@@ -247,6 +263,18 @@ void Sailor::SetCurrentOrder(SailorOrder new_order) {
 
 void Sailor::SetCannonTarget(WorldObject * cannon_target) {
     this->cannon_target = cannon_target;
+}
+
+SailorActionStatus Sailor::SleepAndCheckKilled(float seconds) {
+    const float time_step = 0.1f;
+    float seconds_left = seconds;
+    while(seconds_left > 0){
+        SleepSeconds(time_step);
+        seconds_left -= time_step;
+        if(dying)
+            return SailorActionStatus::kKilledDuringAction;
+    }
+    return SailorActionStatus::kSuccess;
 }
 
 

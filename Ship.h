@@ -27,14 +27,9 @@ class Sailor;
 class Cannon;
 
 class Ship : public WorldObject {
-    std::mutex world_object_mutex;
-
     std::shared_ptr<ShipBody> ship_body;
     std::shared_ptr<Crew> crew;
     std::shared_ptr<ShipController> ship_controller;
-
-    void UpdateThread();
-
 
 public:
     Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
@@ -43,13 +38,13 @@ public:
     void Destroy(bool respawn);
 
     void ApplyWind(Vec2 wind);
-    [[nodiscard]] int GetHP() const;
     void Hit(int damage);
+
+    [[nodiscard]] int GetHP() const;
     [[nodiscard]] float GetLength() const;
-
     ShipState GetState();
-
     std::vector<std::shared_ptr<Sailor>> GetSailors();
+
     std::shared_ptr<ShipObject> GetLeftJunction();
     std::shared_ptr<ShipObject> GetRightJunction();
     std::vector<std::shared_ptr<Cannon>> GetLeftCannons();

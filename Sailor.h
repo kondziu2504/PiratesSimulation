@@ -17,6 +17,11 @@ class Cannon;
 class Ship;
 class Mast;
 
+enum class SailorActionStatus {
+    kSuccess,
+    kKilledDuringAction
+};
+
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
         kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
 
@@ -46,11 +51,9 @@ class Sailor {
 
     std::atomic<bool> dying = false;
 
-    void ThreadFun();
+    SailorActionStatus GoTo(std::shared_ptr<ShipObject> shipObject);
 
-    void GoTo(std::shared_ptr<ShipObject> shipObject);
-
-    void OperateTheShip();
+    SailorActionStatus OperateTheShip();
 
     [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
     [[nodiscard]] std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
@@ -59,24 +62,26 @@ class Sailor {
     bool TryClaimFirstUnoccupiedCannon();
 
     //Mast operations
-    void OperateMast();
+    SailorActionStatus OperateMast();
     void WaitForMast();
-    void GoUseMastProcedure();
-    void ContinuouslyAdjustMast();
+    SailorActionStatus GoUseMastProcedure();
+    SailorActionStatus ContinuouslyAdjustMast();
     void ReleaseMast();
 
-    void WaitForCannon();
-    void UseCannon();
-    void GoUseCannonProcedure();
+    SailorActionStatus WaitForCannon();
+    SailorActionStatus UseCannon();
+    SailorActionStatus GoUseCannonProcedure();
 
-    void GoRest();
-    void ProgressAction(float actionTotalTime, std::function<void(float progress)> action = nullptr);
+    SailorActionStatus GoRest();
+    SailorActionStatus ProgressAction(float actionTotalTime, std::function<void(float progress)> action = nullptr);
 
     void SetState(SailorState new_state);
     void SetProgress(float progress);
 
     void UseStairs();
     void GoUseStairs();
+
+    SailorActionStatus SleepAndCheckKilled(float seconds);
 
 public:
     explicit Sailor(ShipBody *ship_body, WorldObject *parent);

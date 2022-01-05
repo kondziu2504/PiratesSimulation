@@ -35,14 +35,18 @@ void SleepSeconds(float seconds){
     usleep((unsigned int)(1'000'000 * seconds));
 }
 
-void DoRepeatedlyForATime(const std::function<void(float progress)>& action, float totalTimeInSeconds, float updatePeriodInSeconds){
+void DoRepeatedlyForATime(const std::function<void(float progress, bool & stop)>& action, float totalTimeInSeconds, float updatePeriodInSeconds){
     if(totalTimeInSeconds <= 0 || updatePeriodInSeconds <= 0)
         return;
 
+
     float timeLeft = totalTimeInSeconds;
+    bool stop = false;
     while(timeLeft > 0){
         if(action != nullptr)
-            action(1.f - (timeLeft / totalTimeInSeconds));
+            action(1.f - (timeLeft / totalTimeInSeconds), stop);
+        if(stop)
+            return;
         SleepSeconds(updatePeriodInSeconds);
         timeLeft -= updatePeriodInSeconds;
     }

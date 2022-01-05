@@ -43,3 +43,9 @@ void Crew::SetCannonsTarget(WorldObject *target) {
     for(auto sailor : *sailors)
         sailor->SetCannonTarget(target);
 }
+
+void Crew::Kill() {
+    for(const auto& sailor : *sailors){
+        sailor->Kill();
+    }
+}

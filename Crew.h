@@ -22,6 +22,7 @@ public:
     void SetOrders(SailorOrder new_order);
     void SetCannonsTarget(WorldObject * target);
     std::vector<std::shared_ptr<Sailor>> GetSailors();
+    void Kill();
 };
 
 

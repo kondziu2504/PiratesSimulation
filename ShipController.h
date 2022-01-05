@@ -20,6 +20,8 @@ class ShipController {
     Ship * parent = nullptr;
     Ship * enemy = nullptr;
 
+    bool kill = false;
+
     // Fighting
     void EngageFight(Ship * enemy_ship);
 
@@ -42,6 +44,7 @@ public:
     ShipState GetState();
     void PrepareForFight(Ship * ship);
     void Start();
+    void Kill();
 };
 
 

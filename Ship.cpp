@@ -51,39 +51,18 @@ void Ship::ApplyWind(Vec2 wind) {
     const float MIN_EFFECTIVE_POWER = 0.05f;
     effective_power = max(effective_power, MIN_EFFECTIVE_POWER);
 
-    lock_guard<mutex> guard(world_object_mutex);
     SetPosition(GetPosition() + GetDirection() * effective_power);
 }
 
 void Ship::Destroy(bool respawn) {
-    /*auto shipState = GetState();
-    if(shipState == ShipState::kSinking || shipState == ShipState::kDestroyed)
+    if(ship_controller->GetState() == ShipState::kSinking || ship_controller->GetState() == ShipState::kDestroyed)
         return;
-    SetState(ShipState::kSinking);
-    thread destroyThread([this, respawn]{
-        vector<thread> killThreads;
-        for(auto sailor : *sailors)
-            killThreads.emplace_back(thread([=]() {sailor->Kill();}));
 
-        for(auto & killThread : killThreads)
-            killThread.join();
-
-        SetState(ShipState::kDestroyed);
-        {
-            lock_guard<mutex> guard(world->shipsMutex);
-            auto it = world->ships.begin();
-            while (it != world->ships.end()) {
-                if (it->get() == this) {
-                    world->ships.erase(it);
-                    break;
-                }
-                it++;
-            }
-        }
-        if(respawn)
-            world->GenerateShip();
+    thread kill_thread([=](){
+        crew->Kill();
+        ship_controller->Kill();
     });
-    destroyThread.detach();*/
+    kill_thread.detach();
 }
 
 int Ship::GetHP() const {
