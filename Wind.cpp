@@ -19,7 +19,7 @@ void Wind::Start() {
     while(true){
         UpdateVelocity();
         {
-            lock_guard<mutex> guard(world->shipsMutex);
+            lock_guard<mutex> guard(world->ships_mutex);
             for(shared_ptr<Ship> ship : world->ships){
                 auto shipState = ship->GetState();
                 if(shipState == ShipState::kWandering)

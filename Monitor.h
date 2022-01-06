@@ -60,7 +60,7 @@ private:
     void DrawWindDir(int x_offset, int y_offset, int size);
     void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
     void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
-    void DrawShipInfo(int ship_ind);
+    void DrawShipInfo(std::shared_ptr<Ship> ship);
     void DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     int GetColor(Sailor * sailor);
 

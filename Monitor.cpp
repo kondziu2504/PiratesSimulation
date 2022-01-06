@@ -94,8 +94,16 @@ void Monitor::Update() {
         if(display_mode == MonitorDisplayMode::kMap){
             DrawWorld(0, 0, 0, 0, 0, 0);
         }else{
-            lock_guard<mutex> guard(current_ship_mutex);
-            DrawShipInfo(current_ship_ind);
+            shared_ptr<Ship> ship = nullptr;
+            {
+                lock_guard<mutex> ships_guard(world->ships_mutex);
+                if(!world->ships.empty()){
+                    lock_guard<mutex> guard(current_ship_mutex);
+                    ship = world->ships.at(current_ship_ind);
+                }
+            }
+            if(ship != nullptr)
+                DrawShipInfo(ship);
         }
     }
     refresh();
@@ -183,7 +191,7 @@ void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_
 }
 
 void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
-    lock_guard<mutex> guard(world->shipsMutex);
+    lock_guard<mutex> guard(world->ships_mutex);
     for(shared_ptr<Ship> ship : world->ships){
         DrawShip(ship, x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
     }
@@ -465,8 +473,7 @@ void Monitor::DrawSailTarget(int x_offset, int y_offset, int size, std::shared_p
                         size);
 }
 
-void Monitor::DrawShipInfo(int ship_ind) {
-    auto ship = world->ships[ship_ind];
+void Monitor::DrawShipInfo(shared_ptr<Ship> ship) {
     DrawDashboard(ship);
     DrawShipDeck(ship, 40, 0, 29, 50);
     DrawWindDir(71, 0, 18);

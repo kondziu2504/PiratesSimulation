@@ -26,7 +26,7 @@ void ShipController::PrepareForFight(Ship *ship) {
 
 bool ShipController::LookForEnemy() {
     parent->GetPosition();
-    lock_guard<mutex> guard(parent->GetWorld()->shipsMutex);
+    lock_guard<mutex> guard(parent->GetWorld()->ships_mutex);
     for(auto ship : parent->GetWorld()->ships){
         if(ship.get() != parent &&
            ship->GetState() != ShipState::kSinking &&
@@ -119,7 +119,7 @@ Vec2 ShipController::CalculateCorrectionAgainstLand(int scan_dist, int &closest_
 
 Vec2 ShipController::CalculateCorrectionAgainstShips(int scan_dist, int &closest_tile_dist) const {
     Vec2 correction;
-    lock_guard<mutex> guard(parent->GetWorld()->shipsMutex);
+    lock_guard<mutex> guard(parent->GetWorld()->ships_mutex);
     for(shared_ptr<Ship> ship : parent->GetWorld()->ships){
         if(ship.get() != parent){
             Vec2 ship_pos = ship->GetPosition();

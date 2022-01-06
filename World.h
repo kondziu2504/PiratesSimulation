@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 #include <mutex>
+#include "Vec2.h"
+
 class Ship;
 class Wind;
 class Cannonball;
@@ -17,18 +19,24 @@ public:
     int width, height;
     std::shared_ptr<bool[]> map;
     std::vector<std::shared_ptr<Ship>> ships;
-    std::mutex shipsMutex;
+    std::mutex ships_mutex;
+    Vec2 FindFreeSpotForShip();
+    void ShipLiveAndRespawn(std::shared_ptr<Ship> ship);
+    bool respawn = true;
 
 public:
     std::mutex cannonballs_mutex;
     std::vector<std::shared_ptr<Cannonball>> cannonballs;
     std::shared_ptr<Wind> wind;
     World(int width, int height, int seed);
-    void AddShip(std::shared_ptr<Ship> ship);
+    void AddShip(const std::shared_ptr<Ship>& ship);
     void AddRandomShip();
+
     void Stop();
     [[nodiscard]] bool TileInsideWorld(int x, int y) const;
     [[nodiscard]] bool IsLandAt(int x, int y) const;
+
+    void GenerateMap(int map_width, int map_height, int seed);
 };
 
 

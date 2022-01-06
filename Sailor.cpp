@@ -13,8 +13,10 @@
 using namespace std;
 
 void Sailor::Start() {
-    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction)
+    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction){
+        SetState(SailorState::kDead);
         return;
+    }
     while(true){
         if(OperateTheShip() == SailorActionStatus::kKilledDuringAction)
             break;
@@ -22,7 +24,6 @@ void Sailor::Start() {
             break;
     }
     SetState(SailorState::kDead);
-    return;
 }
 
 SailorActionStatus Sailor::GoRest() {
