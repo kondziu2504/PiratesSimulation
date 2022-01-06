@@ -69,10 +69,10 @@ float ShipController::DetermineAngleToFaceEnemy() {
     float to_cannons_right_required_rotation = abs(AngleDifference(parent->GetDirection().Angle(), dir_with_cannons_on_right.Angle()));
     if(to_cannons_left_required_rotation < to_cannons_right_required_rotation) {
         target_angle = dir_with_cannons_on_left.Angle();
-        use_right_cannons = false;
+        crew->SetUseRightCannons(false);
     } else {
         target_angle = dir_with_cannons_on_right.Angle();
-        use_right_cannons = true;
+        crew->SetUseRightCannons(true);
     }
     return target_angle;
 }
@@ -148,10 +148,6 @@ void ShipController::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 
 
 Ship *ShipController::GetEnemy() {
     return enemy;
-}
-
-bool ShipController::GetUseRightCannons() const {
-    return use_right_cannons;
 }
 
 ShipController::ShipController(ShipBody *ship_body, Crew *crew, Ship *parent) {

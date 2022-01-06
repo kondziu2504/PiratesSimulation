@@ -49,3 +49,9 @@ void Crew::Kill() {
         sailor->Kill();
     }
 }
+
+void Crew::SetUseRightCannons(bool right) {
+    for(const auto& sailor : *sailors){
+        sailor->SetUseRightCannons(right);
+    }
+}

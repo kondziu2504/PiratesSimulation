@@ -8,6 +8,7 @@
 #include "ShipBody.h"
 #include "Crew.h"
 #include "ShipState.h"
+#include <atomic>
 
 class Ship;
 
@@ -16,11 +17,10 @@ class ShipController {
     Crew * crew;
 
     std::atomic<ShipState> state = ShipState::kWandering;
-    bool use_right_cannons = true;
     Ship * parent = nullptr;
     Ship * enemy = nullptr;
 
-    bool kill = false;
+    std::atomic<bool> kill = false;
 
     // Fighting
     void EngageFight(Ship * enemy_ship);
@@ -30,7 +30,6 @@ class ShipController {
     void StartTurningTowardsAngle(float target_angle);
     float DetermineAngleToFaceEnemy();
     Ship * GetEnemy();
-    [[nodiscard]] bool GetUseRightCannons() const;
 
     void SetState(ShipState new_state);
     void AdjustDirection();

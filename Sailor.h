@@ -37,7 +37,7 @@ class Sailor {
 
     SailorOrder current_order = SailorOrder::kOperateMasts;
     WorldObject * cannon_target = nullptr;
-    bool use_right_cannons = false;
+    std::atomic<bool> use_right_cannons = false;
 
     //Sailor activity/travel
     std::mutex target_mutex;
@@ -58,7 +58,7 @@ class Sailor {
     [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
     [[nodiscard]] std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
     Vec2 CalculateCannonTarget() const;
-    void FulfillAssignedCannonRole();
+    SailorActionStatus FulfillAssignedCannonRole();
     bool TryClaimFirstUnoccupiedCannon();
 
     //Mast operations
@@ -92,6 +92,7 @@ public:
     bool IsUpperDeck();
     void SetCurrentOrder(SailorOrder new_order);
     void SetCannonTarget(WorldObject * cannon_target);
+    void SetUseRightCannons(bool right);
 
     //Operated elements
     [[nodiscard]] std::shared_ptr<Mast> GetOperatedMast() const;

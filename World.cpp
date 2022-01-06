@@ -40,11 +40,18 @@ World::World(int width, int height, int seed) {
 void World::AddShip(std::shared_ptr<Ship> ship) {
     lock_guard<mutex> guard(shipsMutex);
     ships.push_back(ship);
-    thread ship_thread(&Ship::Start, ship);
+    thread ship_thread([=](){
+        ship->Start();
+        {
+            lock_guard<mutex> guard(shipsMutex);
+            ships.erase(std::remove(ships.begin(), ships.end(), ship));
+        }
+        AddRandomShip();
+    });
     ship_thread.detach();
 }
 
-void World::GenerateShip() {
+void World::AddRandomShip() {
     Vec2 pos;
     bool goodField;
     do{
@@ -72,17 +79,15 @@ void World::GenerateShip() {
     int masts = 2 + rand() % 3;
     int cannonsPerSide = 2 + rand() % 3;
 
-    lock_guard<mutex> guard(shipsMutex);
     auto newShip = make_shared<Ship>(pos, direction, sailors, masts, cannonsPerSide, this);
-    ships.push_back(newShip);
-    newShip->Start();
+    AddShip(newShip);
 }
 
 void World::Stop() {
     {
         lock_guard<mutex> guard(shipsMutex);
         for (auto ship : ships) {
-            ship->Destroy(false);
+            ship->Destroy();
         }
     }
     while(true) {

@@ -25,7 +25,7 @@ public:
     std::shared_ptr<Wind> wind;
     World(int width, int height, int seed);
     void AddShip(std::shared_ptr<Ship> ship);
-    void GenerateShip();
+    void AddRandomShip();
     void Stop();
     [[nodiscard]] bool TileInsideWorld(int x, int y) const;
     [[nodiscard]] bool IsLandAt(int x, int y) const;

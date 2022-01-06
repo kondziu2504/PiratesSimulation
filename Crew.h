@@ -21,6 +21,7 @@ public:
     void Start();
     void SetOrders(SailorOrder new_order);
     void SetCannonsTarget(WorldObject * target);
+    void SetUseRightCannons(bool right);
     std::vector<std::shared_ptr<Sailor>> GetSailors();
     void Kill();
 };

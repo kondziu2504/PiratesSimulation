@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     world->AddShip(make_shared<Ship>(Vec2(55,18), Vec2(1, 0), 24, 3, 3, world.get()));
     world->AddShip(make_shared<Ship>(Vec2(95,15), Vec2(-1,0), 5, 2, 2, world.get()));
 //    for(int i = 0; i < 2; i++)
-//        world->GenerateShip();
+//        world->AddRandomShip();
     Monitor monitor(world);
     monitor.Start();
 

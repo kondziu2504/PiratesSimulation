@@ -237,15 +237,18 @@ Vec2 Sailor::CalculateCannonTarget() const {
     return parent->GetPosition() + perpendicular_right * (use_right_cannons ? 1.f : -1.f);
 }
 
-void Sailor::FulfillAssignedCannonRole() {
+SailorActionStatus Sailor::FulfillAssignedCannonRole() {
     auto cannon_owners = assigned_cannon->GetOwners();
     if(cannon_owners.first == this){
         assigned_cannon->WaitUntilLoadedOrTimeout();
+        if(dying)
+            return SailorActionStatus::kKilledDuringAction;
         if(assigned_cannon->Loaded())
             assigned_cannon->Shoot(CalculateCannonTarget());
     }else if(cannon_owners.second == this){
         assigned_cannon->Load();
     }
+    return SailorActionStatus::kSuccess;
 }
 
 bool Sailor::TryClaimFirstUnoccupiedCannon() {
@@ -278,6 +281,10 @@ SailorActionStatus Sailor::SleepAndCheckKilled(float seconds) {
             return SailorActionStatus::kKilledDuringAction;
     }
     return SailorActionStatus::kSuccess;
+}
+
+void Sailor::SetUseRightCannons(bool right) {
+    use_right_cannons = right;
 }
 
 

@@ -54,7 +54,7 @@ void Ship::ApplyWind(Vec2 wind) {
     SetPosition(GetPosition() + GetDirection() * effective_power);
 }
 
-void Ship::Destroy(bool respawn) {
+void Ship::Destroy() {
     if(ship_controller->GetState() == ShipState::kSinking || ship_controller->GetState() == ShipState::kDestroyed)
         return;
 
@@ -72,7 +72,7 @@ int Ship::GetHP() const {
 void Ship::Hit(int damage) {
     ship_body->Hit(damage);
     if(ship_body->GetHP() <= 0){
-        Destroy(true);
+        Destroy();
     }
 }
 

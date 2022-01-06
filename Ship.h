@@ -35,7 +35,7 @@ public:
     Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
 
     void Start();
-    void Destroy(bool respawn);
+    void Destroy();
 
     void ApplyWind(Vec2 wind);
     void Hit(int damage);
