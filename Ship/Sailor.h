@@ -9,8 +9,8 @@
 #include <mutex>
 #include <atomic>
 #include "ShipObject.h"
-#include "Util.h"
-#include "Vec2.h"
+#include "../Util/Util.h"
+#include "../Util/Vec2.h"
 #include "ShipBody.h"
 
 class Cannon;

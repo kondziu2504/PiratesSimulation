@@ -9,7 +9,6 @@
 
 #include "Mast.h"
 #include "Cannon.h"
-#include "Stairs.h"
 
 class ShipLayout {
     std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;

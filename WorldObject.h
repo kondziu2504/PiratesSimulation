@@ -6,7 +6,7 @@
 #define PIRATESSIMULATION_WORLDOBJECT_H
 
 
-#include "Vec2.h"
+#include "Util/Vec2.h"
 #include "World.h"
 
 class WorldObject {

@@ -8,21 +8,20 @@
 #include <thread>
 #include <iostream>
 #include <cmath>
-#include "Vec2.h"
-#include "Ship.h"
-#include "Sailor.h"
-#include "MastDistributor.h"
-#include "Mast.h"
+#include "Util/Vec2.h"
+#include "Ship/Ship.h"
+#include "Ship/Sailor.h"
+#include "Ship/MastDistributor.h"
+#include "Ship/Mast.h"
 #include "Wind.h"
-#include "Util.h"
-#include "Cannonball.h"
-#include "Cannon.h"
-#include "ShipLayout.h"
+#include "Util/Util.h"
+#include "Ship/Cannonball.h"
+#include "Ship/Cannon.h"
+#include "Ship/ShipLayout.h"
+#include "NcursesUtil.h"
+#include "Util/Vec2i.h"
 
 using namespace std;
-
-#define COLOR_BROWN 8
-#define COLOR_GRAY 9
 
 const vector<int> Monitor::kSailorsColors = {COLOR_RED, COLOR_CYAN, COLOR_MAGENTA, COLOR_YELLOW, COLOR_GREEN};
 unordered_map<Sailor *, int> Monitor::sailors_assigned_colors = unordered_map<Sailor*, int>();
@@ -32,31 +31,24 @@ Monitor::Monitor(shared_ptr<World> world) {
     this->world = world;
 }
 
-
 void Monitor::Start() {
     Initialize();
-    thread monitorThread(&Monitor::UpdateThread, this);
-    monitorThread.detach();
-    //monitorThread.join();
+    while(true)
+    {
+        if (stop) {
+            endwin();
+            return;
+        }
+
+        Update();
+        SleepSeconds(0.08f);
+    }
 }
 
 void Monitor::Initialize() {
-    initscr();
-    cbreak();
-    noecho();
-    clear();
-    refresh();
-    curs_set(0);
+    ncurses_util::Initialize();
 
-    if(!has_colors())
-    {
-        endwin();
-        printf("No color support");
-        exit(1);
-    }
-
-    start_color();
-
+    // Override colors' values
     init_color(COLOR_WHITE, 1000, 1000, 1000);
     init_color(COLOR_BLACK, 0, 0, 0);
     init_color(COLOR_RED, 1000, 350, 350);
@@ -67,8 +59,9 @@ void Monitor::Initialize() {
     init_color(COLOR_BROWN, 500, 275, 0);
     init_color(COLOR_GRAY, 300, 300, 300);
 
-    InitColorpairs();
+    ncurses_util::InitAllPossibleColorPairs();
 
+    // Override color pairs for convenient use with Tile enum
     init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
     init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BROWN );
     init_pair(static_cast<short>(Tile::kLand), COLOR_YELLOW, COLOR_GREEN);
@@ -83,52 +76,39 @@ void Monitor::Initialize() {
 
 void Monitor::Stop() {
     stop = true;
-    while(!stopped);
-    endwin();
 }
 
 void Monitor::Update() {
     clear();
-    {
-        lock_guard<mutex> guard(display_mode_mutex);
-        if(display_mode == MonitorDisplayMode::kMap){
-            DrawWorld(0, 0, 0, 0, 0, 0);
-        }else{
-            shared_ptr<Ship> ship = nullptr;
-            {
-                lock_guard<mutex> ships_guard(world->ships_mutex);
-                if(!world->ships.empty() && current_ship_ind < world->ships.size()){
-                    lock_guard<mutex> guard(current_ship_mutex);
-                    ship = world->ships.at(current_ship_ind);
-                }
-            }
-            if(ship != nullptr)
-                DrawShipInfo(ship);
-        }
-    }
+
+    if(display_mode == MonitorDisplayMode::kMap)
+        DrawWorld(0, 0, Rect(0, 0, 0, 0));
+    else
+        DrawChosenShip();
+
     refresh();
 }
 
-void Monitor::UpdateThread() {
-    while(true)
+void Monitor::DrawChosenShip() {
+    shared_ptr<Ship> chosen_ship = nullptr;
     {
-        Update();
-        if (stop) {
-            stopped = true;
-            return;
+        lock_guard<mutex> ships_guard(world->ships_mutex);
+        if(!world->ships.empty() && current_ship_ind < world->ships.size()){
+            chosen_ship = world->ships.at(current_ship_ind);
         }
-        usleep(80000);
     }
+    if(chosen_ship != nullptr)
+        DrawShipInfo(chosen_ship);
 }
 
 void
-Monitor::DrawMap(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
-    for(int x = 0; x < viewport_width; x++){
-        int map_x = x + x_viewport;
-        for(int y = 0; y < viewport_height; y++){
-            int map_y = y + y_viewport;
-            if(map_x >= 0 && map_x < world->width && map_y >= 0 && map_y < world->height){
-                if(world->map[map_y * world->width + map_x])
+Monitor::DrawMap(int x_offset, int y_offset, Rect viewport) {
+    for(int x = 0; x < viewport.width; x++){
+        for(int y = 0; y < viewport.height; y++){
+            Vec2i map_coords(viewport.x + x, viewport.y + y);
+
+            if(world->CorrectCoords(map_coords)){
+                if(world->LandAt(map_coords))
                     DrawTile(y_offset + y, x_offset + x, ',', Tile::kLand);
                 else
                     DrawTile(y_offset + y, x_offset + x, ';', Tile::kWater);
@@ -145,15 +125,15 @@ void Monitor::DrawTile(int y, int x, char ch, Tile tile) {
     attroff(COLOR_PAIR((int)tile));
 }
 
-void Monitor::DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
-    if(viewport_width == 0)
-        viewport_width = world->width;
-    if(viewport_height == 0)
-        viewport_height = world->height;
+void Monitor::DrawWorld(int x_offset, int y_offset, Rect viewport) {
+    if(viewport.width == 0)
+        viewport.width = world->width;
+    if(viewport.height == 0)
+        viewport.height = world->height;
 
-    DrawMap(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
-    DrawShips(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
-    DrawCannonballs(x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
+    DrawMap(x_offset, y_offset, viewport);
+    DrawShips(x_offset, y_offset, viewport.x, viewport.y, viewport.width, viewport.height);
+    DrawCannonballs(x_offset, y_offset, viewport.x, viewport.y, viewport.width, viewport.height);
 }
 
 void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
@@ -305,7 +285,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
 }
 
 void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height) {
-    sp<std::unordered_map<shared_ptr<ShipObject>, Vec2>> elements_positions = make_shared<unordered_map<shared_ptr<ShipObject>, Vec2>>();
+    s_ptr<std::unordered_map<shared_ptr<ShipObject>, Vec2>> elements_positions = make_shared<unordered_map<shared_ptr<ShipObject>, Vec2>>();
 
     {
         //Generate positions
@@ -475,9 +455,10 @@ void Monitor::DrawShipInfo(shared_ptr<Ship> ship) {
     DrawSailTarget(71, 40, 18, ship);
     int preview_size = 50;
     DrawWorld(90, 0,
-              ship->GetPosition().x - preview_size/2,
-              ship->GetPosition().y - preview_size/2,
-              preview_size, preview_size);
+              Rect(ship->GetPosition().x - preview_size/2,
+                   ship->GetPosition().y - preview_size/2,
+                   preview_size, preview_size)
+              );
 }
 
 void Monitor::DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
@@ -502,76 +483,27 @@ int Monitor::GetColor(Sailor *sailor) {
     return kSailorsColors.at(color_ind % kSailorsColors.size());
 }
 
-short Monitor::CursColor(int fg){
-    switch (7 & fg) {           /* RGB */
-        case 0:                     /* 000 */
-            return (COLOR_BLACK);
-        case 1:                     /* 001 */
-            return (COLOR_RED);
-        case 2:                     /* 010 */
-            return (COLOR_GREEN);
-        case 3:                     /* 011 */
-            return (COLOR_YELLOW);
-        case 4:                     /* 100 */
-            return (COLOR_BLUE);
-        case 5:                     /* 101 */
-            return (COLOR_MAGENTA);
-        case 6:                     /* 110 */
-            return (COLOR_CYAN);
-        case 7:                     /* 111 */
-            return (COLOR_WHITE);
-        default:
-            return (COLOR_BLACK);
-    }
-}
-
-void Monitor::InitColorpairs(){
-    int fg, bg;
-    int colorpair;
-
-    for (bg = 0; bg <= 7; bg++) {
-        for (fg = 0; fg <= 7; fg++) {
-            colorpair = ColorNum(fg, bg);
-            init_pair(colorpair, CursColor(fg), CursColor(bg));
-        }
-    }
-}
-
-int Monitor::ColorNum(int fg, int bg)
-{
-    int B, bbb, ffff;
-
-    B = 1 << 7;
-    bbb = (7 & bg) << 4;
-    ffff = 7 & fg;
-
-    return (B | bbb | ffff);
-}
-
 void Monitor::SetColor(int fg, int bg) {
-    attron(COLOR_PAIR(ColorNum(fg, bg)));
+    attron(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
 }
 
 void Monitor::UnsetColor(int fg, int bg) {
-    attroff(COLOR_PAIR(ColorNum(fg, bg)));
+    attroff(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
 }
 
 void Monitor::NextShip() {
-    lock_guard<mutex> guard(current_ship_mutex);
     current_ship_ind++;
     if(current_ship_ind >= world->ships.size())
         current_ship_ind = 0;
 }
 
 void Monitor::PrevShip() {
-    lock_guard<mutex> guard(current_ship_mutex);
     current_ship_ind--;
     if(current_ship_ind < 0)
         current_ship_ind = world->ships.size() - 1;
 }
 
 void Monitor::ChangeDisplayMode() {
-    lock_guard<mutex> guard(display_mode_mutex);
     if(display_mode == MonitorDisplayMode::kMap)
         display_mode = MonitorDisplayMode::kDashboard;
     else

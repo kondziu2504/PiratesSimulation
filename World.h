@@ -8,7 +8,8 @@
 #include <memory>
 #include <vector>
 #include <mutex>
-#include "Vec2.h"
+#include "Util/Vec2.h"
+#include "Util/Vec2i.h"
 
 class Ship;
 class Wind;
@@ -37,6 +38,8 @@ public:
     [[nodiscard]] bool IsLandAt(int x, int y) const;
 
     void GenerateMap(int map_width, int map_height, int seed);
+    bool CorrectCoords(Vec2i coords);
+    bool LandAt(Vec2i coords);
 };
 
 

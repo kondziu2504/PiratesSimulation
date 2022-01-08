@@ -5,7 +5,7 @@
 #include "World.h"
 #include <memory>
 #include "PerlinNoise.hpp"
-#include "Ship.h"
+#include "Ship/Ship.h"
 #include "Wind.h"
 #include <thread>
 
@@ -125,4 +125,13 @@ Vec2 World::FindFreeSpotForShip() {
     }while(!goodField);
 
     return pos;
+}
+
+bool World::CorrectCoords(Vec2i coords) {
+    return coords.x >= 0 && coords.x < width
+           && coords.y >= 0 && coords.y < height;
+}
+
+bool World::LandAt(Vec2i coords) {
+    return map[coords.y * width + coords.x];
 }

@@ -3,10 +3,10 @@
 #include "Sailor.h"
 #include "Mast.h"
 #include "Ship.h"
-#include "Wind.h"
-#include "World.h"
+#include "../Wind.h"
+#include "../World.h"
 #include "MastDistributor.h"
-#include "Util.h"
+#include "../Util/Util.h"
 #include "Cannon.h"
 #include "ShipLayout.h"
 

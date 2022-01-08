@@ -6,13 +6,12 @@
 #define PIRATESSIMULATION_SHIP_H
 
 
-#include "Vec2.h"
+#include "../Util/Vec2.h"
 #include <mutex>
 #include <memory>
 #include <vector>
 #include "ShipObject.h"
-#include "Stairs.h"
-#include "WorldObject.h"
+#include "../WorldObject.h"
 #include "ShipLayout.h"
 #include "ShipBody.h"
 #include "Crew.h"

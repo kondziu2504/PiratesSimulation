@@ -7,13 +7,12 @@
 #include <iostream>
 #include <cmath>
 #include "Ship.h"
-#include "World.h"
+#include "../World.h"
 #include "Mast.h"
 #include "MastDistributor.h"
 #include "Sailor.h"
-#include "Util.h"
+#include "../Util/Util.h"
 #include "Cannon.h"
-#include "Stairs.h"
 #include "ShipLayout.h"
 #include "Crew.h"
 #include "ShipController.h"

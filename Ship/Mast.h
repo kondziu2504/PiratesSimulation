@@ -9,8 +9,8 @@
 #include <mutex>
 #include <condition_variable>
 #include "ShipObject.h"
-#include "Wind.h"
-#include "WorldObject.h"
+#include "../Wind.h"
+#include "../WorldObject.h"
 
 class MastDistributor;
 class Ship;

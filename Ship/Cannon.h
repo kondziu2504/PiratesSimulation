@@ -8,14 +8,14 @@
 #include <memory>
 #include <mutex>
 #include <condition_variable>
-#include "WorldObject.h"
+#include "../WorldObject.h"
 #include "ShipObject.h"
 #include <functional>
 
 class Sailor;
 class World;
 template<typename T>
-using sp = std::shared_ptr<T>;
+using s_ptr = std::shared_ptr<T>;
 
 class Cannon : public ShipObject {
     std::mutex ownership_mutex;

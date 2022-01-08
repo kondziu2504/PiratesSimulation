@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "Cannon.h"
-#include "World.h"
+#include "../World.h"
 #include "Cannonball.h"
 
 using namespace std;

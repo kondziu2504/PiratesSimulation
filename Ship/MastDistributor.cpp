@@ -10,7 +10,7 @@ using namespace std;
 
 MastDistributor::MastDistributor(std::vector<std::shared_ptr<Mast>> masts) {
     this->masts = masts;
-    masts_owners = make_shared<map<sp<Mast>, sp<vector<Sailor*>>>>();
+    masts_owners = make_shared<map<s_ptr<Mast>, s_ptr<vector<Sailor*>>>>();
     for(shared_ptr<Mast> mast : masts){
             masts_owners->insert(make_pair(mast, make_shared<vector<Sailor*>>()));
     }
@@ -55,7 +55,7 @@ void MastDistributor::ReleaseMast(std::shared_ptr<Mast> mast, Sailor * sailor) {
     c_var_mast_freed.notify_one();
 }
 
-sp<Mast> MastDistributor::FindFreeMast() {
+s_ptr<Mast> MastDistributor::FindFreeMast() {
     for(const auto& mast_owners_pair : *masts_owners){
         if(mast_owners_pair.second->size() < mast_owners_pair.first->GetMaxSlots()){
             return mast_owners_pair.first;

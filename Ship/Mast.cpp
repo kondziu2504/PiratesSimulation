@@ -5,9 +5,9 @@
 #include <cmath>
 #include "Mast.h"
 #include "Ship.h"
-#include "World.h"
-#include "Wind.h"
-#include "Util.h"
+#include "../World.h"
+#include "../Wind.h"
+#include "../Util/Util.h"
 
 using namespace std;
 

@@ -7,25 +7,24 @@
 
 #include <memory>
 #include "World.h"
-#include "Vec2.h"
+#include "Util/Vec2.h"
 #include <pthread.h>
 #include <ncurses.h>
 #include <unordered_set>
 #include <unordered_map>
-#include "Sailor.h"
+#include "Ship/Sailor.h"
+#include "Util/Rect.h"
+#include <atomic>
 
 enum class MonitorDisplayMode {kMap, kDashboard};
 
 template<typename T>
-using sp = std::shared_ptr<T>;
+using s_ptr = std::shared_ptr<T>;
 
 class Monitor {
-    std::shared_ptr<World> world;
-    MonitorDisplayMode display_mode = MonitorDisplayMode::kMap;
-    std::mutex display_mode_mutex;
-    int curr_column = 0, curr_row = 0;
-    std::mutex current_ship_mutex;
-    int current_ship_ind = 0;
+    s_ptr<World> world;
+    std::atomic<MonitorDisplayMode> display_mode = MonitorDisplayMode::kMap;
+    std::atomic<int> current_ship_ind = 0;
 
     static const std::vector<int> kSailorsColors;
 
@@ -35,24 +34,14 @@ class Monitor {
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed};
 
     std::atomic<bool> stop = false;
-    std::atomic<bool> stopped = false;
-public:
-    Monitor(std::shared_ptr<World> world);
 
-    void Start();
-    void Stop();
-
-    void NextShip();
-    void PrevShip();
-    void ChangeDisplayMode();
-
-private:
     void Update();
     void Initialize();
-    void DrawWorld(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+
+    void DrawMap(int x_offset, int y_offset, Rect viewport);
+    void DrawWorld(int x_offset, int y_offset, Rect viewport);
     void DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     void DrawShip(std::shared_ptr<Ship>, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
-    void DrawMap(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     void DrawTile(int y, int x, char ch, Tile tile);
     void DrawDashboard(std::shared_ptr <Ship> ship);
     void DrawShipDeck(std::shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height);
@@ -64,13 +53,22 @@ private:
     void DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
     int GetColor(Sailor * sailor);
 
-    void InitColorpairs();
-    short CursColor(int fg);
-    int ColorNum(int fg, int bg);
     void SetColor(int fg, int bg);
     void UnsetColor(int fg, int bg);
 
     void UpdateThread();
+
+    void DrawChosenShip();
+
+public:
+    explicit Monitor(std::shared_ptr<World> world);
+
+    void Start();
+    void Stop();
+
+    void NextShip();
+    void PrevShip();
+    void ChangeDisplayMode();
 };
 
 

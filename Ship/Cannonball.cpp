@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "Cannonball.h"
 #include <thread>
-#include "World.h"
+#include "../World.h"
 #include "Ship.h"
 using namespace std;
 

@@ -4,6 +4,6 @@ project(PiratesSimulation)
 set(CMAKE_CXX_STANDARD 17)
 
 
-add_executable(PiratesSimulation main.cpp Monitor.cpp Monitor.h World.cpp World.h Ship.cpp Ship.h ShipLayout.cpp ShipLayout.h Vec2.h Vec2.cpp Wind.cpp Wind.h Mast.cpp Mast.h Sailor.cpp Sailor.h MastDistributor.cpp MastDistributor.h Util.h Util.cpp Cannon.cpp Cannon.h Cannonball.cpp Cannonball.h ShipObject.h Stairs.cpp Stairs.h WorldObject.h WorldObject.cpp ShipBody.cpp ShipBody.h Crew.cpp Crew.h ShipController.cpp ShipController.h ShipState.h)
+add_executable(PiratesSimulation main.cpp Monitor.cpp Monitor.h World.cpp World.h Ship/Ship.cpp Ship/Ship.h Ship/ShipLayout.cpp Ship/ShipLayout.h Util/Vec2.h Util/Vec2.cpp Wind.cpp Wind.h Ship/Mast.cpp Ship/Mast.h Ship/Sailor.cpp Ship/Sailor.h Ship/MastDistributor.cpp Ship/MastDistributor.h Util/Util.h Util/Util.cpp Ship/Cannon.cpp Ship/Cannon.h Ship/Cannonball.cpp Ship/Cannonball.h Ship/ShipObject.h WorldObject.h WorldObject.cpp Ship/ShipBody.cpp Ship/ShipBody.h Ship/Crew.cpp Ship/Crew.h Ship/ShipController.cpp Ship/ShipController.h Ship/ShipState.h NcursesUtil.cpp NcursesUtil.h Util/Rect.cpp Util/Rect.h Util/Vec2i.cpp Util/Vec2i.h)
 target_link_libraries(PiratesSimulation LINK_PUBLIC ncurses)
 target_link_libraries(PiratesSimulation LINK_PUBLIC pthread)

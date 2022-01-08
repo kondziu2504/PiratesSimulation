@@ -6,7 +6,7 @@
 #define PIRATESSIMULATION_CANNONBALL_H
 
 #include <mutex>
-#include "Vec2.h"
+#include "../Util/Vec2.h"
 class World;
 
 class Cannonball {

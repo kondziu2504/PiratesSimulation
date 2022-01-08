@@ -6,7 +6,7 @@
 #define PIRATESSIMULATION_WIND_H
 
 
-#include "Vec2.h"
+#include "Util/Vec2.h"
 #include <memory>
 #include <mutex>
 class World;

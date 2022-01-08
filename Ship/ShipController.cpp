@@ -5,7 +5,7 @@
 #include "ShipController.h"
 #include <memory>
 #include <mutex>
-#include "WorldObject.h"
+#include "../WorldObject.h"
 #include "Ship.h"
 
 using namespace std;

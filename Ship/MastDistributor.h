@@ -16,18 +16,18 @@ class Mast;
 class Sailor;
 
 template<typename T>
-using sp = std::shared_ptr<T>;
+using s_ptr = std::shared_ptr<T>;
 
 class MastDistributor {
     std::vector<std::shared_ptr<Mast>> masts;
 
 
     std::condition_variable c_var_mast_freed;
-    sp<Mast> FindFreeMast();
+    s_ptr<Mast> FindFreeMast();
 
 public:
     std::mutex free_masts_mutex;
-    sp<std::map<sp<Mast>, sp<std::vector<Sailor*>>>> masts_owners;
+    s_ptr<std::map<s_ptr<Mast>, s_ptr<std::vector<Sailor*>>>> masts_owners;
     explicit MastDistributor(std::vector<std::shared_ptr<Mast>> masts);
     std::shared_ptr<Mast> RequestMast(Sailor * sailor);
     void ReleaseMast(std::shared_ptr<Mast>, Sailor * sailor);

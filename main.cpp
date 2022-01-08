@@ -4,8 +4,8 @@
 #include <memory>
 #include <ncurses.h>
 #include <thread>
-#include "Vec2.h"
-#include "Ship.h"
+#include "Util/Vec2.h"
+#include "Ship/Ship.h"
 
 using namespace std;
 
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 //    for(int i = 0; i < 2; i++)
 //        world->AddRandomShip();
     Monitor monitor(world);
-    monitor.Start();
+    thread monitor_thread(&Monitor::Start, &monitor);
 
     while(true){
         char key = getchar();
@@ -44,6 +44,8 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
+
+    monitor_thread.join();
 
     return 0;
 }

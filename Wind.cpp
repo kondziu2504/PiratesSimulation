@@ -6,7 +6,7 @@
 #include <thread>
 #include <unistd.h>
 #include "World.h"
-#include "Ship.h"
+#include "Ship/Ship.h"
 
 using namespace std;
 
