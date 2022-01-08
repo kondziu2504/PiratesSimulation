@@ -10,7 +10,6 @@
 using namespace std;
 
 ShipLayout::ShipLayout(int masts_count, int cannons_per_side, float ship_length, WorldObject * parent) {
-    ShipLayout::stairs = make_shared<Stairs>();
     masts = make_shared<vector<shared_ptr<Mast>>>();
     ShipLayout::left_junction = make_shared<ShipObject>();
     ShipLayout::right_junction = make_shared<ShipObject>();
@@ -37,10 +36,6 @@ vector<std::shared_ptr<Cannon>> ShipLayout::GetLeftCannons() {
 
 vector<std::shared_ptr<Cannon>> ShipLayout::GetRightCannons() {
     return right_cannons;
-}
-
-shared_ptr<Stairs> ShipLayout::GetStairs() {
-    return stairs;
 }
 
 shared_ptr<ShipObject> ShipLayout::GetRestingPoint() {

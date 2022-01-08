@@ -42,10 +42,6 @@ std::vector<std::shared_ptr<Cannon>> ShipBody::GetRightCannons() {
     return ship_layout->GetRightCannons();
 }
 
-std::shared_ptr<Stairs> ShipBody::GetStairs() {
-    return ship_layout->GetStairs();
-}
-
 std::shared_ptr<ShipObject> ShipBody::GetRestingPoint() {
     return ship_layout->GetRestingPoint();
 }

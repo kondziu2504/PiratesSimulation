@@ -100,10 +100,6 @@ std::vector<std::shared_ptr<Cannon>> Ship::GetRightCannons() {
     return ship_body->GetRightCannons();
 }
 
-std::shared_ptr<Stairs> Ship::GetStairs() {
-    return ship_body->GetStairs();
-}
-
 std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
     return ship_body->GetRestingPoint();
 }

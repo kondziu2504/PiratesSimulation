@@ -78,9 +78,6 @@ class Sailor {
     void SetState(SailorState new_state);
     void SetProgress(float progress);
 
-    void UseStairs();
-    void GoUseStairs();
-
     SailorActionStatus SleepAndCheckKilled(float seconds);
 
 public:
@@ -89,7 +86,6 @@ public:
     void Kill();
     [[nodiscard]] bool GetIsDying() const;
     SailorState GetState();
-    bool IsUpperDeck();
     void SetCurrentOrder(SailorOrder new_order);
     void SetCannonTarget(WorldObject * cannon_target);
     void SetUseRightCannons(bool right);

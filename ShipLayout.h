@@ -17,7 +17,6 @@ class ShipLayout {
     std::shared_ptr<ShipObject> right_junction;
     std::vector<std::shared_ptr<Cannon>> left_cannons;
     std::vector<std::shared_ptr<Cannon>> right_cannons;
-    std::shared_ptr<Stairs> stairs;
     std::shared_ptr<ShipObject> resting_point;
 
 public:
@@ -27,7 +26,6 @@ public:
     std::shared_ptr<ShipObject> GetRightJunction();
     std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
     std::vector<std::shared_ptr<Cannon>> GetRightCannons();
-    std::shared_ptr<Stairs> GetStairs();
     std::shared_ptr<ShipObject> GetRestingPoint();
     std::vector<std::shared_ptr<Mast>> GetMasts();
 };

@@ -85,30 +85,6 @@ std::shared_ptr<ShipObject> Sailor::GetNextTarget() {
     return next_target;
 }
 
-void Sailor::UseStairs() {
-    SetState(SailorState::kWaitingStairs);
-    lock_guard<mutex> guard(ship->GetStairs()->mutex);
-    SetState(SailorState::kStairs);
-    ProgressAction(2.f);
-    upper_deck = !upper_deck;
-    SetState(SailorState::kStanding);
-}
-
-void Sailor::GoUseStairs() {
-    SetState(SailorState::kWalking);
-    next_target = ship->GetStairs();
-    ProgressAction(2.f);
-    previous_target = next_target;
-    SetState(SailorState::kStanding);
-
-    UseStairs();
-}
-
-bool Sailor::IsUpperDeck() {
-    lock_guard<mutex> guard(sailor_mutex);
-    return upper_deck;
-}
-
 SailorActionStatus Sailor::WaitForCannon() {
     SetState(SailorState::kWaitingCannon);
     while(true){

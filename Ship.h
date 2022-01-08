@@ -49,7 +49,6 @@ public:
     std::shared_ptr<ShipObject> GetRightJunction();
     std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
     std::vector<std::shared_ptr<Cannon>> GetRightCannons();
-    std::shared_ptr<Stairs> GetStairs();
     std::shared_ptr<ShipObject> GetRestingPoint();
     std::shared_ptr<MastDistributor> GetMastDistributor();
     std::vector<std::shared_ptr<Mast>> GetMasts();
