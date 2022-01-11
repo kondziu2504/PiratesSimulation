@@ -6,20 +6,17 @@
 #include <unistd.h>
 #include "Monitor.h"
 #include <thread>
-#include <iostream>
 #include <cmath>
 #include "Util/Vec2.h"
 #include "Ship/Ship.h"
 #include "Ship/Sailor.h"
 #include "Ship/MastDistributor.h"
 #include "Ship/Mast.h"
-#include "Wind.h"
 #include "Util/Util.h"
 #include "Ship/Cannonball.h"
-#include "Ship/Cannon.h"
-#include "Ship/ShipLayout.h"
 #include "NcursesUtil.h"
 #include "Util/Vec2i.h"
+#include <sys/ioctl.h>
 
 using namespace std;
 
@@ -82,7 +79,7 @@ void Monitor::Update() {
     clear();
 
     if(display_mode == MonitorDisplayMode::kMap)
-        DrawWorld(0, 0, Rect(0, 0, 0, 0));
+        DrawWorld();
     else
         DrawChosenShip();
 
@@ -102,41 +99,49 @@ void Monitor::DrawChosenShip() {
 }
 
 void
-Monitor::DrawMap(int x_offset, int y_offset, Rect viewport) {
-    for(int x = 0; x < viewport.width; x++){
-        for(int y = 0; y < viewport.height; y++){
-            Vec2i map_coords(viewport.x + x, viewport.y + y);
+Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
+    for(int x = 0; x < world_viewport.width; x++){
+        for(int y = 0; y < world_viewport.height; y++){
+            Vec2i map_coords(world_viewport.x + x, world_viewport.y + y);
+            Vec2i screen_coords(screen_offset.x + x, screen_offset.y + y);
 
             if(world->CorrectCoords(map_coords)){
                 if(world->LandAt(map_coords))
-                    DrawTile(y_offset + y, x_offset + x, ',', Tile::kLand);
+                    DrawTile(screen_coords, ',', Tile::kLand);
                 else
-                    DrawTile(y_offset + y, x_offset + x, ';', Tile::kWater);
+                    DrawTile(screen_coords, ';', Tile::kWater);
             }else{
-                DrawTile(y_offset + y, x_offset + x, ';', Tile::kGray);
+                DrawTile(screen_coords, ';', Tile::kGray);
             }
         }
     }
 }
 
-void Monitor::DrawTile(int y, int x, char ch, Tile tile) {
+void Monitor::DrawTile(Vec2i screen_coords, char character, Tile tile) {
     attron(COLOR_PAIR((int)tile));
-    mvaddch(y, x, ch);
+    mvaddch(screen_coords.y, screen_coords.x, character);
     attroff(COLOR_PAIR((int)tile));
 }
 
-void Monitor::DrawWorld(int x_offset, int y_offset, Rect viewport) {
-    if(viewport.width == 0)
-        viewport.width = world->width;
-    if(viewport.height == 0)
-        viewport.height = world->height;
+void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
+    // By deafult make drawn world match console size
+    if(world_viewport.width == 0) {
+        winsize win_size{};
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
+        world_viewport.width = win_size.ws_col;
+    }
+    if(world_viewport.height == 0) {
+        winsize win_size{};
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
+        world_viewport.height = win_size.ws_row;
+    }
 
-    DrawMap(x_offset, y_offset, viewport);
-    DrawShips(x_offset, y_offset, viewport.x, viewport.y, viewport.width, viewport.height);
-    DrawCannonballs(x_offset, y_offset, viewport.x, viewport.y, viewport.width, viewport.height);
+    DrawMap(screen_offset, world_viewport);
+    DrawShips(screen_offset, world_viewport);
+    DrawCannonballs(screen_offset, world_viewport);
 }
 
-void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+void Monitor::DrawShip(shared_ptr<Ship> ship, Vec2i screen_offset, Rect world_viewport) {
     Vec2 ship_pos = ship->GetPosition();
     Vec2 ship_dir = ship->GetDirection();
 
@@ -154,12 +159,11 @@ void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_
                         j - length / 2,
                         i - width / 2).Rotated(ship_dir.Angle());
                 Vec2 tile_pos = Vec2((int)ship_pos.x + rotatedLocal.x, (int)ship_pos.y + rotatedLocal.y);
-                if(tile_pos.x >= x_viewport && tile_pos.x < x_viewport + viewport_width
-                    && tile_pos.y >= y_viewport && tile_pos.y < y_viewport + viewport_height)
+                if(tile_pos.x >= world_viewport.x && tile_pos.x < world_viewport.x + world_viewport.width
+                   && tile_pos.y >= world_viewport.y && tile_pos.y < world_viewport.y + world_viewport.height)
                 {
                     DrawTile(
-                            tile_pos.y + y_offset - y_viewport,
-                            tile_pos.x + x_offset - x_viewport,
+                            Vec2i(tile_pos.x + screen_offset.x - world_viewport.x, tile_pos.y + screen_offset.y - world_viewport.y),
                             texture[i][j],
                             ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed ? Tile::kShip : Tile::kDestroyed);
                 }
@@ -170,10 +174,10 @@ void Monitor::DrawShip(shared_ptr<Ship> ship, int x_offset, int y_offset, int x_
     //DrawTile(ship_pos.y, ship_pos.x, '#', Tile::kShip);
 }
 
-void Monitor::DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
     lock_guard<mutex> guard(world->ships_mutex);
     for(shared_ptr<Ship> ship : world->ships){
-        DrawShip(ship, x_offset, y_offset, x_viewport, y_viewport, viewport_width, viewport_height);
+        DrawShip(ship, offset, world_viewport);
     }
 }
 
@@ -330,30 +334,35 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
     char deck_ch = ' ';
     for(int y = 0; y < width/2; y++){
         for(int x = width/2 - y; x <= width/2 + y; x++){
-            DrawTile(y + y_offset, x + x_offset, deck_ch, Tile::kShip);
+            Vec2i screen_coords(x + x_offset, y + y_offset);
+            DrawTile(screen_coords, deck_ch, Tile::kShip);
         }
     }
 
     for(int y = width/2; y < height - width/4; y++){
         for(int x = 0; x < width; x++){
-            DrawTile(y + y_offset, x + x_offset, deck_ch, Tile::kShip);
+            Vec2i screen_coords(x + x_offset, y + y_offset);
+            DrawTile(screen_coords, deck_ch, Tile::kShip);
         }
     }
 
     for(int y = height - width/4; y < height; y++){
         for(int x = width/4 - (height - y); x < width - width/4 + (height - y); x++){
-            DrawTile(y + y_offset, x + x_offset, deck_ch, Tile::kShip);
+            Vec2i screen_coords(x + x_offset, y + y_offset);
+            DrawTile(screen_coords, deck_ch, Tile::kShip);
         }
     }
 
     for(auto cannon : ship->GetRightCannons()){
         Vec2 cannon_pos = elements_positions->find(cannon)->second;
-        DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
+        Vec2i screen_coords(cannon_pos.x + x_offset, cannon_pos.y + y_offset);
+        DrawTile(screen_coords, 'C', Tile::kCannon);
     }
 
     for(auto cannon : ship->GetLeftCannons()){
         Vec2 cannon_pos = elements_positions->find(cannon)->second;
-        DrawTile(cannon_pos.y + y_offset, cannon_pos.x + x_offset, 'C', Tile::kCannon);
+        Vec2i screen_coords(cannon_pos.x + x_offset, cannon_pos.y + y_offset);
+        DrawTile(screen_coords, 'C', Tile::kCannon);
     }
 
     auto masts = ship->GetMasts();
@@ -364,7 +373,8 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, int x_offset, int y_offset, i
             Vec2 rotated_sail_pos = Vec2(i - mast_width / 2, 0).Rotated(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
             Vec2 mast_pos = elements_positions->find(mast)->second;
-            DrawTile(y_offset + mast_pos.y + rotated_sail_pos.y,  rotated_sail_pos.x + x_offset + mast_pos.x, ch, Tile::kSail);
+            Vec2i screen_coords(x_offset + mast_pos.x + rotated_sail_pos.x, y_offset + mast_pos.y + rotated_sail_pos.y);
+            DrawTile(screen_coords, ch, Tile::kSail);
         }
     }
 
@@ -422,11 +432,13 @@ void Monitor::DrawCircleIndicator(int x_offset, int y_offset, float angle, strin
     for(int i = 0; i < angles; i++){
         float angle = (float)i / angles * 2 * M_PI;
         Vec2 local_pos = Vec2(arrow_length - 1, 0).Rotated(angle);
-        DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kGray);
+        Vec2i screen_coords(circle_center.x + round(local_pos.x), circle_center.y + round(local_pos.y));
+        DrawTile(screen_coords, '#', Tile::kGray);
     }
     for(int i = 0; i < arrow_length; i++){
         Vec2 local_pos = Vec2(i, 0).Rotated(angle);
-        DrawTile(circle_center.y + round(local_pos.y), circle_center.x + round(local_pos.x), '#', Tile::kSail);
+        Vec2i screen_coords(circle_center.x + round(local_pos.x), circle_center.y + round(local_pos.y));
+        DrawTile(screen_coords, '#', Tile::kSail);
     }
 }
 
@@ -454,23 +466,24 @@ void Monitor::DrawShipInfo(shared_ptr<Ship> ship) {
     DrawShipDir(71, 20, 18, ship);
     DrawSailTarget(71, 40, 18, ship);
     int preview_size = 50;
-    DrawWorld(90, 0,
+    DrawWorld({90, 0},
               Rect(ship->GetPosition().x - preview_size/2,
                    ship->GetPosition().y - preview_size/2,
                    preview_size, preview_size)
               );
 }
 
-void Monitor::DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height) {
+void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
     lock_guard<mutex> guard(world->cannonballs_mutex);
     for(auto cannonball : world->cannonballs){
         if(cannonball->dead)
             continue;
         Vec2 cannonball_pos = cannonball->GetPos();
-        if(cannonball_pos.x >= x_viewport && cannonball_pos.x < x_viewport + viewport_width
-           && cannonball_pos.y >= y_viewport && cannonball_pos.y < y_viewport + viewport_height)
+        if(cannonball_pos.x >= world_viewport.x && cannonball_pos.x < world_viewport.x + world_viewport.width
+           && cannonball_pos.y >= world_viewport.y && cannonball_pos.y < world_viewport.y + world_viewport.height)
         {
-            DrawTile(cannonball_pos.y + y_offset - y_viewport, cannonball_pos.x + x_offset - x_viewport, 'O', Tile::kCannonball);
+            Vec2i screen_coords(screen_offset.x - world_viewport.x + cannonball_pos.x, screen_offset.y - world_viewport.y + cannonball_pos.y);
+            DrawTile(screen_coords, 'O', Tile::kCannonball);
         }
     }
 }

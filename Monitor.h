@@ -38,11 +38,11 @@ class Monitor {
     void Update();
     void Initialize();
 
-    void DrawMap(int x_offset, int y_offset, Rect viewport);
-    void DrawWorld(int x_offset, int y_offset, Rect viewport);
-    void DrawShips(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
-    void DrawShip(std::shared_ptr<Ship>, int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
-    void DrawTile(int y, int x, char ch, Tile tile);
+    void DrawMap(Vec2i screen_offset, Rect world_viewport);
+    void DrawWorld(Vec2i screen_offset = Vec2i(0, 0), Rect world_viewport = Rect(0, 0, 0, 0));
+    void DrawShips(Vec2i screen_offset, Rect world_viewport);
+    void DrawShip(std::shared_ptr<Ship>, Vec2i screen_offset, Rect world_viewport);
+    void DrawTile(Vec2i screen_coords, char character, Tile tile);
     void DrawDashboard(std::shared_ptr <Ship> ship);
     void DrawShipDeck(std::shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height);
     void DrawCircleIndicator(int x_offset, int y_offset, float angle, std::string label, int size);
@@ -50,7 +50,7 @@ class Monitor {
     void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
     void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
     void DrawShipInfo(std::shared_ptr<Ship> ship);
-    void DrawCannonballs(int x_offset, int y_offset, int x_viewport, int y_viewport, int viewport_width, int viewport_height);
+    void DrawCannonballs(Vec2i screen_offset, Rect world_viewport);
     int GetColor(Sailor * sailor);
 
     void SetColor(int fg, int bg);
