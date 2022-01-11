@@ -23,7 +23,7 @@ enum class SailorActionStatus {
 };
 
 enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
-        kWaitingStairs, kStairs, kWaitingCannon, kCannon, kDead};
+        kWaitingCannon, kCannon, kDead};
 
 enum class SailorOrder {kOperateCannons, kOperateMasts};
 

@@ -6,6 +6,8 @@
 #define PIRATESSIMULATION_UTIL_H
 
 #include <functional>
+#include <string>
+#include "../Ship/Sailor.h"
 
 float AngleDifference(float angle1, float angle2);
 float RandomTime(float min, float max);

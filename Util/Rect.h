@@ -6,6 +6,9 @@
 #define PIRATESSIMULATION_RECT_H
 
 
+#include "Vec2i.h"
+#include "Vec2.h"
+
 struct Rect {
     int x;
     int y;
@@ -13,6 +16,8 @@ struct Rect {
     int height;
 
     Rect(int x, int y, int width, int height);
+
+    bool IsPointInside(Vec2 point);
 };
 
 

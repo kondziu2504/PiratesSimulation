@@ -33,7 +33,20 @@ class Monitor {
 
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed};
 
+    std::unordered_map<SailorState, std::string> sailor_states_map_strings = {
+            {SailorState::kResting, "Resting"},
+            {SailorState::kMast, "Operating mast"},
+            {SailorState::kWalking, "Walking"},
+            {SailorState::kCannon, "Operating cannon"},
+            {SailorState::kWaitingCannon, "Waiting for cannon"},
+            {SailorState::kStanding, "Standing"},
+            {SailorState::kWaitingMast, "Waiting for mast"},
+            {SailorState::kDead, "Dead"}
+    };
+
     std::atomic<bool> stop = false;
+
+
 
     void Update();
     void Initialize();
@@ -44,11 +57,11 @@ class Monitor {
     void DrawShip(std::shared_ptr<Ship>, Vec2i screen_offset, Rect world_viewport);
     void DrawTile(Vec2i screen_coords, char character, Tile tile);
     void DrawDashboard(std::shared_ptr <Ship> ship);
-    void DrawShipDeck(std::shared_ptr <Ship> ship, int x_offset, int y_offset, int width, int height);
-    void DrawCircleIndicator(int x_offset, int y_offset, float angle, std::string label, int size);
-    void DrawWindDir(int x_offset, int y_offset, int size);
-    void DrawShipDir(int x_offset, int y_offset, int size, std::shared_ptr <Ship> ship);
-    void DrawSailTarget(int x_offset, int y_offset, int size, std::shared_ptr<Ship> ship);
+    void DrawShipDeck(std::shared_ptr <Ship> ship, Rect screen_rect);
+    void DrawCircleIndicator(Vec2i offset, float angle, std::string label, int size);
+    void DrawWindDir(Vec2i offset, int size);
+    void DrawShipDir(Vec2i offset, int size, std::shared_ptr <Ship> ship);
+    void DrawSailTarget(Vec2i offset, int size, std::shared_ptr<Ship> ship);
     void DrawShipInfo(std::shared_ptr<Ship> ship);
     void DrawCannonballs(Vec2i screen_offset, Rect world_viewport);
     int GetColor(Sailor * sailor);
