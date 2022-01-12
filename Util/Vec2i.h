@@ -14,9 +14,11 @@ struct Vec2i {
     int x, y;
 
     Vec2i(int x, int y);
+    Vec2i() : Vec2i(0, 0) {};
 
     Vec2i operator+(const Vec2i & second) const;
     Vec2i operator-(const Vec2i & second) const;
+    Vec2 operator*(const float & second) const;
 };
 
 
