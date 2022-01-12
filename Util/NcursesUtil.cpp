@@ -80,12 +80,31 @@ void ncurses_util::UnsetColor(int fg, int bg) {
     attroff(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
 }
 
+void ncurses_util::AddText(Vec2i screen_coords, std::string text, int fg_color, int bg_color) {
+    SetColor(fg_color, bg_color);
+    mvaddstr(screen_coords.y, screen_coords.x, text.c_str());
+    UnsetColor(fg_color, bg_color);
+}
+
+void ncurses_util::AddTextColorPair(Vec2i screen_coords, std::string text, int color_pair) {
+    attron(COLOR_PAIR(color_pair));
+    mvaddstr(screen_coords.y, screen_coords.x, text.c_str());
+    attroff(COLOR_PAIR(color_pair));
+}
+
+void ncurses_util::AddText(Vec2i screen_coords, char character, int fg_color, int bg_color) {
+    AddText(screen_coords, to_string(character), fg_color, bg_color);
+}
+
+void ncurses_util::AddTextColorPair(Vec2i screen_coords, char character, int color_pair) {
+    AddTextColorPair(screen_coords, string(1, character), color_pair);
+}
+
 void ncurses_util::ConsoleWriter::ModifyIndent(int size) {
     indent = max(0, indent + size);
 }
 
 void ncurses_util::ConsoleWriter::AddLine(std::string text, int fg_color, int bg_color) {
-    SetColor(fg_color, bg_color);
-    mvaddstr(line++, indent, text.c_str());
-    UnsetColor(fg_color, bg_color);
+    AddText(console_screen_pos + Vec2i(indent, line), text, fg_color, bg_color);
+    line++;
 }

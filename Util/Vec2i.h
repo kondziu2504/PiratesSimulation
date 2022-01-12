@@ -6,12 +6,17 @@
 #define PIRATESSIMULATION_VEC2I_H
 
 
+#include "Vec2.h"
+
 struct Vec2i {
+    explicit Vec2i(Vec2 vec2);
+
     int x, y;
 
     Vec2i(int x, int y);
 
     Vec2i operator+(const Vec2i & second) const;
+    Vec2i operator-(const Vec2i & second) const;
 };
 
 
