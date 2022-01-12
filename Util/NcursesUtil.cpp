@@ -5,6 +5,9 @@
 #include "NcursesUtil.h"
 #include <ncurses.h>
 #include <cstdlib>
+#include <algorithm>
+
+using namespace std;
 
 void ncurses_util::Initialize() {
     initscr();
@@ -67,4 +70,22 @@ void ncurses_util::InitAllPossibleColorPairs() {
             init_pair(color_pair, ncurses_util::CursColor(fg), ncurses_util::CursColor(bg));
         }
     }
+}
+
+void ncurses_util::SetColor(int fg, int bg) {
+    attron(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
+}
+
+void ncurses_util::UnsetColor(int fg, int bg) {
+    attroff(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
+}
+
+void ncurses_util::ConsoleWriter::ModifyIndent(int size) {
+    indent = max(0, indent + size);
+}
+
+void ncurses_util::ConsoleWriter::AddLine(std::string text, int fg_color, int bg_color) {
+    SetColor(fg_color, bg_color);
+    mvaddstr(line++, indent, text.c_str());
+    UnsetColor(fg_color, bg_color);
 }

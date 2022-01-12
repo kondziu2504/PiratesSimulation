@@ -66,11 +66,6 @@ class Monitor {
     void DrawCannonballs(Vec2i screen_offset, Rect world_viewport);
     int GetColor(Sailor * sailor);
 
-    void SetColor(int fg, int bg);
-    void UnsetColor(int fg, int bg);
-
-    void UpdateThread();
-
     void DrawChosenShip();
 
 public:

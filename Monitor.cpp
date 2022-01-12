@@ -14,7 +14,7 @@
 #include "Ship/Mast.h"
 #include "Util/Util.h"
 #include "Ship/Cannonball.h"
-#include "NcursesUtil.h"
+#include "Util/NcursesUtil.h"
 #include "Util/Vec2i.h"
 #include <sys/ioctl.h>
 
@@ -179,48 +179,48 @@ void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
 
 
 void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
-    int line = 0;
-    int indentation = 0;
-    indentation = 0;
+    ncurses_util::ConsoleWriter console_writer({0, 0});
+
     string health = ship->GetState() == ShipState::kDestroyed ? "Zniszczony" : "Zdrowie: " + to_string(ship->GetHP());
     string header = "Statek(" + health + ")";
-    mvaddstr(line++, 0, header.c_str());
-    indentation += 2;
-    mvaddstr(line++, indentation, "Marynarze:");
+    console_writer.AddLine(header);
+    console_writer.ModifyIndent(2);
+    console_writer.AddLine("Marynarze:");
+    console_writer.ModifyIndent(2);
+
+    int sailor_index = 0;
+    for(const auto& sailor : ship->GetSailors()){
+        string state_text = sailor_states_map_strings.at(sailor->GetState());
+        string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
+        auto sailor_color = GetColor(sailor.get());
+        console_writer.AddLine(sailor_text, sailor_color);
+        sailor_index++;
+    }
+
+    console_writer.ModifyIndent(-2);
+    console_writer.AddLine("Maszty:");
+    int mast_index = 0;
+    console_writer.ModifyIndent(2);
     {
-        indentation += 2;
-        int sailor_index = 0;
-        for(auto sailor : ship->GetSailors()){
-            string state_text = sailor_states_map_strings.at(sailor->GetState());
-            string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
-            auto sailor_color = GetColor(sailor.get());
-            SetColor(sailor_color, 0);
-            mvaddstr(line++, indentation, sailor_text.c_str());
-            UnsetColor(sailor_color, 0);
-            sailor_index++;
+        lock_guard<mutex> guard(ship->GetMastDistributor()->free_masts_mutex);
+        for(const auto& mast_owners_pair : *ship->GetMastDistributor()->masts_owners){
+            bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
+            string mast_text =
+                    "Maszt " + to_string(mast_index) +
+                    " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
+                    " " + (max_owners ? "(max)" : "");
+            console_writer.AddLine(mast_text);
+            mast_index++;
         }
     }
-    indentation -= 2;
-    mvaddstr(line++, indentation, "Maszty:");
-    int mast_index = 0;
-    indentation += 2;
-    lock_guard<mutex> guard(ship->GetMastDistributor()->free_masts_mutex);
-    for(auto mast_owners_pair : *ship->GetMastDistributor()->masts_owners){
-        bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
-        string mast_text =
-                "Maszt " + to_string(mast_index) +
-                " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
-                " " + (max_owners ? "(max)" : "");
-        mvaddstr(line++, indentation, mast_text.c_str());
-        mast_index++;
-    }
-    indentation -= 2;
-    mvaddstr(line++, indentation, "Armaty:");
-    indentation++;
-    mvaddstr(line++, indentation, "Lewa strona:");
-    indentation++;
+
+    console_writer.ModifyIndent(-2);
+    console_writer.AddLine("Armaty:");
+    console_writer.ModifyIndent(1);
+    console_writer.AddLine("Lewa strona:");
+    console_writer.ModifyIndent(1);
     int cannon_ind = 0;
-    for(auto cannon : ship->GetLeftCannons()){
+    for(const auto& cannon : ship->GetLeftCannons()){
         int owners = 0;
         auto cannon_owners = cannon->GetOwners();
         if(cannon_owners.first != nullptr)
@@ -229,14 +229,14 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
             owners++;
         string cannon_message = "Armata " + to_string(cannon_ind) + " Obslugiwana przez: " + to_string(owners) +
                 (owners == 2 ? "(Max)" : "");
-        mvaddstr(line++, indentation, cannon_message.c_str());
+        console_writer.AddLine(cannon_message);
         cannon_ind++;
     }
-    indentation--;
-    mvaddstr(line++, indentation, "Prawa strona:");
-    indentation++;
+    console_writer.ModifyIndent(-1);
+    console_writer.AddLine("Prawa strona:");
+    console_writer.ModifyIndent(1);
     cannon_ind = 0;
-    for(auto cannon : ship->GetRightCannons()){
+    for(const auto& cannon : ship->GetRightCannons()){
         int owners = 0;
         auto cannon_owners = cannon->GetOwners();
         if(cannon_owners.first != nullptr)
@@ -245,10 +245,9 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
             owners++;
         string cannon_message = "Armata " + to_string(cannon_ind) + " Obslugiwana przez: " + to_string(owners) +
                                 (owners == 2 ? "(Max)" : "");
-        mvaddstr(line++, indentation, cannon_message.c_str());
+        console_writer.AddLine(cannon_message);
         cannon_ind++;
     }
-    indentation--;
 }
 
 void Monitor::DrawShipDeck(shared_ptr <Ship> ship, Rect screen_rect) {
@@ -381,9 +380,9 @@ void Monitor::DrawShipDeck(shared_ptr <Ship> ship, Rect screen_rect) {
             tile_pos = prev_target_pos + (next_target_pos - prev_target_pos) * progress;
         }
         auto sailor_color = GetColor(sailor.get());
-        SetColor(sailor_color, COLOR_BLACK);
+        ncurses_util::SetColor(sailor_color, COLOR_BLACK);
         mvaddch(tile_pos.y + screen_rect.y, tile_pos.x + screen_rect.x, 'S');
-        UnsetColor(sailor_color, COLOR_BLACK);
+        ncurses_util::UnsetColor(sailor_color, COLOR_BLACK);
     }
 }
 
@@ -457,14 +456,6 @@ int Monitor::GetColor(Sailor *sailor) {
     }
     int color_ind = sailors_assigned_colors.at(sailor);
     return kSailorsColors.at(color_ind % kSailorsColors.size());
-}
-
-void Monitor::SetColor(int fg, int bg) {
-    attron(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
-}
-
-void Monitor::UnsetColor(int fg, int bg) {
-    attroff(COLOR_PAIR(ncurses_util::ColorNum(fg, bg)));
 }
 
 void Monitor::NextShip() {
