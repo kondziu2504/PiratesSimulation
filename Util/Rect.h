@@ -7,7 +7,7 @@
 
 
 #include "Vec2i.h"
-#include "Vec2.h"
+#include "Vec2f.h"
 
 struct Rect {
     int x;
@@ -17,7 +17,7 @@ struct Rect {
 
     Rect(int x, int y, int width, int height);
 
-    bool IsPointInside(Vec2 point);
+    bool IsPointInside(Vec2f point);
 };
 
 

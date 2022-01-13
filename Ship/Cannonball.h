@@ -6,13 +6,13 @@
 #define PIRATESSIMULATION_CANNONBALL_H
 
 #include <mutex>
-#include "../Util/Vec2.h"
+#include "../Util/Vec2f.h"
 class World;
 
 class Cannonball {
     float progress = 0.f;
-    Vec2 origin;
-    Vec2 target;
+    Vec2f origin;
+    Vec2f target;
 
     World * world;
 
@@ -21,8 +21,8 @@ class Cannonball {
     void CannonThread();
 public:
     bool dead = false;
-    Cannonball(World * world, Vec2 origin, Vec2 target);
-    Vec2 GetPos();
+    Cannonball(World * world, Vec2f origin, Vec2f target);
+    Vec2f GetPos();
 };
 
 

@@ -7,7 +7,7 @@
 
 #include <memory>
 #include "World.h"
-#include "Util/Vec2.h"
+#include "Util/Vec2f.h"
 #include <pthread.h>
 #include <ncurses.h>
 #include <unordered_set>

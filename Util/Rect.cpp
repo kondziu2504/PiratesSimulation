@@ -10,7 +10,7 @@ Rect::Rect(int x, int y, int width, int height) :
         width(width),
         height(height) {}
 
-bool Rect::IsPointInside(Vec2 point) {
+bool Rect::IsPointInside(Vec2f point) {
     return point.x >= x && point.x < x + width
            && point.y >= y && point.y < y + height;
 }

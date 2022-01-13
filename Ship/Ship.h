@@ -6,7 +6,7 @@
 #define PIRATESSIMULATION_SHIP_H
 
 
-#include "../Util/Vec2.h"
+#include "../Util/Vec2f.h"
 #include <mutex>
 #include <memory>
 #include <vector>
@@ -31,12 +31,12 @@ class Ship : public WorldObject {
     std::shared_ptr<ShipController> ship_controller;
 
 public:
-    Ship(Vec2 pos, Vec2 direction, int sailors, int masts, int cannons_per_side, World * world);
+    Ship(Vec2f pos, Vec2f direction, int sailors, int masts, int cannons_per_side, World * world);
 
     void Start();
     void Destroy();
 
-    void ApplyWind(Vec2 wind);
+    void ApplyWind(Vec2f wind);
     void Hit(int damage);
 
     [[nodiscard]] int GetHP() const;

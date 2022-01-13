@@ -11,17 +11,16 @@
 
 using namespace std;
 
-World::World(int width, int height, int seed) {
-    this->map = shared_ptr<bool[]>(new bool[width * height]);
-    this->width = width;
-    this->height = height;
+World::World(int width, int height, int seed) :
+        width(width),
+        height(height),
+        map(GenerateMap(width, height, seed)) {
     this->wind = make_shared<Wind>(this);
-
     wind->Start();
-    GenerateMap(width, height, seed);
 }
 
-void World::GenerateMap(int map_width, int map_height, int seed) {
+std::unique_ptr<bool[]> World::GenerateMap(int map_width, int map_height, int seed) {
+    auto generated_map = make_unique<bool[]>(map_width * map_height);
     siv::PerlinNoise perlinNoise((double)seed);
     float noiseFrequency = 0.03;
     float landThreshold = 0.6f;
@@ -34,9 +33,10 @@ void World::GenerateMap(int map_width, int map_height, int seed) {
                     1);
             noiseVal = 1 - noiseVal;
             int ind = y * map_width + x;
-            map[ind] = noiseVal > landThreshold;
+            generated_map[ind] = noiseVal > landThreshold;
         }
     }
+    return generated_map;
 }
 
 void World::AddShip(const std::shared_ptr<Ship>& ship) {
@@ -46,8 +46,8 @@ void World::AddShip(const std::shared_ptr<Ship>& ship) {
 }
 
 void World::AddRandomShip() {
-    Vec2 pos = FindFreeSpotForShip();
-    Vec2 direction = Vec2::FromAngle((float)rand() / RAND_MAX * 6.28);
+    Vec2f pos = FindFreeSpotForShip();
+    Vec2f direction = Vec2f::FromAngle((float)rand() / RAND_MAX * 6.28);
     int sailors = 10 + rand() % 25;
     int masts = 2 + rand() % 3;
     int cannonsPerSide = 2 + rand() % 3;
@@ -75,10 +75,6 @@ bool World::TileInsideWorld(int x, int y) const {
     return x < 0 || x >= width || y < 0 || y > height;
 }
 
-bool World::IsLandAt(int x, int y) const {
-    return map[y * width + x];
-}
-
 void World::ShipLiveAndRespawn(shared_ptr<Ship> ship) {
     thread ship_thread([=](){
         ship->Start();
@@ -92,17 +88,17 @@ void World::ShipLiveAndRespawn(shared_ptr<Ship> ship) {
     ship_thread.detach();
 }
 
-Vec2 World::FindFreeSpotForShip() {
+Vec2f World::FindFreeSpotForShip() {
     const int searched_square_size = 14;
     const int half_square = searched_square_size / 2;
-    Vec2 pos;
+    Vec2f pos;
     bool goodField;
     do{
         goodField = true;
-        pos = Vec2(rand() % width, rand() % height);
+        pos = Vec2f(rand() % width, rand() % height);
         for(int x = -half_square; x <= half_square / 2; x++) {
             for(int y = -half_square; y <= half_square; y++) {
-                Vec2 newPos = Vec2(pos.x + x, pos.y + y);
+                Vec2f newPos = Vec2f(pos.x + x, pos.y + y);
                 if (newPos.x < 0 || newPos.x >= width || newPos.y < 0 || newPos.y >= height) {
                     goodField = false;
                     break;
@@ -127,11 +123,24 @@ Vec2 World::FindFreeSpotForShip() {
     return pos;
 }
 
-bool World::CorrectCoords(Vec2i coords) {
+bool World::CorrectCoords(Vec2i coords) const {
     return coords.x >= 0 && coords.x < width
            && coords.y >= 0 && coords.y < height;
 }
 
-bool World::LandAt(Vec2i coords) {
+bool World::IsLandAt(Vec2i coords) const {
     return map[coords.y * width + coords.x];
+}
+
+int World::GetWidth() const {
+    return width;
+}
+
+int World::GetHeight() const {
+    return height;
+}
+
+vector<std::shared_ptr<Ship>> World::GetShips() const {
+    lock_guard<mutex> guard(ships_mutex);
+    return ships;
 }

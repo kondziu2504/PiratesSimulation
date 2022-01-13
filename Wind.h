@@ -6,13 +6,13 @@
 #define PIRATESSIMULATION_WIND_H
 
 
-#include "Util/Vec2.h"
+#include "Util/Vec2f.h"
 #include <memory>
 #include <mutex>
 class World;
 
 class Wind {
-    Vec2 velocity = Vec2(1,0);
+    Vec2f velocity = Vec2f(1,0);
     World * world;
 
     std::mutex wind_mutex;
@@ -20,7 +20,7 @@ class Wind {
     [[noreturn]] void ThreadFun();
     void UpdateVelocity();
 public:
-    Vec2 GetVelocity();
+    Vec2f GetVelocity();
     Wind(World * world);
     void Start();
 };

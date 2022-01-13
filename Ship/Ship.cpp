@@ -19,7 +19,7 @@
 
 using namespace std;
 
-Ship::Ship(Vec2 pos, Vec2 direction, int sailors_count, int masts_count, int cannons_per_side, World * world) :
+Ship::Ship(Vec2f pos, Vec2f direction, int sailors_count, int masts_count, int cannons_per_side, World * world) :
         WorldObject(direction.Normalized(), pos, world)
 {
     const int kShipHealth = 10;
@@ -36,13 +36,13 @@ void Ship::Start() {
     crew_thread.join();
 }
 
-void Ship::ApplyWind(Vec2 wind) {
+void Ship::ApplyWind(Vec2f wind) {
     if(GetState() == ShipState::kFighting)
             return;
     float wind_power = wind.Length();
     float effective_power = 0;
     for(shared_ptr<Mast> mast : ship_body->GetMasts()){
-        Vec2 absolute_mast_dir = Vec2::FromAngle(GetDirection().Angle() + mast->GetAngle());
+        Vec2f absolute_mast_dir = Vec2f::FromAngle(GetDirection().Angle() + mast->GetAngle());
         float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;
     }

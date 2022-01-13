@@ -12,7 +12,7 @@ Vec2i Vec2i::operator+(const Vec2i &second) const {
     return {this->x + second.x, this->y + second.y};
 }
 
-Vec2i::Vec2i(Vec2 vec2) {
+Vec2i::Vec2i(Vec2f vec2) {
     x = (int)vec2.x;
     y = (int)vec2.y;
 }
@@ -21,6 +21,6 @@ Vec2i Vec2i::operator-(const Vec2i &second) const {
     return {this->x - second.x, this->y - second.y};
 }
 
-Vec2 Vec2i::operator*(const float & second) const {
+Vec2f Vec2i::operator*(const float & second) const {
     return {(float)this->x * second, (float)this->y * second};
 }

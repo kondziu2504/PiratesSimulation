@@ -34,9 +34,9 @@ class ShipController {
     void SetState(ShipState new_state);
     void AdjustDirection();
 
-    Vec2 CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const;
-    Vec2 CalculateCorrectionAgainstShips(int scan_dist, int& closest_tile_dist) const;
-    void ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2 correction);
+    Vec2f CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const;
+    Vec2f CalculateCorrectionAgainstShips(int scan_dist, int& closest_tile_dist) const;
+    void ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2f correction);
 
 public:
     explicit ShipController(ShipBody *ship_body, Crew *crew, Ship *parent);

@@ -206,11 +206,11 @@ std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
     return use_right_cannons ? ship->GetRightCannons() : ship->GetLeftCannons();
 }
 
-Vec2 Sailor::CalculateCannonTarget() const {
+Vec2f Sailor::CalculateCannonTarget() const {
     float distance = 5;
     if(cannon_target != nullptr)
         distance = (cannon_target->GetPosition() - parent->GetPosition()).Length();
-    Vec2 perpendicular_right = Vec2::FromAngle(parent->GetDirection().Angle() + M_PI_2).Normalized() * distance;
+    Vec2f perpendicular_right = Vec2f::FromAngle(parent->GetDirection().Angle() + M_PI_2).Normalized() * distance;
     return parent->GetPosition() + perpendicular_right * (use_right_cannons ? 1.f : -1.f);
 }
 

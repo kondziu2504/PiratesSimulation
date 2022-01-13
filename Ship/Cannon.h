@@ -23,17 +23,17 @@ class Cannon : public ShipObject {
 
     WorldObject * parent;
 
-    Vec2 local_pos;
+    Vec2f local_pos;
     std::mutex loaded_mutex;
     bool loaded = false;
     std::condition_variable c_var_loaded;
 public:
-    explicit Cannon(Vec2 local_pos, WorldObject * parent);
+    explicit Cannon(Vec2f local_pos, WorldObject * parent);
     std::pair<Sailor *, Sailor *> GetOwners();
     bool Loaded();
     void WaitUntilLoadedOrTimeout();
     void Load();
-    void Shoot(Vec2 target);
+    void Shoot(Vec2f target);
     bool TryClaim(Sailor * sailor);
     void Release(Sailor * sailor);
 };

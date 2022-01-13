@@ -19,8 +19,7 @@ void Wind::Start() {
     while(true){
         UpdateVelocity();
         {
-            lock_guard<mutex> guard(world->ships_mutex);
-            for(shared_ptr<Ship> ship : world->ships){
+            for(const shared_ptr<Ship>& ship : world->GetShips()){
                 auto shipState = ship->GetState();
                 if(shipState == ShipState::kWandering)
                     ship->ApplyWind(velocity);
@@ -37,10 +36,10 @@ Wind::Wind(World * world) {
 void Wind::UpdateVelocity() {
     float currentAngle = velocity.Angle();
     float newAngle = currentAngle + (((float)rand() / RAND_MAX) - 0.5f) / 3.f;
-    velocity = Vec2::FromAngle(newAngle);
+    velocity = Vec2f::FromAngle(newAngle);
 }
 
-Vec2 Wind::GetVelocity() {
+Vec2f Wind::GetVelocity() {
     lock_guard<mutex> guard(wind_mutex);
     return velocity;
 }

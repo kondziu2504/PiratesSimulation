@@ -17,12 +17,12 @@ void Cannon::Load() {
     c_var_loaded.notify_one();
 }
 
-void Cannon::Shoot(Vec2 target) {
+void Cannon::Shoot(Vec2f target) {
     lock_guard<mutex> guard(loaded_mutex);
     loaded = true;
     {
         lock_guard<mutex> guard_cannonballs(parent->GetWorld()->cannonballs_mutex);
-        Vec2 origin_offset = local_pos.Rotated(parent->GetDirection().Angle());
+        Vec2f origin_offset = local_pos.Rotated(parent->GetDirection().Angle());
         parent->GetWorld()->cannonballs.push_back(make_shared<Cannonball>(parent->GetWorld(), parent->GetPosition() + origin_offset, target + origin_offset));
     }
     loaded = false;
@@ -65,7 +65,7 @@ void Cannon::Release(Sailor *sailor) {
         owners.second = nullptr;
 }
 
-Cannon::Cannon(Vec2 local_pos, WorldObject * parent) {
+Cannon::Cannon(Vec2f local_pos, WorldObject * parent) {
     this->parent = parent;
     this->local_pos = local_pos;
     owners.first = owners.second = nullptr;

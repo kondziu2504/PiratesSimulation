@@ -8,7 +8,7 @@
 #include <thread>
 #include <cmath>
 #include <utility>
-#include "Util/Vec2.h"
+#include "Util/Vec2f.h"
 #include "Ship/Ship.h"
 #include "Ship/Sailor.h"
 #include "Ship/MastDistributor.h"
@@ -99,10 +99,9 @@ void Monitor::Update() {
 void Monitor::DrawChosenShip() {
     shared_ptr<Ship> chosen_ship = nullptr;
     {
-        lock_guard<mutex> ships_guard(world->ships_mutex);
-        if(!world->ships.empty() && current_ship_ind < world->ships.size()){
-            chosen_ship = world->ships.at(current_ship_ind);
-        }
+        auto ships = world->GetShips();
+        if(!ships.empty() && current_ship_ind < ships.size())
+            chosen_ship = ships.at(current_ship_ind);
     }
     if(chosen_ship != nullptr)
         DrawShipInfo(chosen_ship);
@@ -116,7 +115,7 @@ Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
             Vec2i screen_coords(screen_offset.x + x, screen_offset.y + y);
 
             if(world->CorrectCoords(map_coords)){
-                if(world->LandAt(map_coords))
+                if(world->IsLandAt(map_coords))
                     DrawTile(screen_coords, ',', Tile::kLand);
                 else
                     DrawTile(screen_coords, ';', Tile::kWater);
@@ -149,8 +148,8 @@ void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
 }
 
 void Monitor::DrawShip(const shared_ptr<Ship>& ship, Vec2i screen_offset, Rect world_viewport) {
-    Vec2 ship_pos = ship->GetPosition();
-    Vec2 ship_dir = ship->GetDirection();
+    Vec2f ship_pos = ship->GetPosition();
+    Vec2f ship_dir = ship->GetDirection();
 
     vector<string> texture = {
             "TTMMMFF",
@@ -163,12 +162,12 @@ void Monitor::DrawShip(const shared_ptr<Ship>& ship, Vec2i screen_offset, Rect w
             if(pixel != ' '){
                 auto length = (float)texture[i].length();
                 auto width = (float)texture.size();
-                Vec2 tile_rotated_local_pos = Vec2(
+                Vec2f tile_rotated_local_pos = Vec2f(
                         (float)j - length / 2,
                         (float)i - width / 2).Rotated(ship_dir.Angle());
-                Vec2 tile_world_pos = Vec2(ship_pos.x + tile_rotated_local_pos.x, ship_pos.y + tile_rotated_local_pos.y);
+                Vec2f tile_world_pos = Vec2f(ship_pos.x + tile_rotated_local_pos.x, ship_pos.y + tile_rotated_local_pos.y);
                 if(world_viewport.IsPointInside(tile_world_pos)){
-                    Vec2i screen_coords = screen_offset + (Vec2i)(tile_world_pos - Vec2((float)world_viewport.x, (float)world_viewport.y));
+                    Vec2i screen_coords = screen_offset + (Vec2i)(tile_world_pos - Vec2f((float)world_viewport.x, (float)world_viewport.y));
                     Tile ship_tile = ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed ? Tile::kShip : Tile::kDestroyed;
                     DrawTile(screen_coords,pixel,ship_tile);
                 }
@@ -178,8 +177,7 @@ void Monitor::DrawShip(const shared_ptr<Ship>& ship, Vec2i screen_offset, Rect w
 }
 
 void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
-    lock_guard<mutex> guard(world->ships_mutex);
-    for(const shared_ptr<Ship>& ship : world->ships){
+    for(const shared_ptr<Ship>& ship : world->GetShips()){
         DrawShip(ship, offset, world_viewport);
     }
 }
@@ -265,7 +263,7 @@ s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPos
 
     int mast_y = first_mast_y;
     for (const auto& mast: masts) {
-        elements_positions->insert(make_pair(mast, Vec2((float)screen_rect.width / 2, (float)mast_y)));
+        elements_positions->insert(make_pair(mast, Vec2f((float)screen_rect.width / 2, (float)mast_y)));
         if (masts.size() > 1) {
             mast_y += (last_mast_y - first_mast_y) / (int)(masts.size() - 1);
         }
@@ -275,7 +273,7 @@ s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPos
         float cannon_y = (float)screen_rect.height / 3.f;
         float cannon_y_delta = (float)screen_rect.height / (float)(cannons.size() + 1);
         for (const auto& cannon: cannons) {
-            elements_positions->insert(make_pair(cannon, Vec2((float)screen_rect.width - 1, (float)cannon_y)));
+            elements_positions->insert(make_pair(cannon, Vec2f((float)screen_rect.width - 1, (float)cannon_y)));
             cannon_y += cannon_y_delta;
         }
     };
@@ -283,9 +281,9 @@ s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPos
     GenerateCannonsPositions(ship->GetLeftCannons());
     GenerateCannonsPositions(ship->GetRightCannons());
 
-    elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2((float)screen_rect.width * 0.75f, (float)screen_rect.height / 2.f)));
-    elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2((float)screen_rect.width  * 0.25f, (float)screen_rect.height / 2.f)));
-    elements_positions->insert(make_pair(ship->GetRestingPoint(), Vec2((float)screen_rect.width  * 0.75f, (float)screen_rect.height * 0.25f)));
+    elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2f((float)screen_rect.width * 0.75f, (float)screen_rect.height / 2.f)));
+    elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2f((float)screen_rect.width  * 0.25f, (float)screen_rect.height / 2.f)));
+    elements_positions->insert(make_pair(ship->GetRestingPoint(), Vec2f((float)screen_rect.width  * 0.75f, (float)screen_rect.height * 0.25f)));
 
     return elements_positions;
 }
@@ -325,13 +323,13 @@ void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const 
     Vec2i circle_center(screen_coords.x + arrow_length, screen_coords.y + arrow_length + 1);
     for(int i = 0; i < angles; i++){
         float angle = (float)i / (float)angles * 2.f * (float)M_PI;
-        Vec2 pixel_local_pos = Vec2((float)arrow_length - 1.f, 0.f).Rotated(angle);
+        Vec2f pixel_local_pos = Vec2f((float)arrow_length - 1.f, 0.f).Rotated(angle);
         Vec2i pixel_local_pos_rounded = Vec2i((int)roundf(pixel_local_pos.x), (int)roundf(pixel_local_pos.y));
         Vec2i pixel_screen_coords = circle_center + pixel_local_pos_rounded;
         DrawTile(pixel_screen_coords, '#', Tile::kGray);
     }
     for(int i = 0; i < arrow_length; i++){
-        Vec2 pixel_local_pos = Vec2((float)i, 0).Rotated(arrow_angle);
+        Vec2f pixel_local_pos = Vec2f((float)i, 0).Rotated(arrow_angle);
         Vec2i pixel_local_pos_rounded = Vec2i((int)roundf(pixel_local_pos.x), (int)roundf(pixel_local_pos.y));
         Vec2i pixel_screen_coords = circle_center + pixel_local_pos_rounded;
         DrawTile(pixel_screen_coords, ' ', Tile::kIndicator);
@@ -339,7 +337,7 @@ void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const 
 }
 
 void Monitor::DrawWindDirIndicator(Vec2i offset, int size) {
-    Vec2 wind_velocity = world->wind->GetVelocity();
+    Vec2f wind_velocity = world->wind->GetVelocity();
     float wind_angle = wind_velocity.Angle();
     DrawCircleIndicator(offset, wind_angle, "Kierunek wiatru", size);
 }
@@ -373,7 +371,7 @@ void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
     for(const auto& cannonball : world->cannonballs) {
         if(cannonball->dead)
             continue;
-        Vec2 cannonball_pos = cannonball->GetPos();
+        Vec2f cannonball_pos = cannonball->GetPos();
         if(world_viewport.IsPointInside(cannonball_pos)) {
             Vec2i screen_coords = screen_offset - Vec2i(world_viewport.x, world_viewport.y) + (Vec2i)cannonball_pos;
             DrawTile(screen_coords, 'O', Tile::kCannonball);
@@ -383,14 +381,14 @@ void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
 
 void Monitor::NextShip() {
     current_ship_ind++;
-    if(current_ship_ind >= world->ships.size())
+    if(current_ship_ind >= world->GetShips().size())
         current_ship_ind = 0;
 }
 
 void Monitor::PrevShip() {
     current_ship_ind--;
     if(current_ship_ind < 0)
-        current_ship_ind = max(0, (int)world->ships.size() - 1);
+        current_ship_ind = max(0, (int)world->GetShips().size() - 1);
 }
 
 void Monitor::ChangeDisplayMode() {
@@ -436,7 +434,7 @@ void Monitor::DrawShipDeckMasts(const s_ptr<Ship>& ship, Rect screen_rect,
     int mast_width = (int)((float)screen_rect.width * 0.9f) - 1;
     for(const auto& mast : masts){
         for(int i = 0; i < mast_width; i++){
-            Vec2i rotated_sail_pos = (Vec2i)Vec2((float)i - (float)mast_width / 2.f, 0.f).Rotated(mast->GetAngle());
+            Vec2i rotated_sail_pos = (Vec2i)Vec2f((float)i - (float)mast_width / 2.f, 0.f).Rotated(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
             Vec2i mast_pos = elements_positions->find(mast)->second;
             Vec2i screen_coords = Vec2i(screen_rect.x, screen_rect.y) + mast_pos + rotated_sail_pos;

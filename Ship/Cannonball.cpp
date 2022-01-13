@@ -9,7 +9,7 @@
 #include "Ship.h"
 using namespace std;
 
-Cannonball::Cannonball(World * world, Vec2 origin, Vec2 target) {
+Cannonball::Cannonball(World * world, Vec2f origin, Vec2f target) {
     this->origin = origin;
     this->target = target;
     this->world = world;
@@ -30,7 +30,7 @@ void Cannonball::CannonThread() {
 
             if(progress_copy >= 1.f){
                 dead = true;
-                for(auto ship : world->ships)
+                for(const auto& ship : world->GetShips())
                     if((ship->GetPosition() - GetPos()).Length() < 3)
                         ship->Hit(1);
                 return;
@@ -40,7 +40,7 @@ void Cannonball::CannonThread() {
     }
 }
 
-Vec2 Cannonball::GetPos() {
+Vec2f Cannonball::GetPos() {
     lock_guard<mutex> guard(progress_mutex);
     return origin + (target - origin) * progress;
 }

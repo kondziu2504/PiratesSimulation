@@ -10,7 +10,7 @@
 #include <atomic>
 #include "ShipObject.h"
 #include "../Util/Util.h"
-#include "../Util/Vec2.h"
+#include "../Util/Vec2f.h"
 #include "ShipBody.h"
 
 class Cannon;
@@ -57,7 +57,7 @@ class Sailor {
 
     [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
     [[nodiscard]] std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
-    Vec2 CalculateCannonTarget() const;
+    Vec2f CalculateCannonTarget() const;
     SailorActionStatus FulfillAssignedCannonRole();
     bool TryClaimFirstUnoccupiedCannon();
 
