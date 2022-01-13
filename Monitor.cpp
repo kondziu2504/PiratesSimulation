@@ -114,7 +114,7 @@ Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
             Vec2i map_coords(world_viewport.x + x, world_viewport.y + y);
             Vec2i screen_coords(screen_offset.x + x, screen_offset.y + y);
 
-            if(world->CorrectCoords(map_coords)){
+            if(world->CoordsInsideWorld(map_coords)){
                 if(world->IsLandAt(map_coords))
                     DrawTile(screen_coords, ',', Tile::kLand);
                 else
@@ -269,17 +269,21 @@ s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPos
         }
     }
 
-    auto GenerateCannonsPositions = [&screen_rect, elements_positions] (const vector<shared_ptr<Cannon>>& cannons) {
+    auto GenerateCannonsPositions = [&screen_rect, elements_positions] (const vector<shared_ptr<Cannon>>& cannons, bool right) {
         float cannon_y = (float)screen_rect.height / 3.f;
         float cannon_y_delta = (float)screen_rect.height / (float)(cannons.size() + 1);
         for (const auto& cannon: cannons) {
-            elements_positions->insert(make_pair(cannon, Vec2f((float)screen_rect.width - 1, (float)cannon_y)));
+            if(right)
+                elements_positions->insert(make_pair(cannon, Vec2f((float)screen_rect.width - 1, (float)cannon_y)));
+            else
+                elements_positions->insert(make_pair(cannon, Vec2f(0, (float)cannon_y)));
+
             cannon_y += cannon_y_delta;
         }
     };
 
-    GenerateCannonsPositions(ship->GetLeftCannons());
-    GenerateCannonsPositions(ship->GetRightCannons());
+    GenerateCannonsPositions(ship->GetLeftCannons(), false);
+    GenerateCannonsPositions(ship->GetRightCannons(), true);
 
     elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2f((float)screen_rect.width * 0.75f, (float)screen_rect.height / 2.f)));
     elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2f((float)screen_rect.width  * 0.25f, (float)screen_rect.height / 2.f)));
@@ -337,7 +341,7 @@ void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const 
 }
 
 void Monitor::DrawWindDirIndicator(Vec2i offset, int size) {
-    Vec2f wind_velocity = world->wind->GetVelocity();
+    Vec2f wind_velocity = world->GetWind()->GetVelocity();
     float wind_angle = wind_velocity.Angle();
     DrawCircleIndicator(offset, wind_angle, "Kierunek wiatru", size);
 }
@@ -347,7 +351,7 @@ void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const shared_ptr<Ship
 }
 
 void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<Ship>& ship) {
-    float wind_angle = world->wind->GetVelocity().Angle();
+    float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
     DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float)M_PI / 2, "Docelowy kat zagli",
                         size);
@@ -367,8 +371,7 @@ void Monitor::DrawShipInfo(const shared_ptr<Ship>& ship) {
 }
 
 void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
-    lock_guard<mutex> guard(world->cannonballs_mutex);
-    for(const auto& cannonball : world->cannonballs) {
+    for(const auto& cannonball : world->GetCannonballs()) {
         if(cannonball->dead)
             continue;
         Vec2f cannonball_pos = cannonball->GetPos();

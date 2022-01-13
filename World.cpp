@@ -8,20 +8,20 @@
 #include "Ship/Ship.h"
 #include "Wind.h"
 #include <thread>
+#include "Ship/Cannonball.h"
 
 using namespace std;
 
 World::World(int width, int height, int seed) :
         width(width),
         height(height),
-        map(GenerateMap(width, height, seed)) {
-    this->wind = make_shared<Wind>(this);
-    wind->Start();
+        map(GenerateMap(width, height, seed)),
+        wind(make_shared<Wind>(this)) {
 }
 
-std::unique_ptr<bool[]> World::GenerateMap(int map_width, int map_height, int seed) {
+std::unique_ptr<bool[]> World::GenerateMap(int map_width, int map_height, unsigned int seed) {
     auto generated_map = make_unique<bool[]>(map_width * map_height);
-    siv::PerlinNoise perlinNoise((double)seed);
+    siv::PerlinNoise perlinNoise(seed);
     float noiseFrequency = 0.03;
     float landThreshold = 0.6f;
 
@@ -69,10 +69,6 @@ void World::Stop() {
         }
         SleepSeconds(0.1f);
     }
-}
-
-bool World::TileInsideWorld(int x, int y) const {
-    return x < 0 || x >= width || y < 0 || y > height;
 }
 
 void World::ShipLiveAndRespawn(shared_ptr<Ship> ship) {
@@ -123,7 +119,7 @@ Vec2f World::FindFreeSpotForShip() {
     return pos;
 }
 
-bool World::CorrectCoords(Vec2i coords) const {
+bool World::CoordsInsideWorld(Vec2i coords) const {
     return coords.x >= 0 && coords.x < width
            && coords.y >= 0 && coords.y < height;
 }
@@ -143,4 +139,32 @@ int World::GetHeight() const {
 vector<std::shared_ptr<Ship>> World::GetShips() const {
     lock_guard<mutex> guard(ships_mutex);
     return ships;
+}
+
+std::vector<std::shared_ptr<Cannonball>> World::GetCannonballs() const {
+    lock_guard<mutex> guard(cannonballs_mutex);
+    return cannonballs;
+}
+
+void World::AddCannonball(std::shared_ptr<Cannonball> cannonball) {
+    {
+        lock_guard<mutex> guard(cannonballs_mutex);
+        cannonballs.push_back(cannonball);
+    }
+    thread cannonball_thread([=](){
+        cannonball->Live();
+        {
+            lock_guard<mutex> guard(cannonballs_mutex);
+            cannonballs.erase(std::remove(cannonballs.begin(), cannonballs.end(), cannonball));
+        }
+    });
+    cannonball_thread.detach();
+}
+
+std::shared_ptr<Wind> World::GetWind() const {
+    return wind;
+}
+
+void World::Start() {
+    wind->Start();
 }

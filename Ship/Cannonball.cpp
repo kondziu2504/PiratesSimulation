@@ -13,34 +13,25 @@ Cannonball::Cannonball(World * world, Vec2f origin, Vec2f target) {
     this->origin = origin;
     this->target = target;
     this->world = world;
-
-    thread cannon_thread(&Cannonball::CannonThread, this);
-    cannon_thread.detach();
-}
-
-void Cannonball::CannonThread() {
-    while(true){
-        {
-            float progress_copy;
-            {
-                lock_guard<mutex> guard(progress_mutex);
-                progress += 0.1f;
-                progress_copy = progress;
-            }
-
-            if(progress_copy >= 1.f){
-                dead = true;
-                for(const auto& ship : world->GetShips())
-                    if((ship->GetPosition() - GetPos()).Length() < 3)
-                        ship->Hit(1);
-                return;
-            }
-        }
-        usleep(100000);
-    }
 }
 
 Vec2f Cannonball::GetPos() {
-    lock_guard<mutex> guard(progress_mutex);
     return origin + (target - origin) * progress;
+}
+
+void Cannonball::Live() {
+    while(true){
+        progress = progress + 0.1f;
+        if(progress >= 1.f){
+            for(const auto& ship : world->GetShips()) {
+                if((ship->GetPosition() - GetPos()).Length() < 3){
+                    ship->Hit(1);
+                    break;
+                }
+            }
+            dead = true;
+            return;
+        }
+        SleepSeconds(0.1f);
+    }
 }

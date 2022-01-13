@@ -30,7 +30,7 @@ int Mast::GetMaxSlots() const {
 }
 
 void Mast::Adjust() {
-    float wind_angle = parent->GetWorld()->wind->GetVelocity().Angle();
+    float wind_angle = parent->GetWorld()->GetWind()->GetVelocity().Angle();
     float absolute_mast_angle = parent->GetDirection().Angle() + GetAngle();
     float angle_diff = AngleDifference(wind_angle, absolute_mast_angle);
     float angle_change = min(abs(angle_diff), (float)M_PI / 180.f);

@@ -101,7 +101,7 @@ Vec2f ShipController::CalculateCorrectionAgainstLand(int scan_dist, int &closest
             Vec2f scannedTile = parent->GetPosition() + checkDir * i;
             scannedTile.x = (int)scannedTile.x;
             scannedTile.y = (int)scannedTile.y;
-            bool tileOutsideWorld = !parent->GetWorld()->CorrectCoords((Vec2i)scannedTile);
+            bool tileOutsideWorld = !parent->GetWorld()->CoordsInsideWorld((Vec2i) scannedTile);
             if(parent->GetWorld()->IsLandAt((Vec2i)scannedTile) || tileOutsideWorld){
                 if(!(parent->GetPosition() - scannedTile).Length() == 0){
                     Vec2f correction_dir = (parent->GetPosition() - scannedTile).Normalized();

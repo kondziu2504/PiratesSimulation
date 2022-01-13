@@ -20,11 +20,8 @@ void Cannon::Load() {
 void Cannon::Shoot(Vec2f target) {
     lock_guard<mutex> guard(loaded_mutex);
     loaded = true;
-    {
-        lock_guard<mutex> guard_cannonballs(parent->GetWorld()->cannonballs_mutex);
-        Vec2f origin_offset = local_pos.Rotated(parent->GetDirection().Angle());
-        parent->GetWorld()->cannonballs.push_back(make_shared<Cannonball>(parent->GetWorld(), parent->GetPosition() + origin_offset, target + origin_offset));
-    }
+    Vec2f origin_offset = local_pos.Rotated(parent->GetDirection().Angle());
+    parent->GetWorld()->AddCannonball(make_shared<Cannonball>(parent->GetWorld(), parent->GetPosition() + origin_offset, target + origin_offset));
     loaded = false;
 }
 

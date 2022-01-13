@@ -19,36 +19,36 @@ class World {
 private:
     const int width, height;
     const std::unique_ptr<const bool[]> map;
-    mutable std::mutex ships_mutex;
+
     std::vector<std::shared_ptr<Ship>> ships;
+    mutable std::mutex ships_mutex;
 
-    static std::unique_ptr<bool[]> GenerateMap(int map_width, int map_height, int seed);
+    std::vector<std::shared_ptr<Cannonball>> cannonballs;
+    mutable std::mutex cannonballs_mutex;
 
-    Vec2f FindFreeSpotForShip();
-    void ShipLiveAndRespawn(std::shared_ptr<Ship> ship);
+    const std::shared_ptr<Wind> wind;
     bool respawn = true;
 
+    static std::unique_ptr<bool[]> GenerateMap(int map_width, int map_height, unsigned int seed);
+    Vec2f FindFreeSpotForShip();
+    void ShipLiveAndRespawn(std::shared_ptr<Ship> ship);
 
 public:
+    World(int width, int height, int seed);
+
+    void Start();
     void Stop();
 
-    std::mutex cannonballs_mutex;
-    std::vector<std::shared_ptr<Cannonball>> cannonballs;
     std::vector<std::shared_ptr<Ship>> GetShips() const;
-
-    std::shared_ptr<Wind> wind;
-    World(int width, int height, int seed);
     void AddShip(const std::shared_ptr<Ship>& ship);
     void AddRandomShip();
-    [[nodiscard]] int GetWidth() const;
-    [[nodiscard]] int GetHeight() const;
-
-
-    [[nodiscard]] bool TileInsideWorld(int x, int y) const;
-    [[nodiscard]] bool IsLandAt(Vec2i coords) const;
-
-
-    bool CorrectCoords(Vec2i coords) const;
+    std::vector<std::shared_ptr<Cannonball>> GetCannonballs() const;
+    void AddCannonball(std::shared_ptr<Cannonball> cannonball);
+    std::shared_ptr<Wind> GetWind() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    bool IsLandAt(Vec2i coords) const;
+    bool CoordsInsideWorld(Vec2i coords) const;
 };
 
 
