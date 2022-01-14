@@ -13,9 +13,8 @@
 class Crew : public Stopable {
     const std::shared_ptr<const std::vector<std::shared_ptr<Sailor>>> sailors;
 
-    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *parent);
+    static std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *parent);
 
-protected:
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
 public:

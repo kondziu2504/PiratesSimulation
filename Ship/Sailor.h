@@ -53,8 +53,8 @@ class Sailor : public Stopable {
 
     SailorActionStatus OperateTheShip();
 
-    [[nodiscard]] std::shared_ptr<ShipObject> GetFightingSideJunction() const;
-    [[nodiscard]] std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
+    std::shared_ptr<ShipObject> GetFightingSideJunction() const;
+    std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
     Vec2f CalculateCannonTarget() const;
     SailorActionStatus FulfillAssignedCannonRole();
     bool TryClaimFirstUnoccupiedCannon();
@@ -86,8 +86,8 @@ public:
     void SetUseRightCannons(bool right);
 
     //Operated elements
-    [[nodiscard]] std::shared_ptr<Mast> GetOperatedMast() const;
-    [[nodiscard]] std::shared_ptr<Cannon> GetOperatedCannon() const;
+    std::shared_ptr<Mast> GetOperatedMast() const;
+    std::shared_ptr<Cannon> GetOperatedCannon() const;
 
     //Sailor activities/travel
     std::shared_ptr<ShipObject> GetPreviousTarget();

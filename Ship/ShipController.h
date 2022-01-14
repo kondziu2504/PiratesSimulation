@@ -29,7 +29,6 @@ class ShipController : public Stopable {
     void GetInPosition();
     void StartTurningTowardsAngle(float target_angle);
     float DetermineAngleToFaceEnemy();
-    Ship * GetEnemy();
 
     void SetState(ShipState new_state);
     void AdjustDirection();

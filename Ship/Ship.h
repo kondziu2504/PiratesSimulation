@@ -38,8 +38,8 @@ public:
     void ApplyWind(Vec2f wind);
     void Hit(int damage);
 
-    [[nodiscard]] int GetHP() const;
-    [[nodiscard]] float GetLength() const;
+    int GetHP() const;
+    float GetLength() const;
     ShipState GetState();
     std::vector<std::shared_ptr<Sailor>> GetSailors();
 

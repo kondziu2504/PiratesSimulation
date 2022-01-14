@@ -38,8 +38,10 @@ void Sailor::SetState(SailorState new_state) {
 
 SailorActionStatus Sailor::OperateMast() {
     SetState(SailorState::kMast);
-    if(ContinuouslyAdjustMast() == SailorActionStatus::kKilledDuringAction)
+    if(ContinuouslyAdjustMast() == SailorActionStatus::kKilledDuringAction){
+        ReleaseMast();
         return SailorActionStatus::kKilledDuringAction;
+    }
     ReleaseMast();
     SetState(SailorState::kStanding);
     return SailorActionStatus::kSuccess;
@@ -84,8 +86,10 @@ SailorActionStatus Sailor::WaitForCannon() {
 
 SailorActionStatus Sailor::UseCannon() {
     SetState(SailorState::kCannon);
-    if(SleepAndCheckKilled(2) == SailorActionStatus::kKilledDuringAction)
+    if(SleepAndCheckKilled(2) == SailorActionStatus::kKilledDuringAction){
+        assigned_cannon->Release(this);
         return SailorActionStatus::kKilledDuringAction;
+    }
     FulfillAssignedCannonRole();
     assigned_cannon->Release(this);
     SetState(SailorState::kStanding);

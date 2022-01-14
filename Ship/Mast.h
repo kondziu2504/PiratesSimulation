@@ -27,7 +27,7 @@ class Mast : public ShipObject{
 public:
     explicit Mast(WorldObject * parent) : parent(parent) {};
 
-    [[nodiscard]] int GetMaxSlots() const;
+    int GetMaxSlots() const;
     float GetAngle();
     void Adjust();
 };

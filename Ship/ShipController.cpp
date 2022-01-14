@@ -5,7 +5,6 @@
 #include "ShipController.h"
 #include <memory>
 #include <mutex>
-#include "../WorldObject.h"
 #include "Ship.h"
 
 using namespace std;
@@ -141,10 +140,6 @@ void ShipController::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2f
         parent->SetDirection(parent->GetDirection() + normalized_correction * correction_significance);
         parent->SetDirection(parent->GetDirection().Normalized());
     }
-}
-
-Ship *ShipController::GetEnemy() {
-    return enemy;
 }
 
 ShipController::ShipController(ShipBody *ship_body, Crew *crew, Ship *parent) {

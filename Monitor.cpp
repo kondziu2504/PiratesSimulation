@@ -51,12 +51,11 @@ const std::unordered_map<SailorState, std::string> Monitor::sailor_states_map_st
         {SailorState::kDead, "Dead"}
 };
 
-Monitor::Monitor(shared_ptr<World> world) {
-    this->world = std::move(world);
+Monitor::Monitor(World * world) {
+    this->world = world;
 }
 
 void Monitor::InitializeNcurses() {
-    ncurses_util::Initialize();
     ncurses_util::InitAllPossibleColorPairs();
 
     // Override default colors' values
@@ -197,19 +196,18 @@ void Monitor::DrawDashboardSailors(shared_ptr<Ship> &ship, ncurses_util::Console
 void Monitor::DrawDashboardMasts(shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) const {
     console_writer.AddLine("Masts:");
     console_writer.ModifyIndent(2);
+
     int mast_index = 0;
-    {
-        lock_guard<mutex> guard(ship->GetMastDistributor()->free_masts_mutex);
-        for(const auto& mast_owners_pair : *ship->GetMastDistributor()->masts_owners){
-            bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
-            string mast_text =
-                    "Mast " + to_string(mast_index) +
-                    " Operated by: " + to_string(mast_owners_pair.second->size()) +
-                    " " + (max_owners ? "(max)" : "");
-            console_writer.AddLine(mast_text);
-            mast_index++;
-        }
+    for(const auto& mast_owners_pair : ship->GetMastDistributor()->GetMastsOwners()) {
+        bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
+        string mast_text =
+                "Mast " + to_string(mast_index) +
+                " Operated by: " + to_string(mast_owners_pair.second->size()) +
+                " " + (max_owners ? "(max)" : "");
+        console_writer.AddLine(mast_text);
+        mast_index++;
     }
+
     console_writer.ModifyIndent(-2);
 }
 
@@ -451,9 +449,10 @@ void Monitor::DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect,
             }else
                 current_sailor_pos = cannon_pos - Vec2i(0, 1);
         }else if(sailor_state == SailorState::kMast){
-            auto mast_owners = ship->GetMastDistributor()->masts_owners->at(sailor->GetOperatedMast());
+            auto mast_owners = ship->GetMastDistributor()->GetMastsOwners().at(sailor->GetOperatedMast());
             Vec2i mast_pos = elements_positions->at(sailor->GetOperatedMast());
 
+            // Find out at which position sailor operates mast
             int ind = 0;
             for(auto mast_owner : *mast_owners){
                 if(mast_owner == sailor.get())

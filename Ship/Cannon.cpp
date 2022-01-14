@@ -11,15 +11,14 @@ using namespace std;
 
 void Cannon::Load() {
     {
-        lock_guard<mutex> guard(loaded_mutex);
+        lock_guard<mutex> guard(load_mutex);
         loaded = true;
     }
     c_var_loaded.notify_one();
 }
 
 void Cannon::Shoot(Vec2f target) {
-    lock_guard<mutex> guard(loaded_mutex);
-    loaded = true;
+    lock_guard<mutex> guard(load_mutex);
     Vec2f origin_offset = local_pos.Rotated(parent->GetDirection().Angle());
     parent->GetWorld()->AddCannonball(make_shared<Cannonball>(parent->GetWorld(), parent->GetPosition() + origin_offset, target + origin_offset));
     loaded = false;
@@ -38,15 +37,12 @@ bool Cannon::TryClaim(Sailor * sailor) {
 }
 
 bool Cannon::Loaded() {
-    lock_guard<mutex> guard(loaded_mutex);
     return loaded;
 }
 
 void Cannon::WaitUntilLoadedOrTimeout() {
-    unique_lock<mutex> lock(loaded_mutex);
-    //c_var_loaded.wait(lock, [&]{return loaded;});
-    c_var_loaded.wait_for(lock, chrono::seconds(5), [&]{return loaded;});
-    lock.unlock();
+    unique_lock<mutex> lock(load_mutex);
+    c_var_loaded.wait_for(lock, chrono::seconds(5), [&]{return loaded.load();});
 }
 
 std::pair<Sailor *, Sailor *> Cannon::GetOwners() {

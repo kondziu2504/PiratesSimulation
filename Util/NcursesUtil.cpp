@@ -12,6 +12,8 @@ using namespace std;
 void ncurses_util::Initialize() {
     initscr();
     cbreak();
+    keypad(stdscr, TRUE);
+    set_escdelay(0);
     noecho();
     clear();
     refresh();

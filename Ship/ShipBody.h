@@ -17,9 +17,9 @@ class ShipBody {
 public:
     explicit ShipBody(WorldObject * parent, int hp = 10, int length = 6, int mast_count = 3, int cannons_per_side = 3);
 
-    [[nodiscard]] int GetHP() const;
+    int GetHP() const;
     void Hit(int damage);
-    [[nodiscard]] float GetLength() const;
+    float GetLength() const;
     std::shared_ptr<MastDistributor> GetMastDistributor();
 
     std::shared_ptr<ShipObject> GetLeftJunction();

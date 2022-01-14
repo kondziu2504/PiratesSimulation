@@ -24,8 +24,8 @@ class Cannon : public ShipObject {
     WorldObject * parent;
 
     Vec2f local_pos;
-    std::mutex loaded_mutex;
-    bool loaded = false;
+    std::atomic<bool> loaded = false;
+    std::mutex load_mutex;
     std::condition_variable c_var_loaded;
 public:
     explicit Cannon(Vec2f local_pos, WorldObject * parent);
