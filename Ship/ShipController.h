@@ -12,7 +12,7 @@
 
 class Ship;
 
-class ShipController {
+class ShipController : public Stopable {
     ShipBody * ship_body;
     Crew * crew;
 
@@ -20,7 +20,7 @@ class ShipController {
     Ship * parent = nullptr;
     Ship * enemy = nullptr;
 
-    std::atomic<bool> kill = false;
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     // Fighting
     void EngageFight(Ship * enemy_ship);
@@ -42,8 +42,6 @@ public:
     explicit ShipController(ShipBody *ship_body, Crew *crew, Ship *parent);
     ShipState GetState();
     void PrepareForFight(Ship * ship);
-    void Start();
-    void Kill();
 };
 
 

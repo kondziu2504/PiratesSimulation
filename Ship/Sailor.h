@@ -27,13 +27,13 @@ enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
 
 enum class SailorOrder {kOperateCannons, kOperateMasts};
 
-class Sailor {
+class Sailor : public Stopable {
     SailorState currentState = SailorState::kResting;
     std::mutex sailor_mutex;
     ShipBody * ship;
     WorldObject * parent;
 
-    std::atomic<bool> upper_deck = true;
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     SailorOrder current_order = SailorOrder::kOperateMasts;
     WorldObject * cannon_target = nullptr;
@@ -48,8 +48,6 @@ class Sailor {
     //Operated elements
     std::shared_ptr<Mast> operated_mast = nullptr;
     std::shared_ptr<Cannon> assigned_cannon = nullptr;
-
-    std::atomic<bool> dying = false;
 
     SailorActionStatus GoTo(std::shared_ptr<ShipObject> shipObject);
 
@@ -82,9 +80,6 @@ class Sailor {
 
 public:
     explicit Sailor(ShipBody *ship_body, WorldObject *parent);
-    void Start();
-    void Kill();
-    [[nodiscard]] bool GetIsDying() const;
     SailorState GetState();
     void SetCurrentOrder(SailorOrder new_order);
     void SetCannonTarget(WorldObject * cannon_target);

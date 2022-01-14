@@ -56,24 +56,10 @@ void World::AddRandomShip() {
     AddShip(newShip);
 }
 
-void World::Stop() {
-    respawn = false;
-    for (auto ship_r_it = ships.rbegin(); ship_r_it != ships.rend(); ++ship_r_it) {
-        (*ship_r_it)->Destroy();
-    }
-    while(true) {
-        {
-            lock_guard<mutex> guard(ships_mutex);
-            if (ships.empty())
-                break;
-        }
-        SleepSeconds(0.1f);
-    }
-}
-
 void World::ShipLiveAndRespawn(shared_ptr<Ship> ship) {
     thread ship_thread([=](){
         ship->Start();
+        ship->WaitUntilStopped();
         {
             lock_guard<mutex> guard(ships_mutex);
             ships.erase(std::remove(ships.begin(), ships.end(), ship));
@@ -152,7 +138,8 @@ void World::AddCannonball(std::shared_ptr<Cannonball> cannonball) {
         cannonballs.push_back(cannonball);
     }
     thread cannonball_thread([=](){
-        cannonball->Live();
+        cannonball->Start();
+        cannonball->WaitUntilStopped();
         {
             lock_guard<mutex> guard(cannonballs_mutex);
             cannonballs.erase(std::remove(cannonballs.begin(), cannonballs.end(), cannonball));
@@ -165,6 +152,19 @@ std::shared_ptr<Wind> World::GetWind() const {
     return wind;
 }
 
-void World::Start() {
+void World::ThreadFunc(const atomic<bool> &stop_requested) {
     wind->Start();
+
+    WaitUntilStopRequested();
+
+    wind->RequestStop();
+
+    respawn = false;
+    auto ships_copy = ships;
+    for (const auto &ship: ships_copy)
+        ship->RequestStop();
+    for (const auto &ship: ships_copy)
+        ship->WaitUntilStopped();
+
+    wind->WaitUntilStopped();
 }

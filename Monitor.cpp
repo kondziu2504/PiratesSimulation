@@ -37,20 +37,6 @@ Monitor::Monitor(shared_ptr<World> world) {
     this->world = std::move(world);
 }
 
-void Monitor::Start() {
-    InitializeNcurses();
-    while(true)
-    {
-        if (stop) {
-            endwin();
-            return;
-        }
-
-        Update();
-        SleepSeconds(0.08f);
-    }
-}
-
 void Monitor::InitializeNcurses() {
     ncurses_util::Initialize();
 
@@ -79,10 +65,6 @@ void Monitor::InitializeNcurses() {
     init_pair(static_cast<short>(Tile::kCannonball), COLOR_WHITE, COLOR_BLACK);
     init_pair(static_cast<short>(Tile::kDestroyed), COLOR_GRAY, COLOR_BLACK);
     init_pair(static_cast<short>(Tile::kIndicator), COLOR_WHITE, COLOR_WHITE);
-}
-
-void Monitor::Stop() {
-    stop = true;
 }
 
 void Monitor::Update() {
@@ -491,5 +473,19 @@ void Monitor::DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect,
 
 int Monitor::GetSailorColor(int sailor_index) {
     return kSailorsColors.at(sailor_index % kSailorsColors.size());
+}
+
+void Monitor::ThreadFunc(const atomic<bool> &stop_requested) {
+    InitializeNcurses();
+    while(true)
+    {
+        if (stop_requested) {
+            endwin();
+            return;
+        }
+
+        Update();
+        SleepSeconds(0.08f);
+    }
 }
 

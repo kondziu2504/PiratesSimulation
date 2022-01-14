@@ -10,20 +10,20 @@
 #include "Sailor.h"
 #include "ShipBody.h"
 
-class Crew {
+class Crew : public Stopable {
     const std::shared_ptr<const std::vector<std::shared_ptr<Sailor>>> sailors;
 
-    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>>
-    GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *parent);
+    std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *parent);
+
+protected:
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
 public:
     Crew(int crew_size, ShipBody * operated_ship, WorldObject * parent);
-    void Start();
     void SetOrders(SailorOrder new_order);
     void SetCannonsTarget(WorldObject * target);
     void SetUseRightCannons(bool right);
     std::vector<std::shared_ptr<Sailor>> GetSailors();
-    void Kill();
 };
 
 

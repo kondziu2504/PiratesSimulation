@@ -20,16 +20,6 @@ Crew::GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *p
 Crew::Crew(int crew_size, ShipBody *operated_ship, WorldObject * parent) :
         sailors(GenerateSailors(crew_size, operated_ship, parent)){}
 
-void Crew::Start() {
-    vector<thread> sailors_threads;
-
-    for(auto sailor : *sailors)
-        sailors_threads.emplace_back(&Sailor::Start, sailor);
-
-    for(thread & sailor_thread : sailors_threads)
-        sailor_thread.join();
-}
-
 std::vector<std::shared_ptr<Sailor>> Crew::GetSailors() {
     return *sailors;
 }
@@ -44,14 +34,22 @@ void Crew::SetCannonsTarget(WorldObject *target) {
         sailor->SetCannonTarget(target);
 }
 
-void Crew::Kill() {
-    for(const auto& sailor : *sailors){
-        sailor->Kill();
-    }
-}
-
 void Crew::SetUseRightCannons(bool right) {
     for(const auto& sailor : *sailors){
         sailor->SetUseRightCannons(right);
     }
+}
+
+void Crew::ThreadFunc(const atomic<bool> &stop_requested) {
+    vector<thread> sailors_threads;
+
+    for(auto sailor : *sailors)
+        sailor->Start();
+
+    WaitUntilStopRequested();
+    for(auto sailor : *sailors)
+        sailor->RequestStop();
+
+    for(auto sailor : *sailors)
+        sailor->WaitUntilStopped();
 }

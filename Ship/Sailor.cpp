@@ -12,20 +12,6 @@
 
 using namespace std;
 
-void Sailor::Start() {
-    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction){
-        SetState(SailorState::kDead);
-        return;
-    }
-    while(true){
-        if(OperateTheShip() == SailorActionStatus::kKilledDuringAction)
-            break;
-        if(GoRest() == SailorActionStatus::kKilledDuringAction)
-            break;
-    }
-    SetState(SailorState::kDead);
-}
-
 SailorActionStatus Sailor::GoRest() {
     GoTo(ship->GetRestingPoint());
     SetState(SailorState::kResting);
@@ -116,21 +102,12 @@ SailorActionStatus Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
     return SailorActionStatus::kSuccess;
 }
 
-void Sailor::Kill(){
-    dying = true;
-    while(GetState() != SailorState::kDead);
-}
-
 std::shared_ptr<Mast> Sailor::GetOperatedMast() const {
     return operated_mast;
 }
 
 std::shared_ptr<Cannon> Sailor::GetOperatedCannon() const {
     return assigned_cannon;
-}
-
-bool Sailor::GetIsDying() const {
-    return dying;
 }
 
 std::shared_ptr<ShipObject> Sailor::GetFightingSideJunction() const {
@@ -192,7 +169,7 @@ SailorActionStatus Sailor::ProgressAction(float actionTotalTime, std::function<v
                 if(action != nullptr)
                     action(progress);
                 SetProgress(progress);
-                if(dying){
+                if(GetStopRequested()){
                     action_status = SailorActionStatus::kKilledDuringAction;
                     stop = true;
                 }
@@ -218,7 +195,7 @@ SailorActionStatus Sailor::FulfillAssignedCannonRole() {
     auto cannon_owners = assigned_cannon->GetOwners();
     if(cannon_owners.first == this){
         assigned_cannon->WaitUntilLoadedOrTimeout();
-        if(dying)
+        if(GetStopRequested())
             return SailorActionStatus::kKilledDuringAction;
         if(assigned_cannon->Loaded())
             assigned_cannon->Shoot(CalculateCannonTarget());
@@ -254,7 +231,7 @@ SailorActionStatus Sailor::SleepAndCheckKilled(float seconds) {
     while(seconds_left > 0){
         SleepSeconds(time_step);
         seconds_left -= time_step;
-        if(dying)
+        if(GetStopRequested())
             return SailorActionStatus::kKilledDuringAction;
     }
     return SailorActionStatus::kSuccess;
@@ -262,6 +239,20 @@ SailorActionStatus Sailor::SleepAndCheckKilled(float seconds) {
 
 void Sailor::SetUseRightCannons(bool right) {
     use_right_cannons = right;
+}
+
+void Sailor::ThreadFunc(const atomic<bool> &stop_requested) {
+    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction){
+        SetState(SailorState::kDead);
+        return;
+    }
+    while(true){
+        if(OperateTheShip() == SailorActionStatus::kKilledDuringAction)
+            break;
+        if(GoRest() == SailorActionStatus::kKilledDuringAction)
+            break;
+    }
+    SetState(SailorState::kDead);
 }
 
 

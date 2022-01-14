@@ -22,16 +22,17 @@ enum class MonitorDisplayMode {kMap, kDashboard};
 template<typename T>
 using s_ptr = std::shared_ptr<T>;
 
-class Monitor {
+class Monitor : public Stopable{
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed, kIndicator};
 
     s_ptr<World> world;
     std::atomic<MonitorDisplayMode> display_mode = MonitorDisplayMode::kMap;
     std::atomic<int> current_ship_ind = 0;
-    std::atomic<bool> stop = false;
 
     static const std::vector<int> kSailorsColors;
     static std::unordered_map<SailorState, std::string> sailor_states_map_strings;
+
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     static void DrawTile(Vec2i screen_coords, char character, Tile tile);
     static int GetSailorColor(int sailor_index);
@@ -68,9 +69,6 @@ class Monitor {
 
 public:
     explicit Monitor(std::shared_ptr<World> world);
-
-    void Start();
-    void Stop();
 
     void NextShip();
     void PrevShip();

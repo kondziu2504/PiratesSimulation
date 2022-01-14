@@ -19,7 +19,7 @@ Vec2f Cannonball::GetPos() {
     return origin + (target - origin) * progress;
 }
 
-void Cannonball::Live() {
+void Cannonball::ThreadFunc(const atomic<bool> &stop_requested) {
     while(true){
         progress = progress + 0.1f;
         if(progress >= 1.f){

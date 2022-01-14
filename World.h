@@ -10,12 +10,13 @@
 #include <mutex>
 #include "Util/Vec2f.h"
 #include "Util/Vec2i.h"
+#include "Stopable.h"
 
 class Ship;
 class Wind;
 class Cannonball;
 
-class World {
+class World : public Stopable{
 private:
     const int width, height;
     const std::unique_ptr<const bool[]> map;
@@ -29,15 +30,14 @@ private:
     const std::shared_ptr<Wind> wind;
     bool respawn = true;
 
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
+
     static std::unique_ptr<bool[]> GenerateMap(int map_width, int map_height, unsigned int seed);
     Vec2f FindFreeSpotForShip();
     void ShipLiveAndRespawn(std::shared_ptr<Ship> ship);
 
 public:
     World(int width, int height, int seed);
-
-    void Start();
-    void Stop();
 
     std::vector<std::shared_ptr<Ship>> GetShips() const;
     void AddShip(const std::shared_ptr<Ship>& ship);

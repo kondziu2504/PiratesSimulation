@@ -10,25 +10,6 @@
 
 using namespace std;
 
-void Wind::Start() {
-    thread wind_thread(&Wind::ThreadFun, this);
-    wind_thread.detach();
-}
-
-[[noreturn]] void Wind::ThreadFun() {
-    while(true){
-        UpdateVelocity();
-        {
-            for(const shared_ptr<Ship>& ship : world->GetShips()){
-                auto shipState = ship->GetState();
-                if(shipState == ShipState::kWandering)
-                    ship->ApplyWind(velocity);
-            }
-        }
-        usleep(100000);
-    }
-}
-
 Wind::Wind(World * world) {
     this->world = world;
 }
@@ -42,4 +23,20 @@ void Wind::UpdateVelocity() {
 Vec2f Wind::GetVelocity() {
     lock_guard<mutex> guard(wind_mutex);
     return velocity;
+}
+
+void Wind::ThreadFunc(const atomic<bool> &stop_requested) {
+    while(true){
+        UpdateVelocity();
+        {
+            for(const shared_ptr<Ship>& ship : world->GetShips()){
+                auto shipState = ship->GetState();
+                if(shipState == ShipState::kWandering)
+                    ship->ApplyWind(velocity);
+            }
+        }
+        SleepSeconds(0.1f);
+        if(stop_requested)
+            return;
+    }
 }

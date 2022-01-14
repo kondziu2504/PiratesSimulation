@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 //    for(int i = 0; i < 2; i++)
 //        world->AddRandomShip();
     Monitor monitor(world);
-    thread monitor_thread(&Monitor::Start, &monitor);
+    monitor.Start();
 
     while(true){
         char key = getchar();
@@ -40,13 +40,14 @@ int main(int argc, char *argv[]) {
         }else if(key == 'd'){
             monitor.NextShip();
         }else if(key == 27){
-            world->Stop();
-            monitor.Stop();
+            world->RequestStop();
+            monitor.RequestStop();
             break;
         }
     }
 
-    monitor_thread.join();
+    monitor.WaitUntilStopped();
+    world->WaitUntilStopped();
 
     return 0;
 }

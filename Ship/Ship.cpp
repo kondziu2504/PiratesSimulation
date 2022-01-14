@@ -29,13 +29,6 @@ Ship::Ship(Vec2f pos, Vec2f direction, int sailors_count, int masts_count, int c
     ship_controller = make_shared<ShipController>(ship_body.get(), crew.get(), this);
 }
 
-void Ship::Start() {
-    thread ship_thread(&ShipController::Start, ship_controller);
-    thread crew_thread(&Crew::Start, crew);
-    ship_thread.join();
-    crew_thread.join();
-}
-
 void Ship::ApplyWind(Vec2f wind) {
     if(GetState() == ShipState::kFighting)
             return;
@@ -53,17 +46,6 @@ void Ship::ApplyWind(Vec2f wind) {
     SetPosition(GetPosition() + GetDirection() * effective_power);
 }
 
-void Ship::Destroy() {
-    if(ship_controller->GetState() == ShipState::kSinking || ship_controller->GetState() == ShipState::kDestroyed)
-        return;
-
-    thread kill_thread([=](){
-        crew->Kill();
-        ship_controller->Kill();
-    });
-    kill_thread.detach();
-}
-
 int Ship::GetHP() const {
     return ship_body->GetHP();
 }
@@ -71,7 +53,7 @@ int Ship::GetHP() const {
 void Ship::Hit(int damage) {
     ship_body->Hit(damage);
     if(ship_body->GetHP() <= 0){
-        Destroy();
+        RequestStop();
     }
 }
 
@@ -117,6 +99,19 @@ ShipState Ship::GetState() {
 
 void Ship::PrepareForFight(Ship *enemy) {
     ship_controller->PrepareForFight(enemy);
+}
+
+void Ship::ThreadFunc(const atomic<bool> &stop_requested) {
+    ship_controller->Start();
+    crew->Start();
+
+    WaitUntilStopRequested();
+
+    crew->RequestStop();
+    ship_controller->RequestStop();
+
+    crew->WaitUntilStopped();
+    ship_controller->WaitUntilStopped();
 }
 
 

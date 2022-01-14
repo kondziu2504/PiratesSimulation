@@ -153,7 +153,7 @@ ShipController::ShipController(ShipBody *ship_body, Crew *crew, Ship *parent) {
     this->parent = parent;
 }
 
-void ShipController::Start() {
+void ShipController::ThreadFunc(const atomic<bool> &stop_requested) {
     crew->SetOrders(SailorOrder::kOperateMasts);
     while(true){
         ShipState current_state = GetState();
@@ -172,14 +172,9 @@ void ShipController::Start() {
                 crew->SetCannonsTarget(nullptr);
             }
         }
-        if(kill){
+        if(stop_requested){
             SetState(ShipState::kDestroyed);
             return;
         }
     }
-}
-
-void ShipController::Kill() {
-    kill = true;
-    SetState(ShipState::kSinking);
 }

@@ -25,16 +25,15 @@ class World;
 class Sailor;
 class Cannon;
 
-class Ship : public WorldObject {
+class Ship : public WorldObject, public Stopable {
     std::shared_ptr<ShipBody> ship_body;
     std::shared_ptr<Crew> crew;
     std::shared_ptr<ShipController> ship_controller;
 
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
+
 public:
     Ship(Vec2f pos, Vec2f direction, int sailors, int masts, int cannons_per_side, World * world);
-
-    void Start();
-    void Destroy();
 
     void ApplyWind(Vec2f wind);
     void Hit(int damage);

@@ -7,22 +7,23 @@
 
 
 #include "Util/Vec2f.h"
+#include "Stopable.h"
 #include <memory>
 #include <mutex>
+#include <atomic>
 class World;
 
-class Wind {
+class Wind : public Stopable {
     Vec2f velocity = Vec2f(1,0);
     World * world;
-
     std::mutex wind_mutex;
 
-    [[noreturn]] void ThreadFun();
+    void ThreadFunc(const std::atomic<bool> &stop_requested) override;
+
     void UpdateVelocity();
 public:
+    explicit Wind(World * world);
     Vec2f GetVelocity();
-    Wind(World * world);
-    void Start();
 };
 
 
