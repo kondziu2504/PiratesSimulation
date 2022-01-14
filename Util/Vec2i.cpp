@@ -24,3 +24,7 @@ Vec2i Vec2i::operator-(const Vec2i &second) const {
 Vec2f Vec2i::operator*(const float & second) const {
     return {(float)this->x * second, (float)this->y * second};
 }
+
+Vec2i::operator Vec2f() const {
+    return {(float)this->x, (float)this->y};
+}

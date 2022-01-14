@@ -8,7 +8,7 @@
 #include <mutex>
 #include <unistd.h>
 
-std::mt19937 mt;
+
 
 using namespace std;
 
@@ -23,13 +23,16 @@ float AngleDifference(float angle1, float angle2){
     return angle_diff;
 }
 
+
+std::mt19937 mt;
 mutex rand_mutex;
 
-float RandomTime(float min, float max){
+float RandomFromRange(float min, float max){
     lock_guard<mutex> guard(rand_mutex);
     std::uniform_real_distribution dis(min, max);
     return dis(mt);
 }
+
 
 void SleepSeconds(float seconds){
     usleep((unsigned int)(1'000'000 * seconds));

@@ -15,7 +15,7 @@ using namespace std;
 SailorActionStatus Sailor::GoRest() {
     GoTo(ship->GetRestingPoint());
     SetState(SailorState::kResting);
-    if(SleepAndCheckKilled(RandomTime(3,5)) == SailorActionStatus::kKilledDuringAction)
+    if(SleepAndCheckKilled(RandomFromRange(3, 5)) == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
     SetState(SailorState::kStanding);
     return SailorActionStatus::kSuccess;
@@ -242,7 +242,7 @@ void Sailor::SetUseRightCannons(bool right) {
 }
 
 void Sailor::ThreadFunc(const atomic<bool> &stop_requested) {
-    if(SleepAndCheckKilled(RandomTime(0,10)) == SailorActionStatus::kKilledDuringAction){
+    if(SleepAndCheckKilled(RandomFromRange(0, 10)) == SailorActionStatus::kKilledDuringAction){
         SetState(SailorState::kDead);
         return;
     }

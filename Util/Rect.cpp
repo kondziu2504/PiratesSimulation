@@ -5,12 +5,12 @@
 #include "Rect.h"
 
 Rect::Rect(int x, int y, int width, int height) :
-        x(x),
-        y(y),
-        width(width),
-        height(height) {}
+        pos(x, y),
+        size(width, height) {}
 
 bool Rect::IsPointInside(Vec2f point) {
-    return point.x >= x && point.x < x + width
-           && point.y >= y && point.y < y + height;
+    return point.x >= pos.x && point.x < pos.x + size.x
+           && point.y >= pos.y && point.y < pos.y + size.y;
 }
+
+Rect::Rect(Vec2i pos, Vec2i size) : pos(pos), size(size) {}

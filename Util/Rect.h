@@ -10,12 +10,11 @@
 #include "Vec2f.h"
 
 struct Rect {
-    int x;
-    int y;
-    int width;
-    int height;
+    Vec2i pos;
+    Vec2i size;
 
     Rect(int x, int y, int width, int height);
+    Rect(Vec2i pos, Vec2i size);
 
     bool IsPointInside(Vec2f point);
 };

@@ -10,6 +10,7 @@
 
 struct Vec2i {
     explicit Vec2i(Vec2f vec2);
+    explicit operator Vec2f() const;
 
     int x, y;
 
