@@ -19,10 +19,28 @@
 #include "Util/Vec2i.h"
 #include <sys/ioctl.h>
 
+
+#define COLOR_BROWN 8
+#define COLOR_GRAY 9
+
 using namespace std;
 
 const vector<int> Monitor::kSailorsColors = {COLOR_RED, COLOR_CYAN, COLOR_MAGENTA, COLOR_YELLOW, COLOR_GREEN};
-std::unordered_map<SailorState, std::string> Monitor::sailor_states_map_strings = {
+
+const std::unordered_map<Monitor::Tile, int> Monitor::tiles_map_color_pairs = {
+        {Monitor::Tile::kWater, ncurses_util::ColorNum(COLOR_CYAN, COLOR_BLUE)},
+        {Monitor::Tile::kShip, ncurses_util::ColorNum(COLOR_YELLOW, COLOR_BROWN)},
+        {Monitor::Tile::kLand, ncurses_util::ColorNum(COLOR_YELLOW, COLOR_GREEN)},
+        {Monitor::Tile::kSail, ncurses_util::ColorNum( COLOR_WHITE, COLOR_BROWN)},
+        {Monitor::Tile::kGray, ncurses_util::ColorNum(COLOR_GRAY, COLOR_GRAY)},
+        {Monitor::Tile::kSailor, ncurses_util::ColorNum(COLOR_YELLOW, COLOR_BLACK)},
+        {Monitor::Tile::kCannon, ncurses_util::ColorNum(COLOR_WHITE, COLOR_BLACK)},
+        {Monitor::Tile::kCannonball, ncurses_util::ColorNum(COLOR_WHITE, COLOR_BLACK)},
+        {Monitor::Tile::kDestroyed, ncurses_util::ColorNum(COLOR_GRAY, COLOR_BLACK)},
+        {Monitor::Tile::kIndicator, ncurses_util::ColorNum(COLOR_WHITE, COLOR_WHITE)}
+};
+
+const std::unordered_map<SailorState, std::string> Monitor::sailor_states_map_strings = {
         {SailorState::kResting, "Resting"},
         {SailorState::kMast, "Operating mast"},
         {SailorState::kWalking, "Walking"},
@@ -39,8 +57,9 @@ Monitor::Monitor(shared_ptr<World> world) {
 
 void Monitor::InitializeNcurses() {
     ncurses_util::Initialize();
+    ncurses_util::InitAllPossibleColorPairs();
 
-    // Override colors' values
+    // Override default colors' values
     init_color(COLOR_WHITE, 1000, 1000, 1000);
     init_color(COLOR_BLACK, 0, 0, 0);
     init_color(COLOR_RED, 1000, 350, 350);
@@ -48,23 +67,9 @@ void Monitor::InitializeNcurses() {
     init_color(COLOR_YELLOW, 1000, 1000, 250);
     init_color(COLOR_GREEN, 250, 1000, 250);
     init_color(COLOR_MAGENTA, 1000, 500, 1000);
+    // Init custom colors
     init_color(COLOR_BROWN, 500, 275, 0);
     init_color(COLOR_GRAY, 300, 300, 300);
-
-    ncurses_util::InitAllPossibleColorPairs();
-
-    // Override color pairs for convenient use with Tile enum
-    init_pair(static_cast<short>(Tile::kWater), COLOR_CYAN, COLOR_BLUE );
-    init_pair(static_cast<short>(Tile::kShip), COLOR_YELLOW, COLOR_BROWN );
-    init_pair(static_cast<short>(Tile::kLand), COLOR_YELLOW, COLOR_GREEN);
-    init_pair(static_cast<short>(Tile::kSail), COLOR_WHITE, COLOR_BROWN);
-    init_pair(static_cast<short>(Tile::kGray), COLOR_GRAY, COLOR_GRAY);
-    init_pair(static_cast<short>(Tile::kSailor), COLOR_YELLOW, COLOR_BLACK);
-    init_pair(static_cast<short>(Tile::kStairs), COLOR_YELLOW, COLOR_BLACK);
-    init_pair(static_cast<short>(Tile::kCannon), COLOR_WHITE, COLOR_BLACK);
-    init_pair(static_cast<short>(Tile::kCannonball), COLOR_WHITE, COLOR_BLACK);
-    init_pair(static_cast<short>(Tile::kDestroyed), COLOR_GRAY, COLOR_BLACK);
-    init_pair(static_cast<short>(Tile::kIndicator), COLOR_WHITE, COLOR_WHITE);
 }
 
 void Monitor::Update() {
@@ -108,7 +113,7 @@ Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
 }
 
 void Monitor::DrawTile(Vec2i screen_coords, char character, Tile tile) {
-    ncurses_util::AddTextColorPair(screen_coords, character, (int)tile);
+    ncurses_util::AddTextColorPair(screen_coords, character, GetTileColorPair(tile));
 }
 
 void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
@@ -166,8 +171,8 @@ void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
 
 void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     ncurses_util::ConsoleWriter console_writer({0, 0});
-    string health = ship->GetState() == ShipState::kDestroyed ? "Zniszczony" : "Zdrowie: " + to_string(ship->GetHP());
-    string header = "Statek(" + health + ")";
+    string health = ship->GetState() == ShipState::kDestroyed ? "Destroyed" : "Health: " + to_string(ship->GetHP());
+    string header = "Ship(" + health + ")";
     console_writer.AddLine(header);
     console_writer.ModifyIndent(2);
     DrawDashboardSailors(ship, console_writer);
@@ -176,12 +181,12 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
 }
 
 void Monitor::DrawDashboardSailors(shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) {
-    console_writer.AddLine("Marynarze:");
+    console_writer.AddLine("Sailors:");
     console_writer.ModifyIndent(2);
     int sailor_index = 0;
     for(const auto& sailor : ship->GetSailors()){
         string state_text = sailor_states_map_strings.at(sailor->GetState());
-        string sailor_text = "Marynarz " + to_string(sailor_index) + " " + state_text;
+        string sailor_text = "Sailor " + to_string(sailor_index) + " " + state_text;
         auto sailor_color = GetSailorColor(sailor_index);
         console_writer.AddLine(sailor_text, sailor_color);
         sailor_index++;
@@ -190,7 +195,7 @@ void Monitor::DrawDashboardSailors(shared_ptr<Ship> &ship, ncurses_util::Console
 }
 
 void Monitor::DrawDashboardMasts(shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) const {
-    console_writer.AddLine("Maszty:");
+    console_writer.AddLine("Masts:");
     console_writer.ModifyIndent(2);
     int mast_index = 0;
     {
@@ -198,8 +203,8 @@ void Monitor::DrawDashboardMasts(shared_ptr<Ship> &ship, ncurses_util::ConsoleWr
         for(const auto& mast_owners_pair : *ship->GetMastDistributor()->masts_owners){
             bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
             string mast_text =
-                    "Maszt " + to_string(mast_index) +
-                    " Obslugiwany przez: " + to_string(mast_owners_pair.second->size()) +
+                    "Mast " + to_string(mast_index) +
+                    " Operated by: " + to_string(mast_owners_pair.second->size()) +
                     " " + (max_owners ? "(max)" : "");
             console_writer.AddLine(mast_text);
             mast_index++;
@@ -217,7 +222,7 @@ void Monitor::DrawDashboardCannons(const vector<shared_ptr<Cannon>>& cannons, nc
             owners++;
         if(cannon_owners.second != nullptr)
             owners++;
-        string cannon_message = "Armata " + to_string(cannon_ind) + " Obslugiwana przez: " + to_string(owners) +
+        string cannon_message = "Cannon " + to_string(cannon_ind) + " Operated by: " + to_string(owners) +
                 (owners == 2 ? "(Max)" : "");
         console_writer.AddLine(cannon_message);
         cannon_ind++;
@@ -301,11 +306,16 @@ void Monitor::DrawShipDeckFloor(const Rect &screen_rect) const {
     }
 }
 
-void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const string& label, int diameter) {
+void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, int diameter, const std::string &label,
+                                  const std::string &sub_label) {
     int arrow_length = (diameter - 1) / 2;
     int angles = arrow_length * 7;
+
     Vec2i offset_for_centered_label((int)((float)diameter / 2.f - (float)label.length() / 2.f), 0);
     ncurses_util::AddText(screen_coords + offset_for_centered_label, label);
+    Vec2i offset_for_centered_sub_label((int)((float)diameter / 2.f - (float)sub_label.length() / 2.f), 1);
+    ncurses_util::AddText(screen_coords + offset_for_centered_sub_label, sub_label);
+
     Vec2i circle_center(screen_coords.x + arrow_length, screen_coords.y + arrow_length + 1);
     for(int i = 0; i < angles; i++){
         float angle = (float)i / (float)angles * 2.f * (float)M_PI;
@@ -325,26 +335,26 @@ void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const 
 void Monitor::DrawWindDirIndicator(Vec2i offset, int size) {
     Vec2f wind_velocity = world->GetWind()->GetVelocity();
     float wind_angle = wind_velocity.Angle();
-    DrawCircleIndicator(offset, wind_angle, "Kierunek wiatru", size);
+    DrawCircleIndicator(offset, wind_angle, size, "Wind direction", "(Global)");
 }
 
 void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const shared_ptr<Ship>& ship) {
-    DrawCircleIndicator(offset, ship->GetDirection().Angle(), "Kierunek statku", size);
+    DrawCircleIndicator(offset, ship->GetDirection().Angle(), size, "Ship direction", "(Global)");
 }
 
 void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<Ship>& ship) {
     float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
-    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float)M_PI / 2, "Docelowy kat zagli",
-                        size);
+    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float) M_PI / 2,
+                        size, "Target sails direction", "(Local)");
 }
 
 void Monitor::DrawShipInfo(const shared_ptr<Ship>& ship) {
     DrawDashboard(ship);
-    DrawShipDeck(ship, {40, 0, 29, 50});
-    DrawWindDirIndicator({71, 0}, 18);
-    DrawShipDirIndicator({71, 20}, 18, ship);
-    DrawSailTargetDirIndicator({71, 40}, 18, ship);
+    DrawShipDeck(ship, {36, 0, 29, 50});
+    DrawWindDirIndicator({69, 0}, 18);
+    DrawShipDirIndicator({69, 20}, 18, ship);
+    DrawSailTargetDirIndicator({69, 40}, 18, ship);
     int map_view_size = 50;
     Rect viewport_centered_on_ship((int)ship->GetPosition().x - map_view_size / 2,
                                    (int)ship->GetPosition().y - map_view_size / 2,
@@ -384,15 +394,15 @@ void Monitor::ChangeDisplayMode() {
 }
 
 void Monitor::DrawDashboardCannons(const std::shared_ptr<Ship>& ship, ncurses_util::ConsoleWriter &console_writer) const {
-    console_writer.AddLine("Armaty:");
+    console_writer.AddLine("Cannons:");
     console_writer.ModifyIndent(1);
 
-    console_writer.AddLine("Lewa strona:");
+    console_writer.AddLine("Left side:");
     console_writer.ModifyIndent(1);
     DrawDashboardCannons(ship->GetLeftCannons(), console_writer);
     console_writer.ModifyIndent(-1);
 
-    console_writer.AddLine("Prawa strona:");
+    console_writer.AddLine("Right side:");
     console_writer.ModifyIndent(1);
     DrawDashboardCannons(ship->GetRightCannons(), console_writer);
     console_writer.ModifyIndent(-2);
@@ -466,7 +476,7 @@ void Monitor::DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect,
             current_sailor_pos = prev_target_pos + (Vec2i)((next_target_pos - prev_target_pos) * progress);
         }
         Vec2i sailor_screen_coords = (Vec2i)current_sailor_pos + Vec2i(screen_rect.x, screen_rect.y);
-        ncurses_util::AddText(sailor_screen_coords, "S", GetSailorColor(sailor_index));
+        ncurses_util::AddText(sailor_screen_coords, 'S', GetSailorColor(sailor_index));
         ++sailor_index;
     }
 }
@@ -487,5 +497,9 @@ void Monitor::ThreadFunc(const atomic<bool> &stop_requested) {
         Update();
         SleepSeconds(0.08f);
     }
+}
+
+int Monitor::GetTileColorPair(Monitor::Tile tile) {
+    return tiles_map_color_pairs.at(tile);
 }
 

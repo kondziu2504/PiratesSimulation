@@ -23,20 +23,22 @@ template<typename T>
 using s_ptr = std::shared_ptr<T>;
 
 class Monitor : public Stopable{
-    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kStairs, kCannon, kCannonball, kDestroyed, kIndicator};
+    enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kCannon, kCannonball, kDestroyed, kIndicator};
 
     s_ptr<World> world;
     std::atomic<MonitorDisplayMode> display_mode = MonitorDisplayMode::kMap;
     std::atomic<int> current_ship_ind = 0;
 
     static const std::vector<int> kSailorsColors;
-    static std::unordered_map<SailorState, std::string> sailor_states_map_strings;
+    static const std::unordered_map<SailorState, std::string> sailor_states_map_strings;
+    static const std::unordered_map<Tile, int> tiles_map_color_pairs;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     static void DrawTile(Vec2i screen_coords, char character, Tile tile);
     static int GetSailorColor(int sailor_index);
     static void InitializeNcurses();
+    static int GetTileColorPair(Tile tile);
 
     void Update();
 
@@ -62,7 +64,8 @@ class Monitor : public Stopable{
     void DrawShipDeckMasts(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions);
     void DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions);
 
-    void DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, const std::string& label, int diameter);
+    void DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, int diameter, const std::string &label,
+                             const std::string &sub_label = "");
     void DrawWindDirIndicator(Vec2i offset, int size);
     void DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr <Ship>& ship);
     void DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<Ship>& ship);

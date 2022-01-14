@@ -27,45 +27,25 @@ void ncurses_util::Initialize() {
     start_color();
 }
 
-short ncurses_util::CursColor(int fg) {
-    switch (7 & fg) {           /* RGB */
-        case 0:                     /* 000 */
-            return (COLOR_BLACK);
-        case 1:                     /* 001 */
-            return (COLOR_RED);
-        case 2:                     /* 010 */
-            return (COLOR_GREEN);
-        case 3:                     /* 011 */
-            return (COLOR_YELLOW);
-        case 4:                     /* 100 */
-            return (COLOR_BLUE);
-        case 5:                     /* 101 */
-            return (COLOR_MAGENTA);
-        case 6:                     /* 110 */
-            return (COLOR_CYAN);
-        case 7:                     /* 111 */
-            return (COLOR_WHITE);
-        default:
-            return (COLOR_BLACK);
-    }
+short ncurses_util::CursColor(int color) {
+    return (short)(15 & color);
 }
 
 int ncurses_util::ColorNum(int fg, int bg) {
-    int B, bbb, ffff;
+    int bbbb, ffff;
 
-    B = 1 << 7;
-    bbb = (7 & bg) << 4;
-    ffff = 7 & fg;
+    bbbb = (15 & bg) << 4;
+    ffff = (15 & fg);
 
-    return (B | bbb | ffff);
+    return (bbbb | ffff);
 }
 
 void ncurses_util::InitAllPossibleColorPairs() {
     int fg, bg;
     int color_pair;
 
-    for (bg = 0; bg <= 7; bg++) {
-        for (fg = 0; fg <= 7; fg++) {
+    for (bg = 0; bg < 16; bg++) {
+        for (fg = 0; fg < 16; fg++) {
             color_pair = ncurses_util::ColorNum(fg, bg);
             init_pair(color_pair, ncurses_util::CursColor(fg), ncurses_util::CursColor(bg));
         }
@@ -93,7 +73,7 @@ void ncurses_util::AddTextColorPair(Vec2i screen_coords, std::string text, int c
 }
 
 void ncurses_util::AddText(Vec2i screen_coords, char character, int fg_color, int bg_color) {
-    AddText(screen_coords, to_string(character), fg_color, bg_color);
+    AddText(screen_coords, string(1, character), fg_color, bg_color);
 }
 
 void ncurses_util::AddTextColorPair(Vec2i screen_coords, char character, int color_pair) {

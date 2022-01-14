@@ -13,6 +13,7 @@ class Stopable {
     std::condition_variable stop_requested_c_var;
     std::atomic<bool> stop_requested = false;
     std::atomic<bool> stopped = false;
+    std::mutex stopped_mutex;
 
 protected:
     virtual void ThreadFunc(const std::atomic<bool> &stop_requested) = 0;

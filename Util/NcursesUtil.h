@@ -9,12 +9,9 @@
 #include "Vec2i.h"
 #include <ncurses.h>
 
-#define COLOR_BROWN 8
-#define COLOR_GRAY 9
-
 namespace ncurses_util {
     void Initialize();
-    short CursColor(int fg);
+    short CursColor(int color);
     int ColorNum(int fg, int bg);
     void InitAllPossibleColorPairs();
     void SetColor(int fg, int bg);

@@ -5,9 +5,12 @@
 #include "Stopable.h"
 #include <thread>
 
+using namespace std;
+
 void Stopable::Start() {
-    std::thread _thread([this](){
+    thread _thread([this](){
         ThreadFunc(stop_requested);
+        lock_guard<mutex> guard(stopped_mutex);
         stopped = true;
         thread_func_finished.notify_all();
     });
@@ -20,18 +23,17 @@ void Stopable::RequestStop() {
 }
 
 void Stopable::WaitUntilStopped() {
+    unique_lock<mutex> lock(stopped_mutex);
     if(stopped)
         return;
-    std::mutex c_var_mutex;
-    std::unique_lock<std::mutex> lock(c_var_mutex);
     thread_func_finished.wait(lock, [this](){return stopped.load();});
 }
 
 void Stopable::WaitUntilStopRequested() {
     if(stop_requested)
         return;
-    std::mutex c_var_mutex;
-    std::unique_lock<std::mutex> lock(c_var_mutex);
+    mutex c_var_mutex;
+    unique_lock<mutex> lock(c_var_mutex);
     stop_requested_c_var.wait(lock, [this](){return stop_requested.load();});
 }
 
