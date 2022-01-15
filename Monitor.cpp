@@ -51,9 +51,7 @@ const std::unordered_map<SailorState, std::string> Monitor::sailor_states_map_st
         {SailorState::kDead, "Dead"}
 };
 
-Monitor::Monitor(World * world) {
-    this->world = world;
-}
+Monitor::Monitor(World * world) : world(world) { }
 
 void Monitor::InitializeNcurses() {
     ncurses_util::InitAllPossibleColorPairs();
@@ -83,14 +81,12 @@ void Monitor::Update() {
 }
 
 void Monitor::DrawChosenShip() {
-    Ship * chosen_ship = nullptr;
-    {
-        auto ships = world->GetShips();
-        if(!ships.empty() && current_ship_ind < ships.size())
-            chosen_ship = ships.at(current_ship_ind);
-    }
-    if(chosen_ship != nullptr)
+    shared_ptr<Ship> chosen_ship;
+    auto ships = world->GetShips();
+    if(!ships.empty() && current_ship_ind < ships.size()){
+        chosen_ship = ships.at(current_ship_ind).lock();
         DrawShipInfo(chosen_ship);
+    }
 }
 
 void
@@ -133,7 +129,7 @@ void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
     DrawCannonballs(screen_offset, world_viewport);
 }
 
-void Monitor::DrawShip(const Ship * ship, Vec2i screen_offset, Rect world_viewport) {
+void Monitor::DrawShip(const std::shared_ptr<const Ship> & ship, Vec2i screen_offset, Rect world_viewport) {
     Vec2f ship_pos = ship->GetPosition();
     Vec2f ship_dir = ship->GetDirection();
 
@@ -163,12 +159,14 @@ void Monitor::DrawShip(const Ship * ship, Vec2i screen_offset, Rect world_viewpo
 }
 
 void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
-    for(const Ship * ship : world->GetShips()) {
-        DrawShip(ship, offset, world_viewport);
+    for(const auto ship : world->GetShips()) {
+        auto _ship = ship.lock();
+        if(_ship)
+            DrawShip(_ship, offset, world_viewport);
     }
 }
 
-void Monitor::DrawDashboard(const Ship * ship) {
+void Monitor::DrawDashboard(const std::shared_ptr<const Ship> & ship) {
     ncurses_util::ConsoleWriter console_writer({0, 0});
     string health = ship->GetState() == ShipState::kDestroyed ? "Destroyed" : "Health: " + to_string(ship->GetHP());
     string header = "Ship(" + health + ")";
@@ -179,7 +177,7 @@ void Monitor::DrawDashboard(const Ship * ship) {
     DrawDashboardCannons(ship, console_writer);
 }
 
-void Monitor::DrawDashboardSailors(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer) {
+void Monitor::DrawDashboardSailors(const std::shared_ptr<const Ship> & ship, ncurses_util::ConsoleWriter &console_writer) {
     console_writer.AddLine("Sailors:");
     console_writer.ModifyIndent(2);
     int sailor_index = 0;
@@ -193,7 +191,7 @@ void Monitor::DrawDashboardSailors(const Ship * &ship, ncurses_util::ConsoleWrit
     console_writer.ModifyIndent(-2);
 }
 
-void Monitor::DrawDashboardMasts(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer) const {
+void Monitor::DrawDashboardMasts(const std::shared_ptr<const Ship> & ship, ncurses_util::ConsoleWriter &console_writer) const {
     console_writer.AddLine("Masts:");
     console_writer.ModifyIndent(2);
 
@@ -227,7 +225,7 @@ void Monitor::DrawDashboardCannons(const vector<Cannon *>& cannons, ncurses_util
     }
 }
 
-void Monitor::DrawShipDeck(const Ship * ship, Rect screen_rect) {
+void Monitor::DrawShipDeck(const std::shared_ptr<const Ship> & ship, Rect screen_rect) {
     s_ptr<std::unordered_map<ShipObject *, Vec2i>> elements_positions = GenerateElementsPositions(ship, screen_rect);
     DrawShipDeckFloor(screen_rect);
     DrawShipDeckCannons(ship, screen_rect, elements_positions);
@@ -235,7 +233,7 @@ void Monitor::DrawShipDeck(const Ship * ship, Rect screen_rect) {
     DrawShipDeckSailors(ship, screen_rect, elements_positions);
 }
 
-s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPositions(const Ship *ship, const Rect &screen_rect) const {
+s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPositions(const std::shared_ptr<const Ship> & ship, const Rect &screen_rect) const {
     s_ptr<std::unordered_map<ShipObject *, Vec2i>> elements_positions = make_shared<unordered_map<ShipObject *, Vec2i>>();
     auto masts = ship->GetMasts();
     int first_mast_y, last_mast_y;
@@ -336,18 +334,18 @@ void Monitor::DrawWindDirIndicator(Vec2i offset, int size) {
     DrawCircleIndicator(offset, wind_angle, size, "Wind direction", "(Global)");
 }
 
-void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const Ship * ship) {
+void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship) {
     DrawCircleIndicator(offset, ship->GetDirection().Angle(), size, "Ship direction", "(Global)");
 }
 
-void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const Ship * ship) {
+void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship) {
     float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
     DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float) M_PI / 2,
                         size, "Target sails direction", "(Local)");
 }
 
-void Monitor::DrawShipInfo(const Ship * ship) {
+void Monitor::DrawShipInfo(const std::shared_ptr<const Ship> & ship) {
     DrawDashboard(ship);
     DrawShipDeck(ship, {36, 0, 29, 50});
     DrawWindDirIndicator({69, 0}, 18);
@@ -391,7 +389,7 @@ void Monitor::ChangeDisplayMode() {
         display_mode = MonitorDisplayMode::kMap;
 }
 
-void Monitor::DrawDashboardCannons(const Ship * ship, ncurses_util::ConsoleWriter &console_writer) const {
+void Monitor::DrawDashboardCannons(const std::shared_ptr<const Ship> & ship, ncurses_util::ConsoleWriter &console_writer) const {
     console_writer.AddLine("Cannons:");
     console_writer.ModifyIndent(1);
 
@@ -406,7 +404,7 @@ void Monitor::DrawDashboardCannons(const Ship * ship, ncurses_util::ConsoleWrite
     console_writer.ModifyIndent(-2);
 }
 
-void Monitor::DrawShipDeckCannons(const Ship * ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
+void Monitor::DrawShipDeckCannons(const std::shared_ptr<const Ship> & ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     for(const auto& cannon : ship->GetRightCannons()){
         Vec2i cannon_pos = elements_positions->find(cannon)->second;
         Vec2i screen_coords = screen_rect.pos + cannon_pos;
@@ -420,7 +418,7 @@ void Monitor::DrawShipDeckCannons(const Ship * ship, Rect screen_rect, const s_p
     }
 }
 
-void Monitor::DrawShipDeckMasts(const Ship * ship, Rect screen_rect,
+void Monitor::DrawShipDeckMasts(const std::shared_ptr<const Ship> & ship, Rect screen_rect,
                                 const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     auto masts = ship->GetMasts();
     int mast_ind = 0;
@@ -436,7 +434,7 @@ void Monitor::DrawShipDeckMasts(const Ship * ship, Rect screen_rect,
     }
 }
 
-void Monitor::DrawShipDeckSailors(const Ship * ship, Rect screen_rect,
+void Monitor::DrawShipDeckSailors(const std::shared_ptr<const Ship> & ship, Rect screen_rect,
                                   const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     int sailor_index = 0;
     for(const auto& sailor : ship->GetSailors()){
@@ -468,8 +466,10 @@ void Monitor::DrawShipDeckSailors(const Ship * ship, Rect screen_rect,
                 default: break;
             }
         } else{
-            Vec2i prev_target_pos = elements_positions->find(sailor->GetPreviousTarget())->second;
-            Vec2i next_target_pos = elements_positions->find(sailor->GetNextTarget())->second;
+            auto prev_target = sailor->GetPreviousTarget();
+            Vec2i prev_target_pos = elements_positions->find(prev_target != nullptr ? prev_target : ship->GetRestingPoint())->second;
+            auto next_target = sailor->GetNextTarget();
+            Vec2i next_target_pos = elements_positions->find(next_target != nullptr ? next_target : ship->GetRestingPoint())->second;
             float progress = sailor->GetProgress();
 
             current_sailor_pos = prev_target_pos + (Vec2i)((next_target_pos - prev_target_pos) * progress);

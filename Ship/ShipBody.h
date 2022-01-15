@@ -7,12 +7,13 @@
 
 
 #include "ShipLayout.h"
+#include "MastDistributor.h"
 
 class ShipBody {
     int hp;
-    float length;
-    std::unique_ptr<ShipLayout> ship_layout;
-    std::unique_ptr<MastDistributor> distributor;
+    const float length;
+    const std::unique_ptr<ShipLayout> ship_layout;
+    const std::unique_ptr<MastDistributor> distributor;
 
 public:
     explicit ShipBody(WorldObject * parent, int hp = 10, float length = 6, int mast_count = 3, int cannons_per_side = 3);
@@ -20,14 +21,14 @@ public:
     int GetHP() const;
     void Hit(int damage);
     float GetLength() const;
-    MastDistributor * GetMastDistributor();
+    MastDistributor * GetMastDistributor() const;
 
-    ShipObject * GetLeftJunction();
-    ShipObject * GetRightJunction();
-    std::vector<Cannon *> GetLeftCannons();
-    std::vector<Cannon *> GetRightCannons();
-    ShipObject * GetRestingPoint();
-    std::vector<Mast *> GetMasts();
+    ShipObject * GetLeftJunction() const;
+    ShipObject * GetRightJunction() const;
+    std::vector<Cannon *> GetLeftCannons() const;
+    std::vector<Cannon *> GetRightCannons() const;
+    ShipObject * GetRestingPoint() const;
+    std::vector<Mast *> GetMasts() const;
 };
 
 

@@ -15,13 +15,11 @@
 using namespace std;
 
 Ship::Ship(Vec2f pos, Vec2f direction, int sailors_count, int masts_count, int cannons_per_side, World * world) :
-        WorldObject(direction.Normalized(), pos, world)
+        WorldObject(direction.Normalized(), pos, world),
+        ship_body(move(make_unique<ShipBody>(this, 10, 6, masts_count, cannons_per_side))),
+        crew(move(make_unique<Crew>(sailors_count, ship_body.get(), this))),
+        ship_controller(move(make_unique<ShipController>(crew.get(), this)))
 {
-    const int kShipHealth = 10;
-    const int kShipLength = 6;
-    ship_body = make_shared<ShipBody>(this, kShipHealth, kShipLength, masts_count, cannons_per_side);
-    crew = make_shared<Crew>(sailors_count, ship_body.get(), this);
-    ship_controller = make_shared<ShipController>(crew.get(), this);
 }
 
 void Ship::ApplyWind(Vec2f wind) {
@@ -92,8 +90,8 @@ ShipState Ship::GetState() const {
     return ship_controller->GetState();
 }
 
-void Ship::PrepareForFight(Ship *enemy) {
-    ship_controller->PrepareForFight(enemy);
+void Ship::PrepareForFight(const weak_ptr<Ship>& enemy) {
+    ship_controller->PrepareForFight(enemy.lock());
 }
 
 void Ship::ThreadFunc(const atomic<bool> &stop_requested) {

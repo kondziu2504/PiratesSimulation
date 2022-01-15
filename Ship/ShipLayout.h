@@ -11,22 +11,25 @@
 #include "Cannon.h"
 
 class ShipLayout {
-    std::vector<std::unique_ptr<Mast>> masts;
-    std::unique_ptr<ShipObject> left_junction;
-    std::unique_ptr<ShipObject> right_junction;
-    std::vector<std::unique_ptr<Cannon>> left_cannons;
-    std::vector<std::unique_ptr<Cannon>> right_cannons;
-    std::unique_ptr<ShipObject> resting_point;
+    const std::vector<std::unique_ptr<Mast>> masts;
+    const std::unique_ptr<ShipObject> left_junction;
+    const std::unique_ptr<ShipObject> right_junction;
+    const std::vector<std::unique_ptr<Cannon>> left_cannons;
+    const std::vector<std::unique_ptr<Cannon>> right_cannons;
+    const std::unique_ptr<ShipObject> resting_point;
+
+    static std::vector<std::unique_ptr<Mast>> GenerateMasts(int masts_count, WorldObject * parent);
+    static std::vector<std::unique_ptr<Cannon>> GenerateCannons(int num_of_cannons, float ship_length, WorldObject * parent);
 
 public:
     ShipLayout(int masts_count, int cannons_per_side, float ship_length, WorldObject * parent);
 
-    ShipObject * GetLeftJunction();
-    ShipObject * GetRightJunction();
-    std::vector<Cannon *> GetLeftCannons();
-    std::vector<Cannon *> GetRightCannons();
-    ShipObject * GetRestingPoint();
-    std::vector<Mast *> GetMasts();
+    ShipObject * GetLeftJunction() const;
+    ShipObject * GetRightJunction() const;
+    std::vector<Cannon *> GetLeftCannons() const;
+    std::vector<Cannon *> GetRightCannons() const;
+    ShipObject * GetRestingPoint() const;
+    std::vector<Mast *> GetMasts() const;
 };
 
 

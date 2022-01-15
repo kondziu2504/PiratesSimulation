@@ -39,7 +39,7 @@ private:
 public:
     World(int width, int height, int seed);
 
-    std::vector<Ship *> GetShips() const;
+    std::vector<std::weak_ptr<Ship>> GetShips() const;
     void AddShip(const std::shared_ptr<Ship>& ship);
     void AddRandomShip();
     std::vector<std::shared_ptr<Cannonball>> GetCannonballs() const;

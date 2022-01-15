@@ -14,6 +14,7 @@
 
 class Sailor;
 class World;
+
 template<typename T>
 using s_ptr = std::shared_ptr<T>;
 

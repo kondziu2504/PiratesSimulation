@@ -9,14 +9,19 @@
 
 using namespace std;
 
-void ShipController::EngageFight(Ship *enemy_ship) {
-    if(enemy_ship->GetState() == ShipState::kFighting)
-        return;
-    PrepareForFight(enemy_ship);
-    enemy_ship->PrepareForFight(parent);
+void ShipController::TryEngageFight(const std::weak_ptr<Ship> & enemy_ship) {
+    auto _enemy_ship = enemy_ship.lock();
+    if(_enemy_ship){
+        auto enemy_state = _enemy_ship->GetState();
+        if(enemy_state == ShipState::kFighting or enemy_state == ShipState::kSinking or enemy_state == ShipState::kDestroyed)
+            return;
+
+        PrepareForFight(enemy_ship);
+        _enemy_ship->PrepareForFight(parent->weak_from_this());
+    }
 }
 
-void ShipController::PrepareForFight(Ship *ship) {
+void ShipController::PrepareForFight(const weak_ptr<Ship>& ship) {
     enemy = ship;
     SetState(ShipState::kFighting);
     crew->SetOrders(SailorOrder::kOperateCannons);
@@ -26,22 +31,29 @@ void ShipController::PrepareForFight(Ship *ship) {
 bool ShipController::LookForEnemy() {
     parent->GetPosition();
     for(const auto& ship : parent->GetWorld()->GetShips()){
-        if(ship != parent &&
-           ship->GetState() != ShipState::kSinking &&
-           ship->GetState() != ShipState::kDestroyed){
-            float dist = (ship->GetPosition() - parent->GetPosition()).Length();
-            if(dist < enemy_lookout_radius){
-                EngageFight(ship);
-                return true;
+        auto _ship = ship.lock();
+        if(_ship){
+            if(_ship.get() != parent &&
+               _ship->GetState() != ShipState::kSinking &&
+               _ship->GetState() != ShipState::kDestroyed){
+                float dist = (_ship->GetPosition() - parent->GetPosition()).Length();
+                if(dist < enemy_lookout_radius){
+                    TryEngageFight(_ship);
+                    return true;
+                }
             }
         }
+
     }
     return false;
 }
 
 void ShipController::GetInPosition() {
-    float fighting_angle = DetermineAngleToFaceEnemy();
-    StartTurningTowardsAngle(fighting_angle);
+    auto _enemy = enemy.lock();
+    if(_enemy){
+        float fighting_angle = DetermineAngleToFaceEnemy(_enemy);
+        StartTurningTowardsAngle(fighting_angle);
+    }
 }
 
 void ShipController::StartTurningTowardsAngle(float target_angle) {
@@ -57,7 +69,7 @@ void ShipController::StartTurningTowardsAngle(float target_angle) {
     }
 }
 
-float ShipController::DetermineAngleToFaceEnemy() {
+float ShipController::DetermineAngleToFaceEnemy(const shared_ptr<Ship> & enemy) {
     Vec2f to_enemy = enemy->GetPosition() - parent->GetPosition();
     Vec2f dir_with_cannons_on_left = to_enemy.Rotated(M_PI_2);
     Vec2f dir_with_cannons_on_right = to_enemy.Rotated(-M_PI_2);
@@ -78,7 +90,7 @@ void ShipController::SetState(ShipState new_state) {
     state = new_state;
 }
 
-ShipState ShipController::GetState() {
+ShipState ShipController::GetState() const {
     return state;
 }
 
@@ -112,9 +124,11 @@ Vec2f ShipController::CalculateCorrectionAgainstLand(float & closest_tile_dist) 
 
 Vec2f ShipController::CalculateCorrectionAgainstShips(float &closest_tile_dist) const {
     Vec2f correction;
-    for(const auto ship : parent->GetWorld()->GetShips()){
-        if(ship != parent){
-            Vec2f ship_pos = ship->GetPosition();
+    for(const auto& ship : parent->GetWorld()->GetShips()){
+        auto _ship = ship.lock();
+
+        if(_ship && _ship.get() != parent){
+            Vec2f ship_pos = _ship->GetPosition();
             float dist = (parent->GetPosition() - ship_pos).Length();
             if(dist < obstacles_lookout_radius && dist > 0){
                 Vec2f correction_dir = (parent->GetPosition()  - ship_pos).Normalized();
@@ -138,10 +152,7 @@ void ShipController::ApplyCorrection(float closest_tile_dist, Vec2f correction) 
     }
 }
 
-ShipController::ShipController(Crew *crew, Ship *parent) {
-    this->crew = crew;
-    this->parent = parent;
-}
+ShipController::ShipController(Crew *crew, Ship *parent) : crew(crew), parent(parent) { }
 
 void ShipController::ThreadFunc(const atomic<bool> &stop_requested) {
     crew->SetOrders(SailorOrder::kOperateMasts);
@@ -155,11 +166,13 @@ void ShipController::ThreadFunc(const atomic<bool> &stop_requested) {
             SleepSeconds(0.1f);
         }else if(current_state == ShipState::kFighting){
             GetInPosition();
-            if(enemy->GetState() == ShipState::kSinking || enemy->GetState() == ShipState::kDestroyed) {
-                enemy = nullptr;
+            auto _enemy = enemy.lock();
+            if(!_enemy || _enemy->GetState() == ShipState::kSinking || _enemy->GetState() == ShipState::kDestroyed)
+            {
+                enemy = weak_ptr<Ship>();
                 SetState(ShipState::kWandering);
                 crew->SetOrders(SailorOrder::kOperateMasts);
-                crew->SetCannonsTarget(nullptr);
+                crew->SetCannonsTarget(weak_ptr<Ship>());
             }
         }
         if(stop_requested){

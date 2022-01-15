@@ -29,7 +29,7 @@ void Crew::SetOrders(SailorOrder new_order) {
         sailor->SetCurrentOrder(new_order);
 }
 
-void Crew::SetCannonsTarget(WorldObject *target) {
+void Crew::SetCannonsTarget(const weak_ptr<WorldObject> & target) {
     for(const auto& sailor : sailors)
         sailor->SetCannonTarget(target);
 }

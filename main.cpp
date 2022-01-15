@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     ReadWorldSettingsFromArgs(argc, argv, seed, world_width, world_height);
 
     World world(world_width, world_height, seed);
-    SpawnRandomShips(1, &world);
+    SpawnRandomShips(5, &world);
 
     world.Start();
 

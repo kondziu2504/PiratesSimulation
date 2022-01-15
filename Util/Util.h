@@ -36,4 +36,14 @@ std::vector<T*> MapToRawPointers(const std::vector<std::shared_ptr<T>> & shared_
     return std::move(raw_pointers);
 }
 
+template<typename T>
+std::vector<std::weak_ptr<T>> MapToWeakPointers(const std::vector<std::shared_ptr<T>> & shared_pointers)  {
+    std::vector<std::weak_ptr<T>> weak_pointers(shared_pointers.size());
+    std::transform(
+            shared_pointers.begin(), shared_pointers.end(),
+            weak_pointers.begin(),
+            [](const std::shared_ptr<T> & s_ptr) -> std::weak_ptr<T> {return s_ptr;}
+    );
+    return std::move(weak_pointers);
+}
 #endif //PIRATESSIMULATION_UTIL_H

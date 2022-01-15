@@ -21,9 +21,12 @@ void Cannonball::ThreadFunc(const atomic<bool> &stop_requested) {
         progress = progress + 0.1f;
         if(progress >= 1.f){
             for(const auto& ship : world->GetShips()) {
-                if((ship->GetPosition() - GetPos()).Length() < 3){
-                    ship->Hit(1);
-                    break;
+                auto _ship = ship.lock();
+                if(_ship){
+                    if((_ship->GetPosition() - GetPos()).Length() < 3){
+                        _ship->Hit(1);
+                        break;
+                    }
                 }
             }
             dead = true;

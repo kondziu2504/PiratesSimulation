@@ -13,23 +13,23 @@
 class Ship;
 
 class ShipController : public Stoppable {
-    Crew * crew;
+    Crew * const crew;
 
     std::atomic<ShipState> state = ShipState::kWandering;
-    Ship * parent = nullptr;
-    Ship * enemy = nullptr;
+    Ship * const parent = nullptr;
+    std::weak_ptr<Ship> enemy;
     const float enemy_lookout_radius = 9.f;
     const float obstacles_lookout_radius = 9.f;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     // Fighting
-    void EngageFight(Ship * enemy_ship);
+    void TryEngageFight(const std::weak_ptr<Ship> & enemy_ship);
 
     bool LookForEnemy();
     void GetInPosition();
     void StartTurningTowardsAngle(float target_angle);
-    float DetermineAngleToFaceEnemy();
+    float DetermineAngleToFaceEnemy(const std::shared_ptr<Ship> & enemy);
 
     void SetState(ShipState new_state);
     void AdjustDirection();
@@ -40,8 +40,8 @@ class ShipController : public Stoppable {
 
 public:
     explicit ShipController(Crew *crew, Ship *parent);
-    ShipState GetState();
-    void PrepareForFight(Ship * ship);
+    ShipState GetState() const;
+    void PrepareForFight(const std::weak_ptr<Ship>& ship);
 };
 
 

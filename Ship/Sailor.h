@@ -36,7 +36,7 @@ class Sailor : public Stoppable {
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     SailorOrder current_order = SailorOrder::kOperateMasts;
-    WorldObject * cannon_target = nullptr;
+    std::weak_ptr<WorldObject> cannon_target;
     std::atomic<bool> use_right_cannons = false;
 
     //Sailor activity/travel
@@ -82,7 +82,7 @@ public:
     explicit Sailor(ShipBody *ship_body, WorldObject *parent);
     SailorState GetState() const;
     void SetCurrentOrder(SailorOrder new_order);
-    void SetCannonTarget(WorldObject * cannon_target);
+    void SetCannonTarget(const std::weak_ptr<WorldObject> & target);
     void SetUseRightCannons(bool right);
 
     //Operated elements

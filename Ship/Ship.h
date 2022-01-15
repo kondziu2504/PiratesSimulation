@@ -19,16 +19,10 @@
 #include <memory>
 #include <atomic>
 
-class MastDistributor;
-class Mast;
-class World;
-class Sailor;
-class Cannon;
-
-class Ship : public WorldObject, public Stoppable {
-    std::shared_ptr<ShipBody> ship_body;
-    std::shared_ptr<Crew> crew;
-    std::shared_ptr<ShipController> ship_controller;
+class Ship : public WorldObject, public Stoppable, public std::enable_shared_from_this<Ship> {
+    const std::unique_ptr<ShipBody> ship_body;
+    const std::unique_ptr<Crew> crew;
+    const std::unique_ptr<ShipController> ship_controller;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
@@ -50,7 +44,7 @@ public:
     ShipObject * GetRestingPoint() const;
     MastDistributor * GetMastDistributor() const;
     std::vector<Mast *> GetMasts() const;
-    void PrepareForFight(Ship * enemy);
+    void PrepareForFight(const std::weak_ptr<Ship>& enemy);
 };
 
 

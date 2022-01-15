@@ -123,9 +123,9 @@ int World::GetHeight() const {
     return height;
 }
 
-vector<Ship *> World::GetShips() const {
+vector<weak_ptr<Ship>> World::GetShips() const {
     lock_guard<mutex> guard(ships_mutex);
-    return MapToRawPointers<Ship>(ships);
+    return MapToWeakPointers(ships);
 }
 
 std::vector<std::shared_ptr<Cannonball>> World::GetCannonballs() const {

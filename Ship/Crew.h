@@ -20,7 +20,7 @@ class Crew : public Stoppable {
 public:
     Crew(int crew_size, ShipBody * operated_ship, WorldObject * parent);
     void SetOrders(SailorOrder new_order);
-    void SetCannonsTarget(WorldObject * target);
+    void SetCannonsTarget(const std::weak_ptr<WorldObject> & target);
     void SetUseRightCannons(bool right);
     std::vector<Sailor *> GetSailors() const;
 };

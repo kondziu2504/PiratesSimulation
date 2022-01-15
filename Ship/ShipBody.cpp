@@ -19,37 +19,37 @@ float ShipBody::GetLength() const {
     return length;
 }
 
-ShipBody::ShipBody(WorldObject * parent, int hp, float length, int mast_count, int cannons_per_side) {
-    this->hp = hp;
-    this->length = length;
-    ship_layout = make_unique<ShipLayout>(mast_count, cannons_per_side, length, parent);
-    distributor = make_unique<MastDistributor>(ship_layout->GetMasts());
+ShipBody::ShipBody(WorldObject * parent, int hp, float length, int mast_count, int cannons_per_side) :
+        hp(hp), length(length),
+        ship_layout(move(make_unique<ShipLayout>(mast_count, cannons_per_side, length, parent))),
+        distributor(move(make_unique<MastDistributor>(ship_layout->GetMasts())))
+{
 }
 
-ShipObject * ShipBody::GetLeftJunction() {
+ShipObject * ShipBody::GetLeftJunction() const {
     return ship_layout->GetLeftJunction();
 }
 
-ShipObject * ShipBody::GetRightJunction() {
+ShipObject * ShipBody::GetRightJunction() const {
     return ship_layout->GetRightJunction();
 }
 
-std::vector<Cannon *> ShipBody::GetLeftCannons() {
+std::vector<Cannon *> ShipBody::GetLeftCannons() const {
     return ship_layout->GetLeftCannons();
 }
 
-std::vector<Cannon *> ShipBody::GetRightCannons() {
+std::vector<Cannon *> ShipBody::GetRightCannons() const {
     return ship_layout->GetRightCannons();
 }
 
-ShipObject * ShipBody::GetRestingPoint() {
+ShipObject * ShipBody::GetRestingPoint() const {
     return ship_layout->GetRestingPoint();
 }
 
-std::vector<Mast *> ShipBody::GetMasts() {
+std::vector<Mast *> ShipBody::GetMasts() const {
     return ship_layout->GetMasts();
 }
 
-MastDistributor * ShipBody::GetMastDistributor() {
+MastDistributor * ShipBody::GetMastDistributor() const {
     return distributor.get();
 }

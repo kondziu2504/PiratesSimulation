@@ -185,8 +185,9 @@ std::vector<Cannon *> Sailor::GetFightingSideCannons() const {
 
 Vec2f Sailor::CalculateCannonTarget() const {
     float distance = 5;
-    if(cannon_target != nullptr)
-        distance = (cannon_target->GetPosition() - parent->GetPosition()).Length();
+    auto _cannon_target = cannon_target.lock();
+    if(_cannon_target)
+        distance = (_cannon_target->GetPosition() - parent->GetPosition()).Length();
     Vec2f perpendicular_right = Vec2f::FromAngle(parent->GetDirection().Angle() + (float)M_PI_2).Normalized() * distance;
     return parent->GetPosition() + perpendicular_right * (use_right_cannons ? 1.f : -1.f);
 }
@@ -221,7 +222,7 @@ void Sailor::SetCurrentOrder(SailorOrder new_order) {
     current_order = new_order;
 }
 
-void Sailor::SetCannonTarget(WorldObject * cannon_target) {
+void Sailor::SetCannonTarget(const weak_ptr<WorldObject> & target) {
     this->cannon_target = cannon_target;
 }
 

@@ -11,12 +11,9 @@
 #include <queue>
 #include <condition_variable>
 #include <map>
+#include "Mast.h"
 
-class Mast;
 class Sailor;
-
-template<typename T>
-using s_ptr = std::shared_ptr<T>;
 
 class MastDistributor {
     std::map<Mast *, std::vector<Sailor*>> masts_map_owners;

@@ -3,15 +3,12 @@
 //
 
 #include "Wind.h"
-#include <thread>
 #include "World.h"
 #include "Ship/Ship.h"
 
 using namespace std;
 
-Wind::Wind(World * world) {
-    this->world = world;
-}
+Wind::Wind(World * world) : world(world){ }
 
 void Wind::UpdateVelocity() {
     float currentAngle = velocity.Angle();
@@ -19,7 +16,7 @@ void Wind::UpdateVelocity() {
     velocity = Vec2f::FromAngle(newAngle);
 }
 
-Vec2f Wind::GetVelocity() {
+Vec2f Wind::GetVelocity() const {
     lock_guard<mutex> guard(wind_mutex);
     return velocity;
 }
@@ -28,10 +25,13 @@ void Wind::ThreadFunc(const atomic<bool> &stop_requested) {
     while(true){
         UpdateVelocity();
         {
-            for(const auto ship : world->GetShips()){
-                auto shipState = ship->GetState();
-                if(shipState == ShipState::kWandering)
-                    ship->ApplyWind(velocity);
+            for(const auto& ship : world->GetShips()){
+                auto _ship = ship.lock();
+                if(_ship){
+                    auto shipState = _ship->GetState();
+                    if(shipState == ShipState::kWandering)
+                        _ship->ApplyWind(velocity);
+                }
             }
         }
         SleepSeconds(0.1f);

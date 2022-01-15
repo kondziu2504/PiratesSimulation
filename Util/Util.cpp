@@ -52,4 +52,3 @@ void DoRepeatedlyForATime(const std::function<void(float progress, bool & stop)>
         timeLeft -= updatePeriodInSeconds;
     }
 }
-

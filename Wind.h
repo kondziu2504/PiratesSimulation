@@ -15,15 +15,15 @@ class World;
 
 class Wind : public Stoppable {
     Vec2f velocity = Vec2f(1,0);
-    World * world;
-    std::mutex wind_mutex;
+    World * const world;
+    mutable std::mutex wind_mutex;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
     void UpdateVelocity();
 public:
     explicit Wind(World * world);
-    Vec2f GetVelocity();
+    Vec2f GetVelocity() const;
 };
 
 

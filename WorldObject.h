@@ -12,7 +12,7 @@
 class WorldObject {
     Vec2f position;
     Vec2f direction;
-    World * world;
+    World * const world;
     mutable std::mutex _mutex;
 
 public:
