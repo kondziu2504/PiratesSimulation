@@ -17,12 +17,12 @@ SailorActionStatus Sailor::GoRest() {
     return SailorActionStatus::kSuccess;
 }
 
-Sailor::Sailor(ShipBody *ship_body, WorldObject *parent) {
-    this->ship = ship_body;
-    this->parent = parent;
+Sailor::Sailor(ShipBody *ship_body, WorldObject *parent) :
+        ship(ship_body), parent(parent) {
+
 }
 
-SailorState Sailor::GetState() {
+SailorState Sailor::GetState() const {
     lock_guard<mutex> guard(sailor_mutex);
     return currentState;
 }
@@ -49,7 +49,7 @@ void Sailor::WaitForMast() {
     SetState(SailorState::kStanding);
 }
 
-float Sailor::GetProgress() {
+float Sailor::GetProgress() const {
     lock_guard<mutex> guard(sailor_mutex);
     return activity_progress;
 }
@@ -59,12 +59,12 @@ void Sailor::SetProgress(float progress) {
     activity_progress = progress;
 }
 
-std::shared_ptr<ShipObject> Sailor::GetPreviousTarget() {
+ShipObject * Sailor::GetPreviousTarget() const {
     lock_guard<mutex> guard(target_mutex);
     return previous_target;
 }
 
-std::shared_ptr<ShipObject> Sailor::GetNextTarget() {
+ShipObject * Sailor::GetNextTarget() const {
     lock_guard<mutex> guard(target_mutex);
     return next_target;
 }
@@ -92,9 +92,9 @@ SailorActionStatus Sailor::UseCannon() {
     return SailorActionStatus::kSuccess;
 }
 
-SailorActionStatus Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
+SailorActionStatus Sailor::GoTo(ShipObject * shipObject) {
     SetState(SailorState::kWalking);
-    next_target = std::move(shipObject);
+    next_target = shipObject;
     if(ProgressAction(3.f) == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
     previous_target = next_target;
@@ -102,15 +102,15 @@ SailorActionStatus Sailor::GoTo(shared_ptr<ShipObject> shipObject) {
     return SailorActionStatus::kSuccess;
 }
 
-std::shared_ptr<Mast> Sailor::GetOperatedMast() const {
+Mast * Sailor::GetOperatedMast() const {
     return operated_mast;
 }
 
-std::shared_ptr<Cannon> Sailor::GetOperatedCannon() const {
+Cannon * Sailor::GetOperatedCannon() const {
     return assigned_cannon;
 }
 
-std::shared_ptr<ShipObject> Sailor::GetFightingSideJunction() const {
+ShipObject * Sailor::GetFightingSideJunction() const {
     return use_right_cannons ? ship->GetRightJunction() : ship->GetLeftJunction();
 }
 
@@ -179,7 +179,7 @@ SailorActionStatus Sailor::ProgressAction(float actionTotalTime, std::function<v
     return action_status;
 }
 
-std::vector<std::shared_ptr<Cannon>> Sailor::GetFightingSideCannons() const {
+std::vector<Cannon *> Sailor::GetFightingSideCannons() const {
     return use_right_cannons ? ship->GetRightCannons() : ship->GetLeftCannons();
 }
 

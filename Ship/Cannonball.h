@@ -14,16 +14,16 @@ class World;
 
 class Cannonball : public Stoppable{
     std::atomic<float> progress = 0.f;
-    Vec2f origin;
-    Vec2f target;
-    World * world;
+    const Vec2f origin;
+    const Vec2f target;
+    World * const world;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
 public:
     bool dead = false;
     Cannonball(World * world, Vec2f origin, Vec2f target);
-    Vec2f GetPos();
+    Vec2f GetPos() const;
 };
 
 

@@ -2,17 +2,17 @@
 
 using namespace std;
 
-Vec2f WorldObject::GetPosition() {
+Vec2f WorldObject::GetPosition() const {
     lock_guard<mutex> guard(_mutex);
     return position;
 }
 
-Vec2f WorldObject::GetDirection() {
+Vec2f WorldObject::GetDirection() const {
     lock_guard<mutex> guard(_mutex);
     return direction;
 }
 
-World *WorldObject::GetWorld() {
+World *WorldObject::GetWorld() const {
     return world;
 }
 

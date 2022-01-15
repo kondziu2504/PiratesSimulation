@@ -19,8 +19,8 @@ class Mast : public ShipObject{
     const int max_slots = 4;
     float angle = 0.f;
 
-    WorldObject * parent;
-    std::mutex mast_mutex;
+    WorldObject * const parent;
+    mutable std::mutex mast_mutex;
 
     void AdjustAngle(float angle_delta);
 
@@ -28,7 +28,7 @@ public:
     explicit Mast(WorldObject * parent) : parent(parent) {};
 
     int GetMaxSlots() const;
-    float GetAngle();
+    float GetAngle() const;
     void Adjust();
 };
 

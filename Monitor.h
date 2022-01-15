@@ -42,33 +42,33 @@ class Monitor : public Stoppable{
 
     void Update();
 
-    void DrawShipInfo(const std::shared_ptr<Ship>& ship);
+    void DrawShipInfo(const Ship * ship);
     void DrawChosenShip();
 
     void DrawWorld(Vec2i screen_offset = Vec2i(0, 0), Rect world_viewport = Rect(0, 0, 0, 0));
     void DrawMap(Vec2i screen_offset, Rect world_viewport);
     void DrawShips(Vec2i screen_offset, Rect world_viewport);
-    void DrawShip(const std::shared_ptr<Ship>&, Vec2i screen_offset, Rect world_viewport);
+    void DrawShip(const Ship *, Vec2i screen_offset, Rect world_viewport);
     void DrawCannonballs(Vec2i screen_offset, Rect world_viewport);
 
-    void DrawDashboard(std::shared_ptr <Ship> ship);
-    void DrawDashboardCannons(const std::vector<std::shared_ptr<Cannon>>& cannons, ncurses_util::ConsoleWriter & console_writer) const;
-    void DrawDashboardCannons(const std::shared_ptr<Ship>& ship, ncurses_util::ConsoleWriter & console_writer) const;
-    void DrawDashboardMasts(std::shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) const;
-    void DrawDashboardSailors(std::shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer);
+    void DrawDashboard(const Ship * ship);
+    void DrawDashboardCannons(const std::vector<Cannon *>& cannons, ncurses_util::ConsoleWriter & console_writer) const;
+    void DrawDashboardCannons(const Ship * ship, ncurses_util::ConsoleWriter & console_writer) const;
+    void DrawDashboardMasts(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer) const;
+    void DrawDashboardSailors(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer);
 
-    void DrawShipDeck(std::shared_ptr <Ship> ship, Rect screen_rect);
-    s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>  GenerateElementsPositions(s_ptr<Ship> &ship, const Rect &screen_rect) const;
+    void DrawShipDeck(const Ship * ship, Rect screen_rect);
+    s_ptr<std::unordered_map<ShipObject *, Vec2i>>  GenerateElementsPositions(const Ship *ship, const Rect &screen_rect) const;
     void DrawShipDeckFloor(const Rect &screen_rect) const;
-    void DrawShipDeckCannons(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions);
-    void DrawShipDeckMasts(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions);
-    void DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions);
+    void DrawShipDeckCannons(const Ship * ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions);
+    void DrawShipDeckMasts(const Ship * ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions);
+    void DrawShipDeckSailors(const Ship * ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions);
 
     void DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, int diameter, const std::string &label,
                              const std::string &sub_label = "");
     void DrawWindDirIndicator(Vec2i offset, int size);
-    void DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr <Ship>& ship);
-    void DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<Ship>& ship);
+    void DrawShipDirIndicator(Vec2i offset, int size, const Ship * ship);
+    void DrawSailTargetDirIndicator(Vec2i offset, int size, const Ship * ship);
 
 public:
     explicit Monitor(World * world);

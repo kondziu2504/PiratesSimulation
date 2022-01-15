@@ -28,7 +28,7 @@ void Wind::ThreadFunc(const atomic<bool> &stop_requested) {
     while(true){
         UpdateVelocity();
         {
-            for(const shared_ptr<Ship>& ship : world->GetShips()){
+            for(const auto ship : world->GetShips()){
                 auto shipState = ship->GetState();
                 if(shipState == ShipState::kWandering)
                     ship->ApplyWind(velocity);

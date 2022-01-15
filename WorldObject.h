@@ -13,15 +13,15 @@ class WorldObject {
     Vec2f position;
     Vec2f direction;
     World * world;
-    std::mutex _mutex;
+    mutable std::mutex _mutex;
 
 public:
     WorldObject(Vec2f direction, Vec2f position, World * world) : direction(direction), position(position), world(world) {};
-    Vec2f GetPosition();
+    Vec2f GetPosition() const;
     void SetPosition(Vec2f new_pos);
-    Vec2f GetDirection();
+    Vec2f GetDirection() const;
     void SetDirection(Vec2f new_dir);
-    World * GetWorld();
+    World * GetWorld() const;
 };
 
 

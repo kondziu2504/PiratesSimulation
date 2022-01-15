@@ -40,16 +40,16 @@ public:
 
     int GetHP() const;
     float GetLength() const;
-    ShipState GetState();
-    std::vector<std::shared_ptr<Sailor>> GetSailors();
+    ShipState GetState() const;
+    std::vector<Sailor *> GetSailors() const;
 
-    std::shared_ptr<ShipObject> GetLeftJunction();
-    std::shared_ptr<ShipObject> GetRightJunction();
-    std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
-    std::vector<std::shared_ptr<Cannon>> GetRightCannons();
-    std::shared_ptr<ShipObject> GetRestingPoint();
-    std::shared_ptr<MastDistributor> GetMastDistributor();
-    std::vector<std::shared_ptr<Mast>> GetMasts();
+    ShipObject * GetLeftJunction() const;
+    ShipObject * GetRightJunction() const;
+    std::vector<Cannon *> GetLeftCannons() const;
+    std::vector<Cannon *> GetRightCannons() const;
+    ShipObject * GetRestingPoint() const;
+    MastDistributor * GetMastDistributor() const;
+    std::vector<Mast *> GetMasts() const;
     void PrepareForFight(Ship * enemy);
 };
 

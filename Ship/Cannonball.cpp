@@ -7,13 +7,12 @@
 #include "Ship.h"
 using namespace std;
 
-Cannonball::Cannonball(World * world, Vec2f origin, Vec2f target) {
-    this->origin = origin;
-    this->target = target;
-    this->world = world;
+Cannonball::Cannonball(World * world, Vec2f origin, Vec2f target) :
+        origin(origin), target(target), world(world) {
+
 }
 
-Vec2f Cannonball::GetPos() {
+Vec2f Cannonball::GetPos() const {
     return origin + (target - origin) * progress;
 }
 

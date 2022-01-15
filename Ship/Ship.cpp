@@ -29,7 +29,7 @@ void Ship::ApplyWind(Vec2f wind) {
             return;
     float wind_power = wind.Length();
     float effective_power = 0;
-    for(const shared_ptr<Mast>& mast : ship_body->GetMasts()){
+    for(const auto mast : ship_body->GetMasts()){
         Vec2f absolute_mast_dir = Vec2f::FromAngle(GetDirection().Angle() + mast->GetAngle());
         float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;
@@ -56,39 +56,39 @@ float Ship::GetLength() const {
     return ship_body->GetLength();
 }
 
-vector<shared_ptr<Sailor>> Ship::GetSailors() {
+vector<Sailor *> Ship::GetSailors() const {
     return crew->GetSailors();
 }
 
-std::shared_ptr<ShipObject> Ship::GetLeftJunction() {
+ShipObject * Ship::GetLeftJunction() const {
     return ship_body->GetLeftJunction();
 }
 
-std::shared_ptr<ShipObject> Ship::GetRightJunction() {
+ShipObject * Ship::GetRightJunction() const {
     return ship_body->GetRightJunction();
 }
 
-std::vector<std::shared_ptr<Cannon>> Ship::GetLeftCannons() {
+std::vector<Cannon *> Ship::GetLeftCannons() const {
     return ship_body->GetLeftCannons();
 }
 
-std::vector<std::shared_ptr<Cannon>> Ship::GetRightCannons() {
+std::vector<Cannon *> Ship::GetRightCannons() const {
     return ship_body->GetRightCannons();
 }
 
-std::shared_ptr<ShipObject> Ship::GetRestingPoint() {
+ShipObject * Ship::GetRestingPoint() const {
     return ship_body->GetRestingPoint();
 }
 
-std::shared_ptr<MastDistributor> Ship::GetMastDistributor() {
+MastDistributor * Ship::GetMastDistributor() const {
     return ship_body->GetMastDistributor();
 }
 
-std::vector<std::shared_ptr<Mast>> Ship::GetMasts() {
+std::vector<Mast *> Ship::GetMasts() const {
     return ship_body->GetMasts();
 }
 
-ShipState Ship::GetState() {
+ShipState Ship::GetState() const {
     return ship_controller->GetState();
 }
 

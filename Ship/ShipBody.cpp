@@ -22,34 +22,34 @@ float ShipBody::GetLength() const {
 ShipBody::ShipBody(WorldObject * parent, int hp, float length, int mast_count, int cannons_per_side) {
     this->hp = hp;
     this->length = length;
-    ship_layout = make_shared<ShipLayout>(mast_count, cannons_per_side, length, parent);
-    distributor = make_shared<MastDistributor>(ship_layout->GetMasts());
+    ship_layout = make_unique<ShipLayout>(mast_count, cannons_per_side, length, parent);
+    distributor = make_unique<MastDistributor>(ship_layout->GetMasts());
 }
 
-std::shared_ptr<ShipObject> ShipBody::GetLeftJunction() {
+ShipObject * ShipBody::GetLeftJunction() {
     return ship_layout->GetLeftJunction();
 }
 
-std::shared_ptr<ShipObject> ShipBody::GetRightJunction() {
+ShipObject * ShipBody::GetRightJunction() {
     return ship_layout->GetRightJunction();
 }
 
-std::vector<std::shared_ptr<Cannon>> ShipBody::GetLeftCannons() {
+std::vector<Cannon *> ShipBody::GetLeftCannons() {
     return ship_layout->GetLeftCannons();
 }
 
-std::vector<std::shared_ptr<Cannon>> ShipBody::GetRightCannons() {
+std::vector<Cannon *> ShipBody::GetRightCannons() {
     return ship_layout->GetRightCannons();
 }
 
-std::shared_ptr<ShipObject> ShipBody::GetRestingPoint() {
+ShipObject * ShipBody::GetRestingPoint() {
     return ship_layout->GetRestingPoint();
 }
 
-std::vector<std::shared_ptr<Mast>> ShipBody::GetMasts() {
+std::vector<Mast *> ShipBody::GetMasts() {
     return ship_layout->GetMasts();
 }
 
-std::shared_ptr<MastDistributor> ShipBody::GetMastDistributor() {
-    return distributor;
+MastDistributor * ShipBody::GetMastDistributor() {
+    return distributor.get();
 }

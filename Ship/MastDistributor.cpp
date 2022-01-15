@@ -8,32 +8,32 @@
 
 using namespace std;
 
-MastDistributor::MastDistributor(std::vector<std::shared_ptr<Mast>> masts) {
-    for(shared_ptr<Mast> mast : masts){
-            masts_map_owners.insert(make_pair(mast, make_shared<vector<Sailor*>>()));
+MastDistributor::MastDistributor(const std::vector<Mast *> & masts) {
+    for(const auto mast : masts){
+            masts_map_owners.insert(make_pair(mast, move(vector<Sailor*>())));
     }
 }
 
-shared_ptr<Mast> MastDistributor::RequestMast(Sailor * sailor) {
+Mast * MastDistributor::RequestMast(Sailor * sailor) {
     unique_lock<mutex> lock(masts_owners_mutex);
-    shared_ptr<Mast> target_mast = FindFreeMast();
+    Mast * target_mast = FindFreeMast();
     if(target_mast == nullptr){
         c_var_mast_freed.wait(lock, [&]{return (target_mast = FindFreeMast()) != nullptr;});
     }
 
-    masts_map_owners.at(target_mast)->push_back(sailor);
+    masts_map_owners.at(target_mast).push_back(sailor);
     lock.unlock();
     return target_mast;
 }
 
-void MastDistributor::ReleaseMast(std::shared_ptr<Mast> mast, Sailor * sailor) {
+void MastDistributor::ReleaseMast(Mast * mast, Sailor * sailor) {
     {
         lock_guard<mutex> guard(masts_owners_mutex);
-        auto owners = masts_map_owners.at(mast);
-        auto it = owners->begin();
-        while(it != owners->end()){
+        auto & owners = masts_map_owners.at(mast);
+        auto it = owners.begin();
+        while(it != owners.end()){
             if(*it == sailor){
-                owners->erase(it);
+                owners.erase(it);
                 break;
             }else{
                 ++it;
@@ -43,16 +43,16 @@ void MastDistributor::ReleaseMast(std::shared_ptr<Mast> mast, Sailor * sailor) {
     c_var_mast_freed.notify_one();
 }
 
-s_ptr<Mast> MastDistributor::FindFreeMast() {
+Mast * MastDistributor::FindFreeMast() const {
     for(const auto& mast_owners_pair : masts_map_owners){
-        if(mast_owners_pair.second->size() < mast_owners_pair.first->GetMaxSlots()){
+        if(mast_owners_pair.second.size() < mast_owners_pair.first->GetMaxSlots()){
             return mast_owners_pair.first;
         }
     }
     return nullptr;
 }
 
-std::map<s_ptr<Mast>, s_ptr<std::vector<Sailor *>>> MastDistributor::GetMastsOwners() {
+std::map<Mast *, std::vector<Sailor *>> MastDistributor::GetMastsOwners() const {
     lock_guard<mutex> guard(masts_owners_mutex);
     return masts_map_owners;
 }

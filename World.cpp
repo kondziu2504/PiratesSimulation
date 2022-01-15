@@ -9,6 +9,7 @@
 #include "Wind.h"
 #include <thread>
 #include "Ship/Cannonball.h"
+#include "Util/Util.h"
 
 using namespace std;
 
@@ -122,9 +123,9 @@ int World::GetHeight() const {
     return height;
 }
 
-vector<std::shared_ptr<Ship>> World::GetShips() const {
+vector<Ship *> World::GetShips() const {
     lock_guard<mutex> guard(ships_mutex);
-    return ships;
+    return MapToRawPointers<Ship>(ships);
 }
 
 std::vector<std::shared_ptr<Cannonball>> World::GetCannonballs() const {

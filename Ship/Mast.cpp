@@ -8,7 +8,7 @@
 
 using namespace std;
 
-float Mast::GetAngle() {
+float Mast::GetAngle() const {
     lock_guard<mutex> guard(mast_mutex);
     return angle;
 }

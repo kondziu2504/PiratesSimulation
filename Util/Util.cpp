@@ -8,8 +8,6 @@
 #include <mutex>
 #include <unistd.h>
 
-
-
 using namespace std;
 
 float AngleDifference(float angle1, float angle2){
@@ -54,3 +52,4 @@ void DoRepeatedlyForATime(const std::function<void(float progress, bool & stop)>
         timeLeft -= updatePeriodInSeconds;
     }
 }
+

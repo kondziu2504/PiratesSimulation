@@ -26,12 +26,12 @@ void ShipController::PrepareForFight(Ship *ship) {
 bool ShipController::LookForEnemy() {
     parent->GetPosition();
     for(const auto& ship : parent->GetWorld()->GetShips()){
-        if(ship.get() != parent &&
+        if(ship != parent &&
            ship->GetState() != ShipState::kSinking &&
            ship->GetState() != ShipState::kDestroyed){
             float dist = (ship->GetPosition() - parent->GetPosition()).Length();
             if(dist < enemy_lookout_radius){
-                EngageFight(ship.get());
+                EngageFight(ship);
                 return true;
             }
         }
@@ -112,8 +112,8 @@ Vec2f ShipController::CalculateCorrectionAgainstLand(float & closest_tile_dist) 
 
 Vec2f ShipController::CalculateCorrectionAgainstShips(float &closest_tile_dist) const {
     Vec2f correction;
-    for(const shared_ptr<Ship>& ship : parent->GetWorld()->GetShips()){
-        if(ship.get() != parent){
+    for(const auto ship : parent->GetWorld()->GetShips()){
+        if(ship != parent){
             Vec2f ship_pos = ship->GetPosition();
             float dist = (parent->GetPosition() - ship_pos).Length();
             if(dist < obstacles_lookout_radius && dist > 0){

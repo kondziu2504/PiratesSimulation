@@ -11,22 +11,22 @@
 #include "Cannon.h"
 
 class ShipLayout {
-    std::shared_ptr<std::vector<std::shared_ptr<Mast>>> masts;
-    std::shared_ptr<ShipObject> left_junction;
-    std::shared_ptr<ShipObject> right_junction;
-    std::vector<std::shared_ptr<Cannon>> left_cannons;
-    std::vector<std::shared_ptr<Cannon>> right_cannons;
-    std::shared_ptr<ShipObject> resting_point;
+    std::vector<std::unique_ptr<Mast>> masts;
+    std::unique_ptr<ShipObject> left_junction;
+    std::unique_ptr<ShipObject> right_junction;
+    std::vector<std::unique_ptr<Cannon>> left_cannons;
+    std::vector<std::unique_ptr<Cannon>> right_cannons;
+    std::unique_ptr<ShipObject> resting_point;
 
 public:
     ShipLayout(int masts_count, int cannons_per_side, float ship_length, WorldObject * parent);
 
-    std::shared_ptr<ShipObject> GetLeftJunction();
-    std::shared_ptr<ShipObject> GetRightJunction();
-    std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
-    std::vector<std::shared_ptr<Cannon>> GetRightCannons();
-    std::shared_ptr<ShipObject> GetRestingPoint();
-    std::vector<std::shared_ptr<Mast>> GetMasts();
+    ShipObject * GetLeftJunction();
+    ShipObject * GetRightJunction();
+    std::vector<Cannon *> GetLeftCannons();
+    std::vector<Cannon *> GetRightCannons();
+    ShipObject * GetRestingPoint();
+    std::vector<Mast *> GetMasts();
 };
 
 

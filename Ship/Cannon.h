@@ -18,20 +18,20 @@ template<typename T>
 using s_ptr = std::shared_ptr<T>;
 
 class Cannon : public ShipObject {
-    std::mutex ownership_mutex;
+    mutable std::mutex ownership_mutex;
     std::pair<Sailor *, Sailor *> owners;
 
-    WorldObject * parent;
+    WorldObject * const parent;
+    const Vec2f local_pos;
 
-    Vec2f local_pos;
     std::atomic<bool> loaded = false;
-    std::mutex load_mutex;
-    std::condition_variable c_var_loaded;
+    mutable std::mutex load_mutex;
+    mutable std::condition_variable c_var_loaded;
 public:
     explicit Cannon(Vec2f local_pos, WorldObject * parent);
-    std::pair<Sailor *, Sailor *> GetOwners();
-    bool Loaded();
-    void WaitUntilLoadedOrTimeout();
+    std::pair<Sailor *, Sailor *> GetOwners() const;
+    bool Loaded() const;
+    void WaitUntilLoadedOrTimeout() const;
     void Load();
     void Shoot(Vec2f target);
     bool TryClaim(Sailor * sailor);

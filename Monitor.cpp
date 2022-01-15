@@ -83,7 +83,7 @@ void Monitor::Update() {
 }
 
 void Monitor::DrawChosenShip() {
-    shared_ptr<Ship> chosen_ship = nullptr;
+    Ship * chosen_ship = nullptr;
     {
         auto ships = world->GetShips();
         if(!ships.empty() && current_ship_ind < ships.size())
@@ -133,7 +133,7 @@ void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
     DrawCannonballs(screen_offset, world_viewport);
 }
 
-void Monitor::DrawShip(const shared_ptr<Ship>& ship, Vec2i screen_offset, Rect world_viewport) {
+void Monitor::DrawShip(const Ship * ship, Vec2i screen_offset, Rect world_viewport) {
     Vec2f ship_pos = ship->GetPosition();
     Vec2f ship_dir = ship->GetDirection();
 
@@ -163,12 +163,12 @@ void Monitor::DrawShip(const shared_ptr<Ship>& ship, Vec2i screen_offset, Rect w
 }
 
 void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
-    for(const shared_ptr<Ship>& ship : world->GetShips()){
+    for(const Ship * ship : world->GetShips()) {
         DrawShip(ship, offset, world_viewport);
     }
 }
 
-void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
+void Monitor::DrawDashboard(const Ship * ship) {
     ncurses_util::ConsoleWriter console_writer({0, 0});
     string health = ship->GetState() == ShipState::kDestroyed ? "Destroyed" : "Health: " + to_string(ship->GetHP());
     string header = "Ship(" + health + ")";
@@ -179,7 +179,7 @@ void Monitor::DrawDashboard(shared_ptr <Ship> ship) {
     DrawDashboardCannons(ship, console_writer);
 }
 
-void Monitor::DrawDashboardSailors(shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) {
+void Monitor::DrawDashboardSailors(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer) {
     console_writer.AddLine("Sailors:");
     console_writer.ModifyIndent(2);
     int sailor_index = 0;
@@ -193,16 +193,16 @@ void Monitor::DrawDashboardSailors(shared_ptr<Ship> &ship, ncurses_util::Console
     console_writer.ModifyIndent(-2);
 }
 
-void Monitor::DrawDashboardMasts(shared_ptr<Ship> &ship, ncurses_util::ConsoleWriter &console_writer) const {
+void Monitor::DrawDashboardMasts(const Ship * &ship, ncurses_util::ConsoleWriter &console_writer) const {
     console_writer.AddLine("Masts:");
     console_writer.ModifyIndent(2);
 
     int mast_index = 0;
     for(const auto& mast_owners_pair : ship->GetMastDistributor()->GetMastsOwners()) {
-        bool max_owners = mast_owners_pair.second->size() == mast_owners_pair.first->GetMaxSlots();
+        bool max_owners = mast_owners_pair.second.size() == mast_owners_pair.first->GetMaxSlots();
         string mast_text =
                 "Mast " + to_string(mast_index) +
-                " Operated by: " + to_string(mast_owners_pair.second->size()) +
+                " Operated by: " + to_string(mast_owners_pair.second.size()) +
                 " " + (max_owners ? "(max)" : "");
         console_writer.AddLine(mast_text);
         mast_index++;
@@ -211,7 +211,7 @@ void Monitor::DrawDashboardMasts(shared_ptr<Ship> &ship, ncurses_util::ConsoleWr
     console_writer.ModifyIndent(-2);
 }
 
-void Monitor::DrawDashboardCannons(const vector<shared_ptr<Cannon>>& cannons, ncurses_util::ConsoleWriter &console_writer) const {
+void Monitor::DrawDashboardCannons(const vector<Cannon *>& cannons, ncurses_util::ConsoleWriter &console_writer) const {
     int cannon_ind = 0;
     for(const auto& cannon : cannons){
         int owners = 0;
@@ -227,16 +227,16 @@ void Monitor::DrawDashboardCannons(const vector<shared_ptr<Cannon>>& cannons, nc
     }
 }
 
-void Monitor::DrawShipDeck(shared_ptr <Ship> ship, Rect screen_rect) {
-    s_ptr<std::unordered_map<shared_ptr<ShipObject>, Vec2i>> elements_positions = GenerateElementsPositions(ship, screen_rect);
+void Monitor::DrawShipDeck(const Ship * ship, Rect screen_rect) {
+    s_ptr<std::unordered_map<ShipObject *, Vec2i>> elements_positions = GenerateElementsPositions(ship, screen_rect);
     DrawShipDeckFloor(screen_rect);
     DrawShipDeckCannons(ship, screen_rect, elements_positions);
     DrawShipDeckMasts(ship, screen_rect, elements_positions);
     DrawShipDeckSailors(ship, screen_rect, elements_positions);
 }
 
-s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPositions(shared_ptr<Ship> &ship, const Rect &screen_rect) const {
-    s_ptr<std::unordered_map<shared_ptr<ShipObject>, Vec2i>> elements_positions = make_shared<unordered_map<shared_ptr<ShipObject>, Vec2i>>();
+s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPositions(const Ship *ship, const Rect &screen_rect) const {
+    s_ptr<std::unordered_map<ShipObject *, Vec2i>> elements_positions = make_shared<unordered_map<ShipObject *, Vec2i>>();
     auto masts = ship->GetMasts();
     int first_mast_y, last_mast_y;
     if (masts.size() == 1)
@@ -254,7 +254,7 @@ s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>> Monitor::GenerateElementsPos
         }
     }
 
-    auto GenerateCannonsPositions = [&screen_rect, elements_positions] (const vector<shared_ptr<Cannon>>& cannons, bool right) {
+    auto GenerateCannonsPositions = [&screen_rect, elements_positions] (const vector<Cannon *>& cannons, bool right) {
         float cannon_y = (float)screen_rect.size.y / 3.f;
         float cannon_y_delta = (float)screen_rect.size.y / (float)(cannons.size() + 1);
         for (const auto& cannon: cannons) {
@@ -336,18 +336,18 @@ void Monitor::DrawWindDirIndicator(Vec2i offset, int size) {
     DrawCircleIndicator(offset, wind_angle, size, "Wind direction", "(Global)");
 }
 
-void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const shared_ptr<Ship>& ship) {
+void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const Ship * ship) {
     DrawCircleIndicator(offset, ship->GetDirection().Angle(), size, "Ship direction", "(Global)");
 }
 
-void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<Ship>& ship) {
+void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const Ship * ship) {
     float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
     DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float) M_PI / 2,
                         size, "Target sails direction", "(Local)");
 }
 
-void Monitor::DrawShipInfo(const shared_ptr<Ship>& ship) {
+void Monitor::DrawShipInfo(const Ship * ship) {
     DrawDashboard(ship);
     DrawShipDeck(ship, {36, 0, 29, 50});
     DrawWindDirIndicator({69, 0}, 18);
@@ -391,7 +391,7 @@ void Monitor::ChangeDisplayMode() {
         display_mode = MonitorDisplayMode::kMap;
 }
 
-void Monitor::DrawDashboardCannons(const std::shared_ptr<Ship>& ship, ncurses_util::ConsoleWriter &console_writer) const {
+void Monitor::DrawDashboardCannons(const Ship * ship, ncurses_util::ConsoleWriter &console_writer) const {
     console_writer.AddLine("Cannons:");
     console_writer.ModifyIndent(1);
 
@@ -406,7 +406,7 @@ void Monitor::DrawDashboardCannons(const std::shared_ptr<Ship>& ship, ncurses_ut
     console_writer.ModifyIndent(-2);
 }
 
-void Monitor::DrawShipDeckCannons(const s_ptr<Ship>& ship, Rect screen_rect, const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions) {
+void Monitor::DrawShipDeckCannons(const Ship * ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     for(const auto& cannon : ship->GetRightCannons()){
         Vec2i cannon_pos = elements_positions->find(cannon)->second;
         Vec2i screen_coords = screen_rect.pos + cannon_pos;
@@ -420,8 +420,8 @@ void Monitor::DrawShipDeckCannons(const s_ptr<Ship>& ship, Rect screen_rect, con
     }
 }
 
-void Monitor::DrawShipDeckMasts(const s_ptr<Ship>& ship, Rect screen_rect,
-                                const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions) {
+void Monitor::DrawShipDeckMasts(const Ship * ship, Rect screen_rect,
+                                const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     auto masts = ship->GetMasts();
     int mast_ind = 0;
     int mast_width = (int)((float)screen_rect.size.x * 0.9f) - 1;
@@ -436,15 +436,15 @@ void Monitor::DrawShipDeckMasts(const s_ptr<Ship>& ship, Rect screen_rect,
     }
 }
 
-void Monitor::DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect,
-                                  const s_ptr<std::unordered_map<s_ptr<ShipObject>, Vec2i>>& elements_positions) {
+void Monitor::DrawShipDeckSailors(const Ship * ship, Rect screen_rect,
+                                  const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) {
     int sailor_index = 0;
     for(const auto& sailor : ship->GetSailors()){
         Vec2i current_sailor_pos;
         SailorState sailor_state = sailor->GetState();
         if(sailor_state == SailorState::kCannon){
             Vec2i cannon_pos = elements_positions->find(sailor->GetOperatedCannon())->second;
-            if(sailor->GetOperatedCannon()->GetOwners().first == sailor.get()){
+            if(sailor->GetOperatedCannon()->GetOwners().first == sailor){
                 current_sailor_pos = cannon_pos + Vec2i(0, 1);
             }else
                 current_sailor_pos = cannon_pos - Vec2i(0, 1);
@@ -454,8 +454,8 @@ void Monitor::DrawShipDeckSailors(const s_ptr<Ship>& ship, Rect screen_rect,
 
             // Find out at which position sailor operates mast
             int ind = 0;
-            for(auto mast_owner : *mast_owners){
-                if(mast_owner == sailor.get())
+            for(auto mast_owner : mast_owners){
+                if(mast_owner == sailor)
                     break;
                 ind++;
             }

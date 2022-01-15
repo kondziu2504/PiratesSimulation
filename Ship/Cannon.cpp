@@ -7,6 +7,13 @@
 
 using namespace std;
 
+Cannon::Cannon(Vec2f local_pos, WorldObject * parent) :
+        local_pos(local_pos) ,
+        parent(parent) {
+    owners.first = owners.second = nullptr;
+}
+
+
 void Cannon::Load() {
     {
         lock_guard<mutex> guard(load_mutex);
@@ -34,16 +41,16 @@ bool Cannon::TryClaim(Sailor * sailor) {
     return false;
 }
 
-bool Cannon::Loaded() {
+bool Cannon::Loaded() const {
     return loaded;
 }
 
-void Cannon::WaitUntilLoadedOrTimeout() {
+void Cannon::WaitUntilLoadedOrTimeout() const {
     unique_lock<mutex> lock(load_mutex);
     c_var_loaded.wait_for(lock, chrono::seconds(5), [&]{return loaded.load();});
 }
 
-std::pair<Sailor *, Sailor *> Cannon::GetOwners() {
+std::pair<Sailor *, Sailor *> Cannon::GetOwners() const {
     lock_guard<mutex> guard(ownership_mutex);
     return owners;
 }
@@ -56,8 +63,3 @@ void Cannon::Release(Sailor *sailor) {
         owners.second = nullptr;
 }
 
-Cannon::Cannon(Vec2f local_pos, WorldObject * parent) {
-    this->parent = parent;
-    this->local_pos = local_pos;
-    owners.first = owners.second = nullptr;
-}

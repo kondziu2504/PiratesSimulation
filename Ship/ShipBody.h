@@ -11,8 +11,8 @@
 class ShipBody {
     int hp;
     float length;
-    std::shared_ptr<ShipLayout> ship_layout;
-    std::shared_ptr<MastDistributor> distributor;
+    std::unique_ptr<ShipLayout> ship_layout;
+    std::unique_ptr<MastDistributor> distributor;
 
 public:
     explicit ShipBody(WorldObject * parent, int hp = 10, float length = 6, int mast_count = 3, int cannons_per_side = 3);
@@ -20,14 +20,14 @@ public:
     int GetHP() const;
     void Hit(int damage);
     float GetLength() const;
-    std::shared_ptr<MastDistributor> GetMastDistributor();
+    MastDistributor * GetMastDistributor();
 
-    std::shared_ptr<ShipObject> GetLeftJunction();
-    std::shared_ptr<ShipObject> GetRightJunction();
-    std::vector<std::shared_ptr<Cannon>> GetLeftCannons();
-    std::vector<std::shared_ptr<Cannon>> GetRightCannons();
-    std::shared_ptr<ShipObject> GetRestingPoint();
-    std::vector<std::shared_ptr<Mast>> GetMasts();
+    ShipObject * GetLeftJunction();
+    ShipObject * GetRightJunction();
+    std::vector<Cannon *> GetLeftCannons();
+    std::vector<Cannon *> GetRightCannons();
+    ShipObject * GetRestingPoint();
+    std::vector<Mast *> GetMasts();
 };
 
 

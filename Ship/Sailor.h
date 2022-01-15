@@ -29,9 +29,9 @@ enum class SailorOrder {kOperateCannons, kOperateMasts};
 
 class Sailor : public Stoppable {
     SailorState currentState = SailorState::kResting;
-    std::mutex sailor_mutex;
-    ShipBody * ship;
-    WorldObject * parent;
+    mutable std::mutex sailor_mutex;
+    ShipBody * const ship;
+    WorldObject * const parent;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
@@ -40,21 +40,21 @@ class Sailor : public Stoppable {
     std::atomic<bool> use_right_cannons = false;
 
     //Sailor activity/travel
-    std::mutex target_mutex;
+    mutable std::mutex target_mutex;
     float activity_progress = 0.f;
-    std::shared_ptr<ShipObject> previous_target = nullptr;
-    std::shared_ptr<ShipObject> next_target = nullptr;
+    ShipObject * previous_target = nullptr;
+    ShipObject * next_target = nullptr;
 
     //Operated elements
-    std::shared_ptr<Mast> operated_mast = nullptr;
-    std::shared_ptr<Cannon> assigned_cannon = nullptr;
+    Mast * operated_mast = nullptr;
+    Cannon * assigned_cannon = nullptr;
 
-    SailorActionStatus GoTo(std::shared_ptr<ShipObject> shipObject);
+    SailorActionStatus GoTo(ShipObject * shipObject);
 
     SailorActionStatus OperateTheShip();
 
-    std::shared_ptr<ShipObject> GetFightingSideJunction() const;
-    std::vector<std::shared_ptr<Cannon>> GetFightingSideCannons() const;
+    ShipObject * GetFightingSideJunction() const;
+    std::vector<Cannon *> GetFightingSideCannons() const;
     Vec2f CalculateCannonTarget() const;
     SailorActionStatus FulfillAssignedCannonRole();
     bool TryClaimFirstUnoccupiedCannon();
@@ -80,19 +80,19 @@ class Sailor : public Stoppable {
 
 public:
     explicit Sailor(ShipBody *ship_body, WorldObject *parent);
-    SailorState GetState();
+    SailorState GetState() const;
     void SetCurrentOrder(SailorOrder new_order);
     void SetCannonTarget(WorldObject * cannon_target);
     void SetUseRightCannons(bool right);
 
     //Operated elements
-    std::shared_ptr<Mast> GetOperatedMast() const;
-    std::shared_ptr<Cannon> GetOperatedCannon() const;
+    Mast * GetOperatedMast() const;
+    Cannon * GetOperatedCannon() const;
 
     //Sailor activities/travel
-    std::shared_ptr<ShipObject> GetPreviousTarget();
-    std::shared_ptr<ShipObject> GetNextTarget();
-    float GetProgress();
+    ShipObject * GetPreviousTarget() const;
+    ShipObject * GetNextTarget() const;
+    float GetProgress() const;
 };
 
 
