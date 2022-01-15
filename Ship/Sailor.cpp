@@ -223,7 +223,7 @@ void Sailor::SetCurrentOrder(SailorOrder new_order) {
 }
 
 void Sailor::SetCannonTarget(const weak_ptr<WorldObject> & target) {
-    this->cannon_target = cannon_target;
+    this->cannon_target = target;
 }
 
 SailorActionStatus Sailor::SleepAndCheckKilled(float seconds) {
