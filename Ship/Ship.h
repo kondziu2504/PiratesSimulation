@@ -25,7 +25,7 @@ class World;
 class Sailor;
 class Cannon;
 
-class Ship : public WorldObject, public Stopable {
+class Ship : public WorldObject, public Stoppable {
     std::shared_ptr<ShipBody> ship_body;
     std::shared_ptr<Crew> crew;
     std::shared_ptr<ShipController> ship_controller;

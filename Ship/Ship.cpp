@@ -2,18 +2,13 @@
 // Created by konrad on 14.05.2021.
 //
 
-#include <unistd.h>
 #include <thread>
-#include <iostream>
 #include <cmath>
 #include "Ship.h"
-#include "../World.h"
 #include "Mast.h"
 #include "MastDistributor.h"
 #include "Sailor.h"
-#include "../Util/Util.h"
 #include "Cannon.h"
-#include "ShipLayout.h"
 #include "Crew.h"
 #include "ShipController.h"
 
@@ -26,7 +21,7 @@ Ship::Ship(Vec2f pos, Vec2f direction, int sailors_count, int masts_count, int c
     const int kShipLength = 6;
     ship_body = make_shared<ShipBody>(this, kShipHealth, kShipLength, masts_count, cannons_per_side);
     crew = make_shared<Crew>(sailors_count, ship_body.get(), this);
-    ship_controller = make_shared<ShipController>(ship_body.get(), crew.get(), this);
+    ship_controller = make_shared<ShipController>(crew.get(), this);
 }
 
 void Ship::ApplyWind(Vec2f wind) {
@@ -34,7 +29,7 @@ void Ship::ApplyWind(Vec2f wind) {
             return;
     float wind_power = wind.Length();
     float effective_power = 0;
-    for(shared_ptr<Mast> mast : ship_body->GetMasts()){
+    for(const shared_ptr<Mast>& mast : ship_body->GetMasts()){
         Vec2f absolute_mast_dir = Vec2f::FromAngle(GetDirection().Angle() + mast->GetAngle());
         float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;

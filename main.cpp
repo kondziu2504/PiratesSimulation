@@ -3,7 +3,6 @@
 #include "Monitor.h"
 #include <memory>
 #include <ncurses.h>
-#include <thread>
 #include "Util/Vec2f.h"
 #include "Ship/Ship.h"
 
@@ -13,7 +12,7 @@ using namespace std;
 
 void ReadWorldSettingsFromArgs(int argc, char *argv[], unsigned int & seed, int & world_width, int & world_height);
 void SpawnRandomShips(int num_of_ships, World * world);
-void SpawnDebugShips(World * world);
+[[maybe_unused]] void SpawnDebugShips(World * world);
 void HandleKeyboardInput(World * world, Monitor * monitor);
 
 int main(int argc, char *argv[]) {
@@ -54,7 +53,7 @@ void SpawnRandomShips(int num_of_ships, World * world) {
         world->AddRandomShip();
 }
 
-void SpawnDebugShips(World * world) {
+[[maybe_unused]] void SpawnDebugShips(World * world) {
     world->AddShip(make_shared<Ship>(Vec2f(55,18), Vec2f(1, 0), 24, 3, 3, world));
     world->AddShip(make_shared<Ship>(Vec2f(95,15), Vec2f(-1,0), 5, 2, 2, world));
 }

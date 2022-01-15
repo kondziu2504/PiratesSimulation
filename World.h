@@ -10,13 +10,13 @@
 #include <mutex>
 #include "Util/Vec2f.h"
 #include "Util/Vec2i.h"
-#include "Stopable.h"
+#include "Stoppable.h"
 
 class Ship;
 class Wind;
 class Cannonball;
 
-class World : public Stopable{
+class World : public Stoppable{
 private:
     const int width, height;
     const std::unique_ptr<const bool[]> map;
@@ -34,7 +34,7 @@ private:
 
     static std::unique_ptr<bool[]> GenerateMap(int map_width, int map_height, unsigned int seed);
     Vec2f FindFreeSpotForShip();
-    void ShipLiveAndRespawn(std::shared_ptr<Ship> ship);
+    void ShipLiveAndRespawn(const std::shared_ptr<Ship>& ship);
 
 public:
     World(int width, int height, int seed);
@@ -43,7 +43,7 @@ public:
     void AddShip(const std::shared_ptr<Ship>& ship);
     void AddRandomShip();
     std::vector<std::shared_ptr<Cannonball>> GetCannonballs() const;
-    void AddCannonball(std::shared_ptr<Cannonball> cannonball);
+    void AddCannonball(const std::shared_ptr<Cannonball>& cannonball);
     std::shared_ptr<Wind> GetWind() const;
     int GetWidth() const;
     int GetHeight() const;

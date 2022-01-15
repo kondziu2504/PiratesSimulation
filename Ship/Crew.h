@@ -10,7 +10,7 @@
 #include "Sailor.h"
 #include "ShipBody.h"
 
-class Crew : public Stopable {
+class Crew : public Stoppable {
     const std::shared_ptr<const std::vector<std::shared_ptr<Sailor>>> sailors;
 
     static std::shared_ptr<std::vector<std::shared_ptr<Sailor>>> GenerateSailors(int sailors_count, ShipBody *operated_ship, WorldObject *parent);

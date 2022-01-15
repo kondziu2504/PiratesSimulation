@@ -2,9 +2,7 @@
 // Created by konrad on 18.05.2021.
 //
 
-#include <unistd.h>
 #include "Cannonball.h"
-#include <thread>
 #include "../World.h"
 #include "Ship.h"
 using namespace std;

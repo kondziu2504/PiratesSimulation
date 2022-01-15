@@ -2,9 +2,7 @@
 // Created by konrad on 18.05.2021.
 //
 
-#include <iostream>
 #include "Cannon.h"
-#include "../World.h"
 #include "Cannonball.h"
 
 using namespace std;

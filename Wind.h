@@ -7,13 +7,13 @@
 
 
 #include "Util/Vec2f.h"
-#include "Stopable.h"
+#include "Stoppable.h"
 #include <memory>
 #include <mutex>
 #include <atomic>
 class World;
 
-class Wind : public Stopable {
+class Wind : public Stoppable {
     Vec2f velocity = Vec2f(1,0);
     World * world;
     std::mutex wind_mutex;

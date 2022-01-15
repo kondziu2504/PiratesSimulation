@@ -22,7 +22,7 @@ enum class MonitorDisplayMode {kMap, kDashboard};
 template<typename T>
 using s_ptr = std::shared_ptr<T>;
 
-class Monitor : public Stopable{
+class Monitor : public Stoppable{
     enum class Tile {kWater = 1, kLand, kShip, kSail, kGray, kSailor, kCannon, kCannonball, kDestroyed, kIndicator};
 
     World * world;

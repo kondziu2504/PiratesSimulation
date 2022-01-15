@@ -8,9 +8,9 @@ Rect::Rect(int x, int y, int width, int height) :
         pos(x, y),
         size(width, height) {}
 
-bool Rect::IsPointInside(Vec2f point) {
-    return point.x >= pos.x && point.x < pos.x + size.x
-           && point.y >= pos.y && point.y < pos.y + size.y;
+bool Rect::IsPointInside(Vec2f point) const {
+    return point.x >= (float)pos.x && point.x < (float)pos.x + (float)size.x
+           && point.y >= (float)pos.y && point.y < (float)pos.y + (float)size.y;
 }
 
 Rect::Rect(Vec2i pos, Vec2i size) : pos(pos), size(size) {}

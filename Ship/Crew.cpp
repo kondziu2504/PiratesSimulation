@@ -25,12 +25,12 @@ std::vector<std::shared_ptr<Sailor>> Crew::GetSailors() {
 }
 
 void Crew::SetOrders(SailorOrder new_order) {
-    for(auto sailor : *sailors)
+    for(const auto& sailor : *sailors)
         sailor->SetCurrentOrder(new_order);
 }
 
 void Crew::SetCannonsTarget(WorldObject *target) {
-    for(auto sailor : *sailors)
+    for(const auto& sailor : *sailors)
         sailor->SetCannonTarget(target);
 }
 
@@ -43,13 +43,13 @@ void Crew::SetUseRightCannons(bool right) {
 void Crew::ThreadFunc(const atomic<bool> &stop_requested) {
     vector<thread> sailors_threads;
 
-    for(auto sailor : *sailors)
+    for(const auto& sailor : *sailors)
         sailor->Start();
 
     WaitUntilStopRequested();
-    for(auto sailor : *sailors)
+    for(const auto& sailor : *sailors)
         sailor->RequestStop();
 
-    for(auto sailor : *sailors)
+    for(const auto& sailor : *sailors)
         sailor->WaitUntilStopped();
 }

@@ -2,12 +2,12 @@
 // Created by konrad on 13.01.2022.
 //
 
-#include "Stopable.h"
+#include "Stoppable.h"
 #include <thread>
 
 using namespace std;
 
-void Stopable::Start() {
+void Stoppable::Start() {
     thread _thread([this](){
         ThreadFunc(stop_requested);
         lock_guard<mutex> guard(stopped_mutex);
@@ -17,19 +17,19 @@ void Stopable::Start() {
     _thread.detach();
 }
 
-void Stopable::RequestStop() {
+void Stoppable::RequestStop() {
     stop_requested = true;
     stop_requested_c_var.notify_all();
 }
 
-void Stopable::WaitUntilStopped() {
+void Stoppable::WaitUntilStopped() {
     unique_lock<mutex> lock(stopped_mutex);
     if(stopped)
         return;
     thread_func_finished.wait(lock, [this](){return stopped.load();});
 }
 
-void Stopable::WaitUntilStopRequested() {
+void Stoppable::WaitUntilStopRequested() {
     if(stop_requested)
         return;
     mutex c_var_mutex;
@@ -37,11 +37,11 @@ void Stopable::WaitUntilStopRequested() {
     stop_requested_c_var.wait(lock, [this](){return stop_requested.load();});
 }
 
-bool Stopable::GetStopRequested() {
+bool Stoppable::GetStopRequested() {
     return stop_requested;
 }
 
-Stopable::~Stopable() {
+Stoppable::~Stoppable() {
     RequestStop();
     WaitUntilStopped();
 }

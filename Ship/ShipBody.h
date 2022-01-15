@@ -15,7 +15,7 @@ class ShipBody {
     std::shared_ptr<MastDistributor> distributor;
 
 public:
-    explicit ShipBody(WorldObject * parent, int hp = 10, int length = 6, int mast_count = 3, int cannons_per_side = 3);
+    explicit ShipBody(WorldObject * parent, int hp = 10, float length = 6, int mast_count = 3, int cannons_per_side = 3);
 
     int GetHP() const;
     void Hit(int damage);

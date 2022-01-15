@@ -16,7 +16,7 @@ struct Rect {
     Rect(int x, int y, int width, int height);
     Rect(Vec2i pos, Vec2i size);
 
-    bool IsPointInside(Vec2f point);
+    bool IsPointInside(Vec2f point) const;
 };
 
 

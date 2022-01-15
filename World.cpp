@@ -47,7 +47,7 @@ void World::AddShip(const std::shared_ptr<Ship>& ship) {
 
 void World::AddRandomShip() {
     Vec2f pos = FindFreeSpotForShip();
-    Vec2f direction = Vec2f::FromAngle((float)rand() / RAND_MAX * 6.28);
+    Vec2f direction = Vec2f::FromAngle((float)rand() / RAND_MAX * 6.28f);
     int sailors = 10 + rand() % 25;
     int masts = 2 + rand() % 3;
     int cannonsPerSide = 2 + rand() % 3;
@@ -56,7 +56,7 @@ void World::AddRandomShip() {
     AddShip(newShip);
 }
 
-void World::ShipLiveAndRespawn(shared_ptr<Ship> ship) {
+void World::ShipLiveAndRespawn(const shared_ptr<Ship>& ship) {
     thread ship_thread([=](){
         ship->Start();
         ship->WaitUntilStopped();
@@ -74,33 +74,33 @@ Vec2f World::FindFreeSpotForShip() {
     const int searched_square_size = 14;
     const int half_square = searched_square_size / 2;
     Vec2f pos;
-    bool goodField;
+    bool good_field;
     do{
-        goodField = true;
-        pos = Vec2f(rand() % width, rand() % height);
+        good_field = true;
+        pos = Vec2f((float)(rand() % width), (float)(rand() % height));
         for(int x = -half_square; x <= half_square / 2; x++) {
             for(int y = -half_square; y <= half_square; y++) {
-                Vec2f newPos = Vec2f(pos.x + x, pos.y + y);
-                if (newPos.x < 0 || newPos.x >= width || newPos.y < 0 || newPos.y >= height) {
-                    goodField = false;
+                Vec2f new_pos = pos + Vec2f((float)x, (float)y);
+                if (new_pos.x < 0 || new_pos.x >= (float)width || new_pos.y < 0 || new_pos.y >= (float)height) {
+                    good_field = false;
                     break;
                 }
-                if(map[newPos.y * width + newPos.x]) {
-                    goodField = false;
+                if(IsLandAt((Vec2i)new_pos)) {
+                    good_field = false;
                     break;
                 }
             }
-            if (!goodField)
+            if (!good_field)
                 break;
         }
         {
             lock_guard<mutex> guard(ships_mutex);
             for(const auto& ship : ships){
                 if((ship->GetPosition() - pos).Length() < half_square)
-                    goodField = false;
+                    good_field = false;
             }
         }
-    }while(!goodField);
+    }while(!good_field);
 
     return pos;
 }
@@ -132,7 +132,7 @@ std::vector<std::shared_ptr<Cannonball>> World::GetCannonballs() const {
     return cannonballs;
 }
 
-void World::AddCannonball(std::shared_ptr<Cannonball> cannonball) {
+void World::AddCannonball(const std::shared_ptr<Cannonball>& cannonball) {
     {
         lock_guard<mutex> guard(cannonballs_mutex);
         cannonballs.push_back(cannonball);

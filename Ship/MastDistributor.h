@@ -19,9 +19,7 @@ template<typename T>
 using s_ptr = std::shared_ptr<T>;
 
 class MastDistributor {
-    std::vector<std::shared_ptr<Mast>> masts;
-
-    std::map<s_ptr<Mast>, s_ptr<std::vector<Sailor*>>> masts_owners;
+    std::map<s_ptr<Mast>, s_ptr<std::vector<Sailor*>>> masts_map_owners;
     std::mutex masts_owners_mutex;
     std::condition_variable c_var_mast_freed;
 
@@ -31,7 +29,6 @@ public:
     explicit MastDistributor(std::vector<std::shared_ptr<Mast>> masts);
     std::shared_ptr<Mast> RequestMast(Sailor * sailor);
     void ReleaseMast(std::shared_ptr<Mast> mast, Sailor * sailor);
-    int OccupiedMasts();
 };
 
 

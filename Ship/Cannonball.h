@@ -8,11 +8,11 @@
 #include <mutex>
 #include <atomic>
 #include "../Util/Vec2f.h"
-#include "../Stopable.h"
+#include "../Stoppable.h"
 
 class World;
 
-class Cannonball : public Stopable{
+class Cannonball : public Stoppable{
     std::atomic<float> progress = 0.f;
     Vec2f origin;
     Vec2f target;

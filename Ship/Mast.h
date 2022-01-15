@@ -16,7 +16,7 @@ class MastDistributor;
 class Ship;
 
 class Mast : public ShipObject{
-    int max_slots = 4;
+    const int max_slots = 4;
     float angle = 0.f;
 
     WorldObject * parent;

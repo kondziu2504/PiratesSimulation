@@ -16,7 +16,7 @@ ShipLayout::ShipLayout(int masts_count, int cannons_per_side, float ship_length,
     for(int i = 0; i < masts_count; i++)
         masts->push_back(make_shared<Mast>(parent));
     for(int i = 0; i < cannons_per_side; i++){
-        Vec2f local_canon_pos = parent->GetDirection() * -1 * ship_length * ((i + 0.5f) / cannons_per_side - 0.5f);
+        Vec2f local_canon_pos = parent->GetDirection() * -1 * ship_length * (((float)i + 0.5f) / (float)cannons_per_side - 0.5f);
         ShipLayout::right_cannons.push_back(make_shared<Cannon>(local_canon_pos, parent));
         ShipLayout::left_cannons.push_back(make_shared<Cannon>(local_canon_pos, parent));
     }

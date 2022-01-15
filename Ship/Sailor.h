@@ -27,7 +27,7 @@ enum class SailorState {kMast, kResting, kWalking, kWaitingMast, kStanding,
 
 enum class SailorOrder {kOperateCannons, kOperateMasts};
 
-class Sailor : public Stopable {
+class Sailor : public Stoppable {
     SailorState currentState = SailorState::kResting;
     std::mutex sailor_mutex;
     ShipBody * ship;
@@ -41,7 +41,7 @@ class Sailor : public Stopable {
 
     //Sailor activity/travel
     std::mutex target_mutex;
-    float activity_progress;
+    float activity_progress = 0.f;
     std::shared_ptr<ShipObject> previous_target = nullptr;
     std::shared_ptr<ShipObject> next_target = nullptr;
 

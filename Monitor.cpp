@@ -116,7 +116,7 @@ void Monitor::DrawTile(Vec2i screen_coords, char character, Tile tile) {
 }
 
 void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
-    // By deafult make drawn world match console size
+    // By default, make drawn world match console size
     if(world_viewport.size.x == 0) {
         winsize win_size{};
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);

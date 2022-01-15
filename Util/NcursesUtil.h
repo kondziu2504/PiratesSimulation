@@ -16,9 +16,9 @@ namespace ncurses_util {
     void InitAllPossibleColorPairs();
     void SetColor(int fg, int bg);
     void UnsetColor(int fg, int bg);
-    void AddText(Vec2i screen_coords, std::string text, int fg_color = COLOR_WHITE, int bg_color = COLOR_BLACK);
+    void AddText(Vec2i screen_coords, const std::string& text, int fg_color = COLOR_WHITE, int bg_color = COLOR_BLACK);
     void AddText(Vec2i screen_coords, char character, int fg_color = COLOR_WHITE, int bg_color = COLOR_BLACK);
-    void AddTextColorPair(Vec2i screen_coords, std::string text, int color_pair);
+    void AddTextColorPair(Vec2i screen_coords, const std::string& text, int color_pair);
     void AddTextColorPair(Vec2i screen_coords, char character, int color_pair);
 
     class ConsoleWriter {
@@ -28,7 +28,7 @@ namespace ncurses_util {
     public:
         explicit ConsoleWriter(Vec2i console_screen_pos) : console_screen_pos(console_screen_pos) {};
         void ModifyIndent(int size);
-        void AddLine(std::string text, int fg_color = COLOR_WHITE, int bg_color = COLOR_BLACK);
+        void AddLine(const std::string& text, int fg_color = COLOR_WHITE, int bg_color = COLOR_BLACK);
     };
 }
 

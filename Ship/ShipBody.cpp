@@ -19,7 +19,7 @@ float ShipBody::GetLength() const {
     return length;
 }
 
-ShipBody::ShipBody(WorldObject * parent, int hp, int length, int mast_count, int cannons_per_side) {
+ShipBody::ShipBody(WorldObject * parent, int hp, float length, int mast_count, int cannons_per_side) {
     this->hp = hp;
     this->length = length;
     ship_layout = make_shared<ShipLayout>(mast_count, cannons_per_side, length, parent);

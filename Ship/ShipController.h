@@ -12,13 +12,14 @@
 
 class Ship;
 
-class ShipController : public Stopable {
-    ShipBody * ship_body;
+class ShipController : public Stoppable {
     Crew * crew;
 
     std::atomic<ShipState> state = ShipState::kWandering;
     Ship * parent = nullptr;
     Ship * enemy = nullptr;
+    const float enemy_lookout_radius = 9.f;
+    const float obstacles_lookout_radius = 9.f;
 
     void ThreadFunc(const std::atomic<bool> &stop_requested) override;
 
@@ -33,12 +34,12 @@ class ShipController : public Stopable {
     void SetState(ShipState new_state);
     void AdjustDirection();
 
-    Vec2f CalculateCorrectionAgainstLand(int scan_dist, int& closest_tile_dist) const;
-    Vec2f CalculateCorrectionAgainstShips(int scan_dist, int& closest_tile_dist) const;
-    void ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2f correction);
+    Vec2f CalculateCorrectionAgainstLand(float & closest_tile_dist) const;
+    Vec2f CalculateCorrectionAgainstShips(float & closest_tile_dist) const;
+    void ApplyCorrection(float closest_tile_dist, Vec2f correction);
 
 public:
-    explicit ShipController(ShipBody *ship_body, Crew *crew, Ship *parent);
+    explicit ShipController(Crew *crew, Ship *parent);
     ShipState GetState();
     void PrepareForFight(Ship * ship);
 };

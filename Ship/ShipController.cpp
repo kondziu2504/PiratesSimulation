@@ -29,9 +29,8 @@ bool ShipController::LookForEnemy() {
         if(ship.get() != parent &&
            ship->GetState() != ShipState::kSinking &&
            ship->GetState() != ShipState::kDestroyed){
-            const int lookout_radius = 9;
             float dist = (ship->GetPosition() - parent->GetPosition()).Length();
-            if(dist < lookout_radius){
+            if(dist < enemy_lookout_radius){
                 EngageFight(ship.get());
                 return true;
             }
@@ -52,7 +51,7 @@ void ShipController::StartTurningTowardsAngle(float target_angle) {
 
     while(CurrentDeviation() > kMaxDeviationFromTargetAngle){
         float angle_diff = AngleDifference(target_angle, CurrentAngle());
-        const float kAngleCorrection = min(abs(angle_diff), 0.1f) * (angle_diff > 0 ? 1 : -1);
+        const float kAngleCorrection = min(abs(angle_diff), 0.1f) * (angle_diff > 0 ? 1.f : -1.f);
         parent->SetDirection(parent->GetDirection().Rotated(kAngleCorrection));
         SleepSeconds(0.1f);
     }
@@ -84,28 +83,25 @@ ShipState ShipController::GetState() {
 }
 
 void ShipController::AdjustDirection() {
-    const int scan_dist = 9;
-    int closest_tile_dist = scan_dist;
+    float closest_tile_dist = obstacles_lookout_radius;
     Vec2f total_correction(0, 0);
-    total_correction += CalculateCorrectionAgainstLand(scan_dist, closest_tile_dist);
-    total_correction += CalculateCorrectionAgainstShips(scan_dist, closest_tile_dist);
-    ApplyCorrection(scan_dist, closest_tile_dist, total_correction);
+    total_correction += CalculateCorrectionAgainstLand(closest_tile_dist);
+    total_correction += CalculateCorrectionAgainstShips(closest_tile_dist);
+    ApplyCorrection(closest_tile_dist, total_correction);
 }
 
-Vec2f ShipController::CalculateCorrectionAgainstLand(int scan_dist, int &closest_tile_dist) const {
+Vec2f ShipController::CalculateCorrectionAgainstLand(float & closest_tile_dist) const {
     Vec2f correction(0, 0);
     for(int j = 0; j < 16; j++){
-        Vec2f checkDir = Vec2f::FromAngle((float)j/16 * 2 * M_PI);
-        for(int i = 0; i < scan_dist; i++){
-            Vec2f scannedTile = parent->GetPosition() + checkDir * i;
-            scannedTile.x = (int)scannedTile.x;
-            scannedTile.y = (int)scannedTile.y;
-            bool tileOutsideWorld = !parent->GetWorld()->CoordsInsideWorld((Vec2i) scannedTile);
-            if(parent->GetWorld()->IsLandAt((Vec2i)scannedTile) || tileOutsideWorld){
-                if(!(parent->GetPosition() - scannedTile).Length() == 0){
-                    Vec2f correction_dir = (parent->GetPosition() - scannedTile).Normalized();
-                    float significance = (float)(scan_dist - i) / scan_dist;
-                    closest_tile_dist = min(closest_tile_dist, i);
+        Vec2f checkDir = Vec2f::FromAngle((float)j/16 * 2 * (float)M_PI);
+        for(int i = 0; i < (int)obstacles_lookout_radius; i++){
+            Vec2i scannedTile = (Vec2i)(parent->GetPosition() + checkDir * i);
+            bool tileOutsideWorld = !parent->GetWorld()->CoordsInsideWorld(scannedTile);
+            if(parent->GetWorld()->IsLandAt(scannedTile) || tileOutsideWorld){
+                if((parent->GetPosition() - (Vec2f)scannedTile).Length() != 0){
+                    Vec2f correction_dir = (parent->GetPosition() - (Vec2f)scannedTile).Normalized();
+                    float significance = (obstacles_lookout_radius - (float)i) / obstacles_lookout_radius;
+                    closest_tile_dist = min(closest_tile_dist, (float)i);
                     correction = correction + correction_dir * significance;
                 }
             }
@@ -114,16 +110,16 @@ Vec2f ShipController::CalculateCorrectionAgainstLand(int scan_dist, int &closest
     return correction;
 }
 
-Vec2f ShipController::CalculateCorrectionAgainstShips(int scan_dist, int &closest_tile_dist) const {
+Vec2f ShipController::CalculateCorrectionAgainstShips(float &closest_tile_dist) const {
     Vec2f correction;
-    for(shared_ptr<Ship> ship : parent->GetWorld()->GetShips()){
+    for(const shared_ptr<Ship>& ship : parent->GetWorld()->GetShips()){
         if(ship.get() != parent){
             Vec2f ship_pos = ship->GetPosition();
             float dist = (parent->GetPosition() - ship_pos).Length();
-            if(dist < scan_dist && dist > 0){
+            if(dist < obstacles_lookout_radius && dist > 0){
                 Vec2f correction_dir = (parent->GetPosition()  - ship_pos).Normalized();
-                float significance = (float)(scan_dist - dist) / scan_dist;
-                closest_tile_dist = min(closest_tile_dist, (int)dist);
+                float significance = (float)(obstacles_lookout_radius - dist) / obstacles_lookout_radius;
+                closest_tile_dist = min(closest_tile_dist, dist);
                 correction = correction + correction_dir * significance;
             }
         }
@@ -131,10 +127,10 @@ Vec2f ShipController::CalculateCorrectionAgainstShips(int scan_dist, int &closes
     return correction;
 }
 
-void ShipController::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2f correction) {
+void ShipController::ApplyCorrection(float closest_tile_dist, Vec2f correction) {
     if(correction.Length() != 0){
         Vec2f normalized_correction = correction.Normalized();
-        float correction_significance = (float)(scan_dist - closest_tile_dist) / scan_dist;
+        float correction_significance = (float)(obstacles_lookout_radius - closest_tile_dist) / obstacles_lookout_radius;
         if(parent->GetDirection().Dot(normalized_correction) > 0)
             correction_significance = 0;
         parent->SetDirection(parent->GetDirection() + normalized_correction * correction_significance);
@@ -142,8 +138,7 @@ void ShipController::ApplyCorrection(int scan_dist, int closest_tile_dist, Vec2f
     }
 }
 
-ShipController::ShipController(ShipBody *ship_body, Crew *crew, Ship *parent) {
-    this->ship_body = ship_body;
+ShipController::ShipController(Crew *crew, Ship *parent) {
     this->crew = crew;
     this->parent = parent;
 }

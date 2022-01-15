@@ -4,7 +4,6 @@
 
 #include "Wind.h"
 #include <thread>
-#include <unistd.h>
 #include "World.h"
 #include "Ship/Ship.h"
 
