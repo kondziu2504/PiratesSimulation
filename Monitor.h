@@ -26,6 +26,9 @@ class Monitor : public Stoppable{
     std::atomic<MonitorDisplayMode> display_mode = MonitorDisplayMode::kMap;
     std::atomic<int> current_ship_ind = 0;
 
+    Vec2i camera_pos = {0, 0};
+    const int kCameraMoveDelta = 10;
+
     static const std::vector<int> kSailorsColors;
     static const std::unordered_map<SailorState, std::string> sailor_states_map_strings;
     static const std::unordered_map<Tile, int> tiles_map_color_pairs;
@@ -69,12 +72,20 @@ class Monitor : public Stoppable{
     void DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship);
     void DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship);
 
+    static Vec2i ToInverseY(Vec2i coords, int height);
+    static Vec2i GetWindowSize();
+
 public:
     explicit Monitor(World * world);
 
     void NextShip();
     void PrevShip();
     void ChangeDisplayMode();
+
+    void MoveCameraUp();
+    void MoveCameraDown();
+    void MoveCameraLeft();
+    void MoveCameraRight();
 };
 
 

@@ -73,7 +73,7 @@ void Monitor::Update() {
     clear();
 
     if(display_mode == MonitorDisplayMode::kMap)
-        DrawWorld();
+        DrawWorld({0, 0}, {camera_pos - Vec2i(0, GetWindowSize().y - world->GetHeight()) , {0, 0}});
     else
         DrawChosenShip();
 
@@ -89,12 +89,11 @@ void Monitor::DrawChosenShip() {
     }
 }
 
-void
-Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
+void Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
     for(int x = 0; x < world_viewport.size.x; x++){
         for(int y = 0; y < world_viewport.size.y; y++){
             Vec2i map_coords = world_viewport.pos + Vec2i(x, y);
-            Vec2i screen_coords = screen_offset + Vec2i(x, y);
+            Vec2i screen_coords = ToInverseY(screen_offset + Vec2i(x, y), world_viewport.size.y);
 
             if(world->CoordsInsideWorld(map_coords)){
                 if(world->IsLandAt(map_coords))
@@ -114,14 +113,10 @@ void Monitor::DrawTile(Vec2i screen_coords, char character, Tile tile) {
 void Monitor::DrawWorld(Vec2i screen_offset, Rect world_viewport) {
     // By default, make drawn world match console size
     if(world_viewport.size.x == 0) {
-        winsize win_size{};
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
-        world_viewport.size.x = win_size.ws_col;
+        world_viewport.size.x = GetWindowSize().x;
     }
     if(world_viewport.size.y == 0) {
-        winsize win_size{};
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
-        world_viewport.size.y = win_size.ws_row;
+        world_viewport.size.y = GetWindowSize().y;
     }
 
     DrawMap(screen_offset, world_viewport);
@@ -149,8 +144,8 @@ void Monitor::DrawShip(const std::shared_ptr<const Ship> & ship, Vec2i screen_of
                         (float)i - width / 2).Rotated(ship_dir.Angle());
                 Vec2f tile_world_pos = Vec2f(ship_pos.x + tile_rotated_local_pos.x, ship_pos.y + tile_rotated_local_pos.y);
                 if(world_viewport.IsPointInside(tile_world_pos)){
-                    Vec2i screen_coords = screen_offset + (Vec2i)(tile_world_pos - (Vec2f)world_viewport.pos);
-                    Tile ship_tile = ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed ? Tile::kShip : Tile::kDestroyed;
+                    Vec2i screen_coords = ToInverseY(screen_offset + (Vec2i)(tile_world_pos - (Vec2f)world_viewport.pos), world_viewport.size.y);
+                    Tile ship_tile = (ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed) ? Tile::kShip : Tile::kDestroyed;
                     DrawTile(screen_coords,pixel,ship_tile);
                 }
             }
@@ -158,11 +153,11 @@ void Monitor::DrawShip(const std::shared_ptr<const Ship> & ship, Vec2i screen_of
     }
 }
 
-void Monitor::DrawShips(Vec2i offset, Rect world_viewport) {
+void Monitor::DrawShips(Vec2i screen_offset, Rect world_viewport) {
     for(const auto ship : world->GetShips()) {
         auto _ship = ship.lock();
         if(_ship)
-            DrawShip(_ship, offset, world_viewport);
+            DrawShip(_ship, screen_offset, world_viewport);
     }
 }
 
@@ -375,7 +370,7 @@ void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
             continue;
         Vec2f cannonball_pos = cannonball->GetPos();
         if(world_viewport.IsPointInside(cannonball_pos)) {
-            Vec2i screen_coords = screen_offset - world_viewport.pos + (Vec2i)cannonball_pos;
+            Vec2i screen_coords = ToInverseY(screen_offset - world_viewport.pos + (Vec2i)cannonball_pos, world_viewport.size.y);
             DrawTile(screen_coords, 'O', Tile::kCannonball);
         }
     }
@@ -511,6 +506,34 @@ void Monitor::ThreadFunc(const atomic<bool> &stop_requested) {
 
 int Monitor::GetTileColorPair(Monitor::Tile tile) {
     return tiles_map_color_pairs.at(tile);
+}
+
+void Monitor::MoveCameraUp() {
+    camera_pos.y += kCameraMoveDelta;
+}
+
+void Monitor::MoveCameraDown() {
+    camera_pos.y -= kCameraMoveDelta;
+}
+
+void Monitor::MoveCameraLeft() {
+    camera_pos.x -= kCameraMoveDelta;
+}
+
+void Monitor::MoveCameraRight() {
+    camera_pos.x += kCameraMoveDelta;
+}
+
+Vec2i Monitor::ToInverseY(Vec2i coords, int height) {
+    coords.y *= -1;
+    coords.y += height - 1;
+    return coords;
+}
+
+Vec2i Monitor::GetWindowSize() {
+    winsize win_size{};
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
+    return {win_size.ws_col, win_size.ws_row};
 }
 
 

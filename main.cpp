@@ -21,11 +21,11 @@ int main(int argc, char *argv[]) {
     ncurses_util::Initialize();
 
     unsigned int seed = 1;
-    int world_width = 130, world_height = 60;
+    int world_width = 200, world_height = 100;
     ReadWorldSettingsFromArgs(argc, argv, seed, world_width, world_height);
 
     World world(world_width, world_height, seed);
-    SpawnRandomShips(5, &world);
+    SpawnRandomShips(10, &world);
 
     world.Start();
 
@@ -65,8 +65,16 @@ void HandleKeyboardInput(World * world, Monitor * monitor) {
             monitor->ChangeDisplayMode();
         }else if(key == 'a'){
             monitor->PrevShip();
-        }else if(key == 'd'){
+        }else if(key == 'd') {
             monitor->NextShip();
+        }else if(key == KEY_UP){
+            monitor->MoveCameraUp();
+        }else if(key == KEY_DOWN){
+            monitor->MoveCameraDown();
+        }else if(key == KEY_LEFT){
+            monitor->MoveCameraLeft();
+        }else if(key == KEY_RIGHT){
+            monitor->MoveCameraRight();
         }else if(key == KEY_ESC){
             world->RequestStop();
             world->WaitUntilStopped();

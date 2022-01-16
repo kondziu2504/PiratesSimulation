@@ -28,3 +28,7 @@ Vec2f Vec2i::operator*(const float & second) const {
 Vec2i::operator Vec2f() const {
     return {(float)this->x, (float)this->y};
 }
+
+Vec2i Vec2i::operator-() const {
+    return {-this->x, -this->y};
+}

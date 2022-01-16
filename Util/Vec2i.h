@@ -20,6 +20,7 @@ struct Vec2i {
     Vec2i operator+(const Vec2i & second) const;
     Vec2i operator-(const Vec2i & second) const;
     Vec2f operator*(const float & second) const;
+    Vec2i operator-() const;
 };
 
 
