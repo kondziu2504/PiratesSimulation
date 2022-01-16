@@ -33,7 +33,7 @@ float RandomFromRange(float min, float max){
 
 
 void SleepSeconds(float seconds){
-    usleep((unsigned int)(1'000'000 * seconds));
+    usleep((unsigned int)(1000000 * seconds));
 }
 
 void DoRepeatedlyForATime(const std::function<void(float progress, bool & stop)>& action, float totalTimeInSeconds, float updatePeriodInSeconds){

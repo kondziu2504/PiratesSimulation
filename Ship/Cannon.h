@@ -27,12 +27,12 @@ class Cannon : public ShipObject {
 
     std::atomic<bool> loaded = false;
     mutable std::mutex load_mutex;
-    mutable std::condition_variable c_var_loaded;
+    mutable std::condition_variable c_var_loaded_or_released;
 public:
     explicit Cannon(Vec2f local_pos, WorldObject * parent);
     std::pair<Sailor *, Sailor *> GetOwners() const;
     bool Loaded() const;
-    void WaitUntilLoadedOrTimeout() const;
+    void WaitUntilLoadedOrTimeout(const std::function<bool()>& StopCondition) const;
     void Load();
     void Shoot(Vec2f target);
     bool TryClaim(Sailor * sailor);

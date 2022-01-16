@@ -59,28 +59,35 @@ void SpawnRandomShips(int num_of_ships, World * world) {
 }
 
 void HandleKeyboardInput(World * world, Monitor * monitor) {
-    while(true){
+    while(true) {
         int key = getch();
-        if(key == ' '){
+        if (key == ' ') {
             monitor->ChangeDisplayMode();
-        }else if(key == 'a'){
-            monitor->PrevShip();
-        }else if(key == 'd') {
-            monitor->NextShip();
-        }else if(key == KEY_UP){
-            monitor->MoveCameraUp();
-        }else if(key == KEY_DOWN){
-            monitor->MoveCameraDown();
-        }else if(key == KEY_LEFT){
-            monitor->MoveCameraLeft();
-        }else if(key == KEY_RIGHT){
-            monitor->MoveCameraRight();
-        }else if(key == KEY_ESC){
+        } else if (key == KEY_ESC) {
             world->RequestStop();
             world->WaitUntilStopped();
             monitor->RequestStop();
             monitor->WaitUntilStopped();
             break;
+        } else {
+            auto display_mode = monitor->GetDisplayMode();
+            if (display_mode == MonitorDisplayMode::kMap) {
+                if (key == KEY_UP or key == 'w') {
+                    monitor->MoveCameraUp();
+                } else if (key == KEY_DOWN or key == 's') {
+                    monitor->MoveCameraDown();
+                } else if (key == KEY_LEFT or key == 'a') {
+                    monitor->MoveCameraLeft();
+                } else if (key == KEY_RIGHT or key == 'd') {
+                    monitor->MoveCameraRight();
+                }
+            } else if(display_mode == MonitorDisplayMode::kDashboard) {
+                if (key == KEY_LEFT or key == 'a') {
+                    monitor->PrevShip();
+                } else if (key == KEY_RIGHT or key == 'd') {
+                    monitor->NextShip();
+                }
+            }
         }
     }
 }

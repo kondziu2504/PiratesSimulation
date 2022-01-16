@@ -81,12 +81,26 @@ void Monitor::Update() {
 }
 
 void Monitor::DrawChosenShip() {
-    shared_ptr<Ship> chosen_ship;
-    auto ships = world->GetShips();
-    if(!ships.empty() && current_ship_ind < ships.size()){
-        chosen_ship = ships.at(current_ship_ind).lock();
-        DrawShipInfo(chosen_ship);
+    shared_ptr<Ship> _current_ship;
+    {
+        lock_guard<mutex> guard(current_ship_mutex);
+        _current_ship = current_ship.lock();
+        if (!_current_ship) {
+            auto ships = world->GetShips();
+            if (!ships.empty()) {
+                for (auto ship: ships) {
+                    auto _ship = ship.lock();
+                    if (_ship) {
+                        current_ship = ship;
+                        _current_ship = _ship;
+                        break;
+                    }
+                }
+            }
+        }
     }
+    if(_current_ship)
+        DrawShipInfo(_current_ship);
 }
 
 void Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
@@ -377,15 +391,39 @@ void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
 }
 
 void Monitor::NextShip() {
-    current_ship_ind++;
-    if(current_ship_ind >= world->GetShips().size())
-        current_ship_ind = 0;
+    auto ships = world->GetShips();
+    lock_guard<mutex> guard(current_ship_mutex);
+    auto cur_ship_it = std::find_if(ships.begin(), ships.end(),
+                                    [this](weak_ptr<Ship> & ship) {
+                                        auto _ship = ship.lock();
+                                        return (_ship == current_ship.lock()) && _ship != nullptr;
+                                    });
+
+    if(cur_ship_it == ships.end())
+        return;
+
+    if(++cur_ship_it != ships.end())
+        current_ship = *cur_ship_it;
+    else
+        current_ship = *ships.begin();
 }
 
 void Monitor::PrevShip() {
-    current_ship_ind--;
-    if(current_ship_ind < 0)
-        current_ship_ind = max(0, (int)world->GetShips().size() - 1);
+    auto ships = world->GetShips();
+    lock_guard<mutex> guard(current_ship_mutex);
+    auto cur_ship_it = std::find_if(ships.begin(), ships.end(),
+                                    [this](weak_ptr<Ship> & ship) {
+                                        auto _ship = ship.lock();
+                                        return (_ship == current_ship.lock()) && _ship != nullptr;
+                                    });
+
+    if(cur_ship_it == ships.end())
+        return;
+
+    if(cur_ship_it != ships.begin())
+        current_ship = *(--cur_ship_it);
+    else
+        current_ship = *(--ships.end());
 }
 
 void Monitor::ChangeDisplayMode() {
@@ -534,6 +572,10 @@ Vec2i Monitor::GetWindowSize() {
     winsize win_size{};
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &win_size);
     return {win_size.ws_col, win_size.ws_row};
+}
+
+MonitorDisplayMode Monitor::GetDisplayMode() {
+    return display_mode;
 }
 
 

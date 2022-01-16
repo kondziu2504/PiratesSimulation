@@ -24,7 +24,8 @@ class Monitor : public Stoppable{
 
     World * const world;
     std::atomic<MonitorDisplayMode> display_mode = MonitorDisplayMode::kMap;
-    std::atomic<int> current_ship_ind = 0;
+    std::mutex current_ship_mutex;
+    std::weak_ptr<Ship> current_ship;
 
     Vec2i camera_pos = {0, 0};
     const int kCameraMoveDelta = 10;
@@ -81,6 +82,7 @@ public:
     void NextShip();
     void PrevShip();
     void ChangeDisplayMode();
+    MonitorDisplayMode GetDisplayMode();
 
     void MoveCameraUp();
     void MoveCameraDown();

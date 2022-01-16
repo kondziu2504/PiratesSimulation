@@ -24,7 +24,7 @@ class MastDistributor {
 public:
     std::map<Mast *, std::vector<Sailor*>> GetMastsOwners() const;
     explicit MastDistributor(const std::vector<Mast *> & masts);
-    Mast * RequestMast(Sailor * sailor);
+    [[nodiscard]] Mast * RequestMast(Sailor * sailor);
     void ReleaseMast(Mast * mast, Sailor * sailor);
 };
 

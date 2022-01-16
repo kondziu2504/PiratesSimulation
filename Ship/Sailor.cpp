@@ -34,10 +34,8 @@ void Sailor::SetState(SailorState new_state) {
 
 SailorActionStatus Sailor::OperateMast() {
     SetState(SailorState::kMast);
-    if(ContinuouslyAdjustMast() == SailorActionStatus::kKilledDuringAction){
-        ReleaseMast();
+    if(ContinuouslyAdjustMast() == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
-    }
     ReleaseMast();
     SetState(SailorState::kStanding);
     return SailorActionStatus::kSuccess;
@@ -82,10 +80,8 @@ SailorActionStatus Sailor::WaitForCannon() {
 
 SailorActionStatus Sailor::UseCannon() {
     SetState(SailorState::kCannon);
-    if(SleepAndCheckKilled(2) == SailorActionStatus::kKilledDuringAction){
-        assigned_cannon->Release(this);
+    if(SleepAndCheckKilled(2) == SailorActionStatus::kKilledDuringAction)
         return SailorActionStatus::kKilledDuringAction;
-    }
     FulfillAssignedCannonRole();
     assigned_cannon->Release(this);
     SetState(SailorState::kStanding);
@@ -195,7 +191,7 @@ Vec2f Sailor::CalculateCannonTarget() const {
 SailorActionStatus Sailor::FulfillAssignedCannonRole() {
     auto cannon_owners = assigned_cannon->GetOwners();
     if(cannon_owners.first == this){
-        assigned_cannon->WaitUntilLoadedOrTimeout();
+        assigned_cannon->WaitUntilLoadedOrTimeout([this]() {return GetStopRequested();});
         if(GetStopRequested())
             return SailorActionStatus::kKilledDuringAction;
         if(assigned_cannon->Loaded())
@@ -253,6 +249,11 @@ void Sailor::ThreadFunc(const atomic<bool> &stop_requested) {
         if(GoRest() == SailorActionStatus::kKilledDuringAction)
             break;
     }
+
+    if(operated_mast != nullptr)
+        ReleaseMast();
+    if(assigned_cannon != nullptr)
+        assigned_cannon->Release(this);
     SetState(SailorState::kDead);
 }
 

@@ -13,7 +13,7 @@
 
 using namespace std;
 
-World::World(int width, int height, int seed) :
+World::World(int width, int height, unsigned int seed) :
         width(width),
         height(height),
         map(GenerateMap(width, height, seed)),

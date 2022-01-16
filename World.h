@@ -37,7 +37,7 @@ private:
     void ShipLiveAndRespawn(const std::shared_ptr<Ship>& ship);
 
 public:
-    World(int width, int height, int seed);
+    World(int width, int height, unsigned seed);
 
     std::vector<std::weak_ptr<Ship>> GetShips() const;
     void AddShip(const std::shared_ptr<Ship>& ship);

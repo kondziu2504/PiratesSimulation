@@ -4,6 +4,7 @@
 
 #include "Cannon.h"
 #include "Cannonball.h"
+#include "../Util/Util.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ void Cannon::Load() {
         lock_guard<mutex> guard(load_mutex);
         loaded = true;
     }
-    c_var_loaded.notify_one();
+    c_var_loaded_or_released.notify_one();
 }
 
 void Cannon::Shoot(Vec2f target) {
@@ -45,9 +46,17 @@ bool Cannon::Loaded() const {
     return loaded;
 }
 
-void Cannon::WaitUntilLoadedOrTimeout() const {
-    unique_lock<mutex> lock(load_mutex);
-    c_var_loaded.wait_for(lock, chrono::seconds(5), [&]{return loaded.load();});
+void Cannon::WaitUntilLoadedOrTimeout(const std::function<bool()>& StopCondition) const {
+    const float kTimeoutTime = 5;
+    const float kStepSeconds = 0.1f;
+    float time_left = kTimeoutTime;
+    while(time_left > 0) {
+        unique_lock<mutex> lock(load_mutex);
+        bool predicate_true = c_var_loaded_or_released.wait_for(lock, chrono::milliseconds((int)(kStepSeconds * 1000)) , [&]{return loaded.load();});
+        time_left -= kStepSeconds;
+        if(predicate_true || StopCondition())
+            return;
+    }
 }
 
 std::pair<Sailor *, Sailor *> Cannon::GetOwners() const {
