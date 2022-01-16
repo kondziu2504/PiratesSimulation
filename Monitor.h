@@ -56,6 +56,8 @@ class Monitor : public Stoppable{
 
     void DrawShipDeck(const std::shared_ptr<const Ship> & ship, Rect screen_rect);
     s_ptr<std::unordered_map<ShipObject *, Vec2i>>  GenerateElementsPositions(const std::shared_ptr<const Ship> & ship, const Rect &screen_rect) const;
+    void GenerateMastsPositions(const std::shared_ptr<const Ship> & ship, const Rect &screen_rect, s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) const;
+    void GenerateCannonsPositions(const std::shared_ptr<const Ship> & ship, const Rect &screen_rect, s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions) const;
     void DrawShipDeckFloor(const Rect &screen_rect) const;
     void DrawShipDeckCannons(const std::shared_ptr<const Ship> & ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions);
     void DrawShipDeckMasts(const std::shared_ptr<const Ship> & ship, Rect screen_rect, const s_ptr<std::unordered_map<ShipObject *, Vec2i>>& elements_positions);

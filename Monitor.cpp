@@ -235,6 +235,19 @@ void Monitor::DrawShipDeck(const std::shared_ptr<const Ship> & ship, Rect screen
 
 s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPositions(const std::shared_ptr<const Ship> & ship, const Rect &screen_rect) const {
     s_ptr<std::unordered_map<ShipObject *, Vec2i>> elements_positions = make_shared<unordered_map<ShipObject *, Vec2i>>();
+    GenerateMastsPositions(ship, screen_rect, elements_positions);
+    GenerateCannonsPositions(ship, screen_rect, elements_positions);
+
+    elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2f((float)screen_rect.size.x * 0.75f, (float)screen_rect.size.y / 2.f)));
+    elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2f((float)screen_rect.size.x  * 0.25f, (float)screen_rect.size.y / 2.f)));
+    elements_positions->insert(make_pair(ship->GetRestingPoint(), Vec2f((float)screen_rect.size.x  * 0.75f, (float)screen_rect.size.y * 0.25f)));
+
+    return elements_positions;
+}
+
+
+void Monitor::GenerateMastsPositions(const shared_ptr<const Ship> &ship, const Rect &screen_rect,
+                                     s_ptr<unordered_map<ShipObject *, Vec2i>> &elements_positions) const {
     auto masts = ship->GetMasts();
     int first_mast_y, last_mast_y;
     if (masts.size() == 1)
@@ -251,10 +264,14 @@ s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPosition
             mast_y += (last_mast_y - first_mast_y) / (int)(masts.size() - 1);
         }
     }
+}
 
-    auto GenerateCannonsPositions = [&screen_rect, elements_positions] (const vector<Cannon *>& cannons, bool right) {
-        float cannon_y = (float)screen_rect.size.y / 3.f;
-        float cannon_y_delta = (float)screen_rect.size.y / (float)(cannons.size() + 1);
+
+void Monitor::GenerateCannonsPositions(const shared_ptr<const Ship> &ship, const Rect &screen_rect,
+                                       s_ptr<unordered_map<ShipObject *, Vec2i>> &elements_positions) const {
+    auto GenerateSideCannonsPositions = [&screen_rect, elements_positions] (const vector<Cannon *>& cannons, bool right) {
+        float cannon_y_delta = ((float)screen_rect.size.y - 0.75f * (float)screen_rect.size.x) / (float)(cannons.size());
+        float cannon_y = (float)screen_rect.size.x / 2.f + cannon_y_delta / 2.f;
         for (const auto& cannon: cannons) {
             if(right)
                 elements_positions->insert(make_pair(cannon, Vec2f((float)screen_rect.size.x - 1, (float)cannon_y)));
@@ -265,14 +282,8 @@ s_ptr<std::unordered_map<ShipObject *, Vec2i>> Monitor::GenerateElementsPosition
         }
     };
 
-    GenerateCannonsPositions(ship->GetLeftCannons(), false);
-    GenerateCannonsPositions(ship->GetRightCannons(), true);
-
-    elements_positions->insert(make_pair(ship->GetRightJunction(), Vec2f((float)screen_rect.size.x * 0.75f, (float)screen_rect.size.y / 2.f)));
-    elements_positions->insert(make_pair(ship->GetLeftJunction(), Vec2f((float)screen_rect.size.x  * 0.25f, (float)screen_rect.size.y / 2.f)));
-    elements_positions->insert(make_pair(ship->GetRestingPoint(), Vec2f((float)screen_rect.size.x  * 0.75f, (float)screen_rect.size.y * 0.25f)));
-
-    return elements_positions;
+    GenerateSideCannonsPositions(ship->GetLeftCannons(), false);
+    GenerateSideCannonsPositions(ship->GetRightCannons(), true);
 }
 
 void Monitor::DrawShipDeckFloor(const Rect &screen_rect) const {
@@ -501,4 +512,6 @@ void Monitor::ThreadFunc(const atomic<bool> &stop_requested) {
 int Monitor::GetTileColorPair(Monitor::Tile tile) {
     return tiles_map_color_pairs.at(tile);
 }
+
+
 
