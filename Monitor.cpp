@@ -109,7 +109,7 @@ void Monitor::DrawMap(Vec2i screen_offset, Rect world_viewport) {
     for(int x = 0; x < world_viewport.size.x; x++){
         for(int y = 0; y < world_viewport.size.y; y++){
             Vec2i map_coords = world_viewport.pos + Vec2i(x, y);
-            Vec2i screen_coords = ToInverseY(screen_offset + Vec2i(x, y), world_viewport.size.y);
+            Vec2i screen_coords = ToInverseYGlobal(screen_offset + Vec2i(x, y), world_viewport.size.y);
 
             if(world->CoordsInsideWorld(map_coords)){
                 if(world->IsLandAt(map_coords))
@@ -160,7 +160,9 @@ void Monitor::DrawShip(const std::shared_ptr<const Ship> & ship, Vec2i screen_of
                         (float)i - width / 2).Rotated(ship_dir.Angle());
                 Vec2f tile_world_pos = Vec2f(ship_pos.x + tile_rotated_local_pos.x, ship_pos.y + tile_rotated_local_pos.y);
                 if(world_viewport.IsPointInside(tile_world_pos)){
-                    Vec2i screen_coords = ToInverseY(screen_offset + (Vec2i)(tile_world_pos - (Vec2f)world_viewport.pos), world_viewport.size.y);
+                    Vec2i screen_coords = ToInverseYGlobal(
+                            screen_offset + (Vec2i) (tile_world_pos - (Vec2f) world_viewport.pos),
+                            world_viewport.size.y);
                     Tile ship_tile = (ship->GetState() != ShipState::kSinking && ship->GetState() != ShipState::kDestroyed) ? Tile::kShip : Tile::kDestroyed;
                     DrawTile(screen_coords,pixel,ship_tile);
                 }
@@ -339,13 +341,13 @@ void Monitor::DrawCircleIndicator(Vec2i screen_coords, float arrow_angle, int di
         float angle = (float)i / (float)angles * 2.f * (float)M_PI;
         Vec2f pixel_local_pos = Vec2f((float)arrow_length - 1.f, 0.f).Rotated(angle);
         Vec2i pixel_local_pos_rounded = Vec2i((int)roundf(pixel_local_pos.x), (int)roundf(pixel_local_pos.y));
-        Vec2i pixel_screen_coords = circle_center + pixel_local_pos_rounded;
+        Vec2i pixel_screen_coords = circle_center + ToInverseY(pixel_local_pos_rounded);
         DrawTile(pixel_screen_coords, '#', Tile::kGray);
     }
     for(int i = 0; i < arrow_length; i++){
         Vec2f pixel_local_pos = Vec2f((float)i, 0).Rotated(arrow_angle);
         Vec2i pixel_local_pos_rounded = Vec2i((int)roundf(pixel_local_pos.x), (int)roundf(pixel_local_pos.y));
-        Vec2i pixel_screen_coords = circle_center + pixel_local_pos_rounded;
+        Vec2i pixel_screen_coords = circle_center + ToInverseY(pixel_local_pos_rounded);
         DrawTile(pixel_screen_coords, ' ', Tile::kIndicator);
     }
 }
@@ -363,7 +365,7 @@ void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr
 void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship) {
     float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
-    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) - (float) M_PI / 2,
+    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) + (float) M_PI / 2,
                         size, "Target sails direction", "(Local)");
 }
 
@@ -386,7 +388,8 @@ void Monitor::DrawCannonballs(Vec2i screen_offset, Rect world_viewport) {
             continue;
         Vec2f cannonball_pos = cannonball->GetPos();
         if(world_viewport.IsPointInside(cannonball_pos)) {
-            Vec2i screen_coords = ToInverseY(screen_offset - world_viewport.pos + (Vec2i)cannonball_pos, world_viewport.size.y);
+            Vec2i screen_coords = ToInverseYGlobal(screen_offset - world_viewport.pos + (Vec2i) cannonball_pos,
+                                                   world_viewport.size.y);
             DrawTile(screen_coords, 'O', Tile::kCannonball);
         }
     }
@@ -568,7 +571,7 @@ void Monitor::MoveCameraRight() {
     camera_pos.x += kCameraMoveDelta;
 }
 
-Vec2i Monitor::ToInverseY(Vec2i coords, int height) {
+Vec2i Monitor::ToInverseYGlobal(Vec2i coords, int height) {
     coords.y *= -1;
     coords.y += height - 1;
     return coords;
@@ -582,6 +585,10 @@ Vec2i Monitor::GetWindowSize() {
 
 MonitorDisplayMode Monitor::GetDisplayMode() {
     return display_mode;
+}
+
+Vec2i Monitor::ToInverseY(Vec2i coords) {
+    return {coords.x, -coords.y};
 }
 
 

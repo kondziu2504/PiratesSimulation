@@ -74,7 +74,8 @@ class Monitor : public Stoppable{
     void DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship);
     void DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship);
 
-    static Vec2i ToInverseY(Vec2i coords, int height);
+    static Vec2i ToInverseYGlobal(Vec2i coords, int height);
+    static Vec2i ToInverseY(Vec2i coords);
     static Vec2i GetWindowSize();
 
 public:
