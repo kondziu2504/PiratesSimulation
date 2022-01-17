@@ -71,8 +71,8 @@ void ShipController::StartTurningTowardsAngle(float target_angle) {
 
 float ShipController::DetermineAngleToFaceEnemy(const shared_ptr<Ship> & enemy) {
     Vec2f to_enemy = enemy->GetPosition() - parent->GetPosition();
-    Vec2f dir_with_cannons_on_left = to_enemy.Rotated(M_PI_2);
-    Vec2f dir_with_cannons_on_right = to_enemy.Rotated(-M_PI_2);
+    Vec2f dir_with_cannons_on_left = to_enemy.Rotated(-M_PI_2);
+    Vec2f dir_with_cannons_on_right = to_enemy.Rotated(M_PI_2);
     float target_angle;
     float to_cannons_left_required_rotation = abs(AngleDifference(parent->GetDirection().Angle(), dir_with_cannons_on_left.Angle()));
     float to_cannons_right_required_rotation = abs(AngleDifference(parent->GetDirection().Angle(), dir_with_cannons_on_right.Angle()));

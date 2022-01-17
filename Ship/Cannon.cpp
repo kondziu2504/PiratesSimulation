@@ -66,8 +66,13 @@ std::pair<Sailor *, Sailor *> Cannon::GetOwners() const {
 
 void Cannon::Release(Sailor *sailor) {
     lock_guard<mutex> guard(ownership_mutex);
-    if(owners.first == sailor)
+    if(owners.first == sailor){
         owners.first = nullptr;
+        if(owners.second != nullptr) {
+            owners.first = owners.second;
+            owners.second = nullptr;
+        }
+    }
     else if(owners.second == sailor)
         owners.second = nullptr;
 }

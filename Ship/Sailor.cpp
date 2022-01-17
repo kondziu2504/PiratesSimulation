@@ -184,7 +184,7 @@ Vec2f Sailor::CalculateCannonTarget() const {
     auto _cannon_target = cannon_target.lock();
     if(_cannon_target)
         distance = (_cannon_target->GetPosition() - parent->GetPosition()).Length();
-    Vec2f perpendicular_right = Vec2f::FromAngle(parent->GetDirection().Angle() + (float)M_PI_2).Normalized() * distance;
+    Vec2f perpendicular_right = Vec2f::FromAngle(parent->GetDirection().Angle() - (float)M_PI_2).Normalized() * distance;
     return parent->GetPosition() + perpendicular_right * (use_right_cannons ? 1.f : -1.f);
 }
 
