@@ -365,7 +365,7 @@ void Monitor::DrawShipDirIndicator(Vec2i offset, int size, const std::shared_ptr
 void Monitor::DrawSailTargetDirIndicator(Vec2i offset, int size, const std::shared_ptr<const Ship> & ship) {
     float wind_angle = world->GetWind()->GetVelocity().Angle();
     float ship_angle = ship->GetDirection().Angle();
-    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle) + (float) M_PI / 2,
+    DrawCircleIndicator(offset, AngleDifference(wind_angle, ship_angle - (float)M_PI_2),
                         size, "Target sails direction", "(Local)");
 }
 
@@ -474,10 +474,10 @@ void Monitor::DrawShipDeckMasts(const std::shared_ptr<const Ship> & ship, Rect s
     int mast_width = (int)((float)screen_rect.size.x * 0.9f) - 1;
     for(const auto& mast : masts){
         for(int i = 0; i < mast_width; i++){
-            Vec2i rotated_sail_pos = (Vec2i)Vec2f((float)i - (float)mast_width / 2.f, 0.f).Rotated(mast->GetAngle());
+            Vec2i rotated_sail_pos = (Vec2i)Vec2f(0.f, (float)mast_width / 2.f - (float)i).Rotated(mast->GetAngle());
             char ch = i < mast_width / 2 ? 'L' : 'R';
             Vec2i mast_pos = elements_positions->find(mast)->second;
-            Vec2i screen_coords = screen_rect.pos + mast_pos + rotated_sail_pos;
+            Vec2i screen_coords = screen_rect.pos + mast_pos + ToInverseY(rotated_sail_pos);
             DrawTile(screen_coords, ch, Tile::kSail);
         }
     }

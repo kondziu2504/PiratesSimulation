@@ -28,7 +28,7 @@ void Ship::ApplyWind(Vec2f wind) {
     float wind_power = wind.Length();
     float effective_power = 0;
     for(const auto mast : ship_body->GetMasts()){
-        Vec2f absolute_mast_dir = Vec2f::FromAngle(GetDirection().Angle() + mast->GetAngle());
+        Vec2f absolute_mast_dir = Vec2f::FromAngle(GetDirection().Angle() - (float)M_PI_2 + mast->GetAngle());
         float mast_effectiveness = absolute_mast_dir.Dot(wind.Normalized()) / 6;
         effective_power += wind_power * mast_effectiveness;
     }

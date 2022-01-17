@@ -11,13 +11,15 @@
 #include "ShipObject.h"
 #include "../Wind.h"
 #include "../WorldObject.h"
+#define _USE_MATH_DEFINES
+#include <cmath>
 
 class MastDistributor;
 class Ship;
 
 class Mast : public ShipObject{
     const int max_slots = 4;
-    float angle = 0.f;
+    float angle = M_PI_2;
 
     WorldObject * const parent;
     mutable std::mutex mast_mutex;
