@@ -27,6 +27,7 @@ class Monitor : public Stoppable{
     std::mutex current_ship_mutex;
     std::weak_ptr<Ship> current_ship;
 
+    std::mutex camera_pos_mutex;
     Vec2i camera_pos = {0, 0};
     const int kCameraMoveDelta = 10;
 

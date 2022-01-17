@@ -72,8 +72,10 @@ void Monitor::InitializeNcurses() {
 void Monitor::Update() {
     clear();
 
-    if(display_mode == MonitorDisplayMode::kMap)
+    if(display_mode == MonitorDisplayMode::kMap){
+        lock_guard<mutex> guard(camera_pos_mutex);
         DrawWorld({0, 0}, {camera_pos - Vec2i(0, GetWindowSize().y - world->GetHeight()) , {0, 0}});
+    }
     else
         DrawChosenShip();
 
@@ -547,18 +549,22 @@ int Monitor::GetTileColorPair(Monitor::Tile tile) {
 }
 
 void Monitor::MoveCameraUp() {
+    lock_guard<mutex> guard(camera_pos_mutex);
     camera_pos.y += kCameraMoveDelta;
 }
 
 void Monitor::MoveCameraDown() {
+    lock_guard<mutex> guard(camera_pos_mutex);
     camera_pos.y -= kCameraMoveDelta;
 }
 
 void Monitor::MoveCameraLeft() {
+    lock_guard<mutex> guard(camera_pos_mutex);
     camera_pos.x -= kCameraMoveDelta;
 }
 
 void Monitor::MoveCameraRight() {
+    lock_guard<mutex> guard(camera_pos_mutex);
     camera_pos.x += kCameraMoveDelta;
 }
 
